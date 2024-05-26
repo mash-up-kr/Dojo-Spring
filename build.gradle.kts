@@ -13,7 +13,6 @@ plugins {
     idea
 }
 
-
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
@@ -68,7 +67,6 @@ project(":api") {
 project(":service") {
     dependencies {
         api(project(":entity"))
-
     }
 }
 
