@@ -1,11 +1,10 @@
-package com.mashup.dojo.api
+package com.mashup.dojo
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-@ComponentScan("com.mashup.dojo")
 class DojoApplication
 
 fun main(args: Array<String>) {

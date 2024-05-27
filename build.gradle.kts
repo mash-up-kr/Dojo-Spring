@@ -13,7 +13,6 @@ plugins {
     idea
 }
 
-
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
