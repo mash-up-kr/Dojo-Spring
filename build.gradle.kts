@@ -75,7 +75,6 @@ project(":api") {
 project(":service") {
     dependencies {
         api(project(":entity"))
-
     }
 }
 
