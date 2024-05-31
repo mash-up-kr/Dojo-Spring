@@ -1,4 +1,4 @@
-package com.mashup.dojo.common.exception
+package com.mashup.dojo
 
 class DojoException(
     val errorCode: String,

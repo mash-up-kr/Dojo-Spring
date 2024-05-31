@@ -1,6 +1,6 @@
-package com.mashup.dojo.common
+package com.mashup.dojo.api
 
-import com.mashup.dojo.common.exception.DojoExceptionType
+import com.mashup.dojo.DojoExceptionType
 
 data class DojoApiResponse<T>(
     val success: Boolean = true,
@@ -32,7 +32,6 @@ data class DojoApiResponse<T>(
                 )
             )
         }
-
     }
 }
 
@@ -40,4 +39,3 @@ data class DojoApiErrorResponse(
     val code: String,
     val message: String?,
 )
-

@@ -75,12 +75,18 @@ project(":api") {
 project(":service") {
     dependencies {
         api(project(":entity"))
+        api(project(":common"))
     }
 }
 
 project(":entity") {
     dependencies {
         // 실제 DB 연결할 때 디펜던시 추가할 것
-        // implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    }
+}
+
+project(":common") {
+    dependencies {
     }
 }
