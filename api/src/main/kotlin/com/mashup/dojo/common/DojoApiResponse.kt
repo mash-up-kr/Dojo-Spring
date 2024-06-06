@@ -1,4 +1,4 @@
-package com.mashup.dojo.api
+package com.mashup.dojo.common
 
 import com.mashup.dojo.DojoExceptionType
 
