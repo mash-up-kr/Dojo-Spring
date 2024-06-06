@@ -10,15 +10,18 @@ class DojoException(
             return DojoException(
                 errorCode = type.errorCode,
                 httpStatusCode = type.httpStatusCode,
-                message = type.message,
+                message = type.message
             )
         }
 
-        fun of(type: DojoExceptionType, message: String): DojoException {
+        fun of(
+            type: DojoExceptionType,
+            message: String,
+        ): DojoException {
             return DojoException(
                 errorCode = type.errorCode,
                 httpStatusCode = type.httpStatusCode,
-                message = message,
+                message = message
             )
         }
     }

@@ -22,14 +22,14 @@ data class DojoApiResponse<T>(
             )
         }
 
-        fun fail(dojoExceptionType: DojoExceptionType, message: String?): DojoApiResponse<Unit> {
+        fun fail(
+            dojoExceptionType: DojoExceptionType,
+            message: String?,
+        ): DojoApiResponse<Unit> {
             return DojoApiResponse(
                 success = true,
                 data = null,
-                error = DojoApiErrorResponse(
-                    code = dojoExceptionType.errorCode,
-                    message = message ?: dojoExceptionType.message,
-                )
+                error = DojoApiErrorResponse(code = dojoExceptionType.errorCode, message = message ?: dojoExceptionType.message)
             )
         }
     }

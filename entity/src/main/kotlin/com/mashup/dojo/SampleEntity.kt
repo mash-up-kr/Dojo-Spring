@@ -1,4 +1,8 @@
 package com.mashup.dojo
 
-class SampleEntity {
-}
+import jakarta.persistence.Entity
+
+@Entity
+class SampleEntity(
+    val name: String,
+) : BaseEntity()

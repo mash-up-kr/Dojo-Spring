@@ -6,9 +6,10 @@ plugins {
 
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
+    kotlin("plugin.jpa") version "2.0.0"
 
     // lint
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 
     idea
 }
@@ -43,6 +44,8 @@ subprojects {
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        // logging
+        implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     }
 
     tasks.withType<KotlinCompile> {
@@ -80,8 +83,12 @@ project(":service") {
 }
 
 project(":entity") {
+    apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+
     dependencies {
-        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+        api("org.springframework.boot:spring-boot-starter-data-jpa")
+        api("com.mysql:mysql-connector-j:8.4.0")
+        runtimeOnly("com.h2database:h2") // todo : fade out
     }
 }
 

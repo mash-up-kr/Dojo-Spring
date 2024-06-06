@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class SampleUseCase(
-    private val sampleService: SampleService
+    private val sampleService: SampleService,
 ) {
     fun getSampleId(): Long {
-        return sampleService.getSampleId()
+        return sampleService.getSample().id
     }
 }
