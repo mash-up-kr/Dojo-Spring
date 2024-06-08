@@ -89,6 +89,9 @@ project(":entity") {
         api("org.springframework.boot:spring-boot-starter-data-jpa")
         api("com.mysql:mysql-connector-j:8.4.0")
         runtimeOnly("com.h2database:h2") // todo : fade out
+
+        // Jasypt
+        implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
     }
 }
 
