@@ -1,9 +1,9 @@
 spring:
   datasource: # todo mysql 
-    url: jdbc:h2:mem:local;MODE=MySQL;DATABASE_TO_LOWER=TRUE #mysql 모드 설정
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver # todo com.mysql.cj.jdbc.Driver
+    url: ENC(GPT8CR78IymrQCJ/ui4FKpW3y+eOb99E9Neh0AqVsGe4wR4+llYdbISGgFUaJB1RKBc99SK1pJ/Y2yE3MpOVH/30rdTmQ4qD+VNoC6B42wBzr2aiqlYE4x8hF8XvtdmT)
+    username: ENC(WS0DuwNzN19hZCDcpeK0ptXS6Gv3CowQNfwGQ4A3byU=)
+    password: ENC(ozxs8iZBHjljszbq6/y3cVt5Xt1Z8Nj6qh6gPobhs9A=)
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
       hibernate:
