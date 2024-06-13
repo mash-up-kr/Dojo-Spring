@@ -92,6 +92,17 @@ project(":entity") {
 
         // Jasypt
         implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
+
+        // Querydsl
+        val queryDslVersion = "6.0"
+        implementation("io.github.openfeign.querydsl:querydsl-core:$queryDslVersion")
+        implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
+        annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:$queryDslVersion:jpa")
+        annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+        annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+        // query 값 정렬
+        implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0")
     }
 }
 
