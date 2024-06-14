@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseEntity : BaseTimeEntity() {
-
     @CreatedBy
     @Column(updatable = false)
     var createdBy: String? = null

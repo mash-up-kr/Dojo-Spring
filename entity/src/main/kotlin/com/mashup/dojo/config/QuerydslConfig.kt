@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class QuerydslConfig {
-
     @PersistenceContext
     private lateinit var entityManager: EntityManager
 
