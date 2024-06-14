@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @EnableEncryptableProperties
 class DojoJasyptConfig {
-
     @Value("\${JASYPT_ENCRYPTOR_PASSWORD}")
     private lateinit var password: String
 
@@ -19,16 +18,17 @@ class DojoJasyptConfig {
     fun stringEncryptor(): StringEncryptor {
         val encryptor = PooledPBEStringEncryptor()
         val configPassword = password
-        val config = SimpleStringPBEConfig().apply {
-            this.password = configPassword
-            this.algorithm = "PBEWithMD5AndDES"
-            this.keyObtentionIterations = 1000
-            this.poolSize = 1
-            this.providerName = "SunJCE"
-            this.saltGenerator = org.jasypt.salt.RandomSaltGenerator()
-            this.ivGenerator = org.jasypt.iv.NoIvGenerator()
-            this.stringOutputType = "base64"
-        }
+        val config =
+            SimpleStringPBEConfig().apply {
+                this.password = configPassword
+                this.algorithm = "PBEWithMD5AndDES"
+                this.keyObtentionIterations = 1000
+                this.poolSize = 1
+                this.providerName = "SunJCE"
+                this.saltGenerator = org.jasypt.salt.RandomSaltGenerator()
+                this.ivGenerator = org.jasypt.iv.NoIvGenerator()
+                this.stringOutputType = "base64"
+            }
         encryptor.setConfig(config)
         return encryptor
     }
