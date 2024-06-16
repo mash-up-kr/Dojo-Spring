@@ -19,7 +19,7 @@ class ControllerExceptionAdvice {
     }
 
     @ExceptionHandler(DojoException::class)
-    fun handleMoitException(ex: DojoException): ResponseEntity<DojoApiResponse<Any>> {
+    fun handleDojoException(ex: DojoException): ResponseEntity<DojoApiResponse<Any>> {
         log.error { "Dojo Exception Handler $ex" }
         return errorResponse(ex.httpStatusCode, ex.toApiErrorResponse())
     }

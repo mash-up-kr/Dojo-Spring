@@ -1,4 +1,4 @@
-package com.mashup.dojo
+package com.mashup.dojo.base
 
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners
@@ -13,20 +13,19 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntity {
+abstract class BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     val id: Long = 0L
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: LocalDateTime
+        private set
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     lateinit var updatedAt: LocalDateTime
-
-    @Column(name = "is_deleted", nullable = false)
-    var isDeleted: Boolean = false
+        private set
 }

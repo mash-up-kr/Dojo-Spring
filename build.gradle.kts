@@ -14,8 +14,10 @@ plugins {
     idea
 }
 
+val properties = project.properties
+
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.toVersion(properties["javaVersion"] as String)
 }
 
 allprojects {
@@ -45,13 +47,13 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         // logging
-        implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+        implementation("io.github.oshai:kotlin-logging-jvm:${properties["kotlinLoggingJvmVersion"]}")
     }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs += "-Xjsr305=strict"
-            jvmTarget = "21"
+            jvmTarget = properties["javaVersion"] as String
         }
     }
 
@@ -87,11 +89,21 @@ project(":entity") {
 
     dependencies {
         api("org.springframework.boot:spring-boot-starter-data-jpa")
-        api("com.mysql:mysql-connector-j:8.4.0")
-        runtimeOnly("com.h2database:h2") // todo : fade out
+        api("com.mysql:mysql-connector-j:${properties["mysqlConnectorVersion"]}")
+        runtimeOnly("com.h2database:h2:${properties["h2DatabaseVersion"]}") // todo : fade out
 
         // Jasypt
-        implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
+        implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${properties["jasyptSpringBootStarterVersion"]}")
+
+        // Querydsl
+        implementation("io.github.openfeign.querydsl:querydsl-core:${properties["queryDslVersion"]}")
+        implementation("io.github.openfeign.querydsl:querydsl-jpa:${properties["queryDslVersion"]}")
+        annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:${properties["queryDslVersion"]}:jpa")
+        annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+        annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+        // query 값 정렬
+        implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:${properties["p6spyVersion"]}")
     }
 }
 
