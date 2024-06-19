@@ -7,7 +7,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "notification")
-open class Notification protected constructor(
+class Notification(
     @Column(name = "title", nullable = false)
     val title: String,
     @Column(name = "content", nullable = false)

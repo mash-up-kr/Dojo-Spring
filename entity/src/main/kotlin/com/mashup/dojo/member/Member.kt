@@ -14,7 +14,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "member")
-open class Member protected constructor(
+class Member(
     @Column(name = "name", nullable = false)
     val name: String,
     @Enumerated(EnumType.STRING)
@@ -35,7 +35,7 @@ open class Member protected constructor(
 ) : BaseTimeEntity() {
     @Column(name = "point", nullable = false)
     var point: Int = point
-        private set
+        protected set
 
     fun updatePoint(newPoint: Int) {
         this.point = newPoint
