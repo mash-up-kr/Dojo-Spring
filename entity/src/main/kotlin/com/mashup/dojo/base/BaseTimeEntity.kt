@@ -22,10 +22,10 @@ abstract class BaseTimeEntity {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: LocalDateTime
-        private set
+        protected set
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     lateinit var updatedAt: LocalDateTime
-        private set
+        protected set
 }
