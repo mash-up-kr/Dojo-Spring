@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ENC(i+u914ZiotX9OZ2gFuRg+4+CpIK142QN/KuzoMmvPz8wHrvSO9ow1F8hwlD9WY1O29WITufUjEL2zAKZJv0wTNk8+19/cJgYj4F7b0H4bjVlNVuslh7FMMIJ/zgZst5o)
+    username: ENC(WS0DuwNzN19hZCDcpeK0ptXS6Gv3CowQNfwGQ4A3byU=)
+    password: ENC(ozxs8iZBHjljszbq6/y3cVt5Xt1Z8Nj6qh6gPobhs9A=)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_batch_fetch_size: 200
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
