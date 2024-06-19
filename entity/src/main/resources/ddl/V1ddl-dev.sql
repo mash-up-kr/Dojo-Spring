@@ -53,6 +53,6 @@ CREATE TABLE dojo_dev.member
     updated_at DATETIME(6) NOT NULL,
     name       VARCHAR(255) NOT NULL,
     gender     ENUM('FEMALE','MALE') NOT NULL,
-    part       ENUM('ANDROID','IOS','PRODUCT_DESIGN','SPRING','WEB') NOT NULL,
+    platform   ENUM('ANDROID','IOS','PRODUCT_DESIGN','SPRING','WEB') NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB;

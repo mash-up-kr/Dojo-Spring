@@ -1,6 +1,6 @@
 package com.mashup.dojo.member
 
-enum class Part {
+enum class Platform {
     PRODUCT_DESIGN,
     WEB,
     IOS,
