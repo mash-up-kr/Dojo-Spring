@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "pick")
-open class Pick protected constructor(
+class Pick(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     val question: Question,

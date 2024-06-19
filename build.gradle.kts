@@ -89,8 +89,8 @@ project(":entity") {
 
     dependencies {
         api("org.springframework.boot:spring-boot-starter-data-jpa")
-        api("com.mysql:mysql-connector-j:${properties["mysqlConnectorVersion"]}")
-        runtimeOnly("com.h2database:h2:${properties["h2DatabaseVersion"]}") // todo : fade out
+        runtimeOnly("com.mysql:mysql-connector-j:${properties["mysqlConnectorVersion"]}")
+        // runtimeOnly("com.h2database:h2:${properties["h2DatabaseVersion"]}") // todo : fade out
 
         // Jasypt
         implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${properties["jasyptSpringBootStarterVersion"]}")
@@ -104,6 +104,16 @@ project(":entity") {
 
         // query 값 정렬
         implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:${properties["p6spyVersion"]}")
+    }
+
+    allOpen {
+        annotation("jakarta.persistence.Entity")
+        annotation("jakarta.persistence.Embeddable")
+        annotation("jakarta.persistence.MappedSuperclass")
+    }
+
+    noArg {
+        annotation("jakarta.persistence.Entity")
     }
 }
 

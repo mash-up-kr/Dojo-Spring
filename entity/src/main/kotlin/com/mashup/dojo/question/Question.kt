@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "question")
-open class Question protected constructor(
+class Question(
     @Column(name = "content", nullable = false)
     var content: String,
     @Enumerated(EnumType.STRING)

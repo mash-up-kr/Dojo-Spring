@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "profile")
-open class Profile protected constructor(
+class Profile(
     imageUrl: String,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -19,7 +19,7 @@ open class Profile protected constructor(
 ) : BaseEntity() {
     @Column(name = "image_url", nullable = false)
     var imageUrl: String = imageUrl
-        private set
+        protected set
 
     fun updateImageUrl(newImageUrl: String) {
         this.imageUrl = newImageUrl
