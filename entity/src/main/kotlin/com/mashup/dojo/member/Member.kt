@@ -18,8 +18,8 @@ class Member(
     @Column(name = "name", nullable = false)
     val name: String,
     @Enumerated(EnumType.STRING)
-    @Column(name = "part", nullable = false)
-    val part: Part,
+    @Column(name = "platform", nullable = false)
+    val platform: Platform,
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
     val gender: Gender,
@@ -44,11 +44,11 @@ class Member(
     companion object {
         fun createMember(
             name: String,
-            part: Part,
+            platform: Platform,
             gender: Gender,
             generation: Int,
         ): Member {
-            return Member(name, part, gender, 200, generation)
+            return Member(name, platform, gender, 200, generation)
         }
     }
 }
