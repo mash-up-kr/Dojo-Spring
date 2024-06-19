@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "profile")
-class Profile(
+open class Profile protected constructor(
     imageUrl: String,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
