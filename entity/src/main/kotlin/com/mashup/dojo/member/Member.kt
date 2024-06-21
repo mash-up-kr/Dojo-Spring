@@ -12,6 +12,8 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
+private const val DEFAULT_POINT = 200
+
 @Entity
 @Table(name = "member")
 class Member(
@@ -23,7 +25,7 @@ class Member(
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
     val gender: Gender,
-    point: Int = 200,
+    point: Int = DEFAULT_POINT,
     @Column(name = "generation", nullable = false)
     val generation: Int,
     @OneToOne(mappedBy = "member")
@@ -48,7 +50,7 @@ class Member(
             gender: Gender,
             generation: Int,
         ): Member {
-            return Member(name, platform, gender, 200, generation)
+            return Member(name, platform, gender, DEFAULT_POINT, generation)
         }
     }
 }
