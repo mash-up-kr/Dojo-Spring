@@ -8,12 +8,18 @@ value class PickId(val value: Long)
 data class Pick(
     val id: PickId,
     val questionId: QuestionId,
-    val pickerId: MemberId, // 고른 멤버
-    val pickedId: MemberId, // 골라진 멤버
-    val isGenderOpen: Boolean, // 성별 공개 여부
-    val isPlatformOpen: Boolean, // 플랫폼 공개 여부
-    val isMidInitialNameOpen: Boolean, // 이름 중간 글자 공개 여부
-    val isFullNameOpen: Boolean, // 이름 전체 공개 여부
+    // 고른 멤버
+    val pickerId: MemberId,
+    // 골라진 멤버
+    val pickedId: MemberId,
+    // 성별 공개 여부
+    val isGenderOpen: Boolean,
+    // 플랫폼 공개 여부
+    val isPlatformOpen: Boolean,
+    // 이름 중간 글자 공개 여부
+    val isMidInitialNameOpen: Boolean,
+    // 이름 전체 공개 여부
+    val isFullNameOpen: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )

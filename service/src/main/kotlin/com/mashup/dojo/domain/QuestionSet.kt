@@ -8,5 +8,6 @@ value class QuestionSetId(val value: Long)
 data class QuestionSet(
     val id: QuestionSetId,
     val questionIds: List<QuestionId>,
-    val publishedAt: LocalDateTime, // 질문 발행일
+    // 질문 발행일
+    val publishedAt: LocalDateTime,
 )
