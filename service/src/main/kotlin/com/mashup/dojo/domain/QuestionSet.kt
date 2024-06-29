@@ -10,6 +10,11 @@ data class QuestionOrder(
     val order: Int,
 )
 
+data class QuestionOrder(
+    val questionId: QuestionId,
+    val order: Int,
+)
+
 data class QuestionSet(
     val id: QuestionSetId,
     val questionIds: List<QuestionOrder>,
