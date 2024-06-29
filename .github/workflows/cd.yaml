@@ -17,15 +17,15 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: 빌드 캐싱
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      # - name: 빌드 캐싱
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.gradle/caches
+      #       ~/.gradle/wrapper
+      #     key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gradle-
 
       - name: 현재 시간 가져오기
         uses: 1466587594/get-current-time@v2
