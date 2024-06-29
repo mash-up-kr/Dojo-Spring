@@ -1,6 +1,7 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
+import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.dto.QuestionCreateRequest
 import com.mashup.dojo.usecase.QuestionUseCase
 import io.swagger.v3.oas.annotations.Operation
@@ -22,15 +23,13 @@ class QuestionController(
     @PostMapping
     fun createQuestion(
         @Valid @RequestBody request: QuestionCreateRequest,
-    ): DojoApiResponse<Unit> {
-        questionUseCase.create(
+    ): DojoApiResponse<QuestionId> {
+        return questionUseCase.create(
             QuestionUseCase.CreateCommand(
                 content = request.content,
                 type = request.type,
-                imageUrl = request.imageUrl
+                emojiImageId = request.emojiImageId
             )
-        )
-
-        return DojoApiResponse.success()
+        ).let { DojoApiResponse.success(it.id) }
     }
 }
