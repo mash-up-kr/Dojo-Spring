@@ -1,16 +1,37 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.ImageEntity
+import com.mashup.dojo.ImageRepository
 import com.mashup.dojo.domain.Image
 import com.mashup.dojo.domain.ImageId
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 interface ImageService {
     fun load(imageId: ImageId): Image
+
+    fun save(
+        uuid: String,
+        imageUrl: String,
+    ): ImageId
 }
 
+@Transactional(readOnly = true)
 @Service
-class MockImageService() : ImageService {
+class DefaultImageService(
+    private val imageRepository: ImageRepository,
+) : ImageService {
+    @Transactional
+    override fun save(
+        uuid: String,
+        imageUrl: String,
+    ): ImageId {
+        val entity = ImageEntity(uuid = uuid, url = imageUrl)
+        val saved = imageRepository.save(entity)
+        return ImageId(saved.id)
+    }
+
     override fun load(imageId: ImageId): Image {
-        return Image.MOCK_USER_IMAGE
+        TODO("Not yet implemented")
     }
 }
