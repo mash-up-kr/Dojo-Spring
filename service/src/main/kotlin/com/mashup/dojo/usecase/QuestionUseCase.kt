@@ -44,7 +44,7 @@ class DefaultQuestionUseCase(
 
     override fun createQuestionSet(): QuestionSet {
         // 직전에 발행된 QuestionSet 확인 및 후보에서 제외 (redis 조회 필요)
-        val previousQuestionSet = questionService.getPreviousQuestionSet()
+        val previousQuestionSet = questionService.getCurrentQuestionSet()
         return questionService.createQuestionSet(previousQuestionSet)
     }
 }
