@@ -13,13 +13,13 @@ class SampleService(
     private val sampleRepository: SampleRepository,
 ) {
     fun getSample(): Sample {
-        val sampleEntity = sampleRepository.findByIdOrNull(0L) ?: throw DojoException.of(DojoExceptionType.NOT_EXIST)
+        val sampleEntity = sampleRepository.findByIdOrNull("123456") ?: throw DojoException.of(DojoExceptionType.NOT_EXIST)
         return sampleEntity.buildDomain()
     }
 
     private fun SampleEntity.buildDomain(): Sample {
         return Sample(
-            id = id,
+            id = "sample Id",
             name = name,
             createdAt = createdAt,
             updatedAt = updatedAt,

@@ -7,7 +7,7 @@ import java.time.LocalDateTime
  * (Mashup)Member
  */
 @JvmInline
-value class MemberId(val value: Long)
+value class MemberId(val value: String)
 
 data class Member(
     val id: MemberId,
