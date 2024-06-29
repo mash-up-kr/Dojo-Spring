@@ -17,9 +17,9 @@ class SheetController(
     // 질문지 목록 12개를 반환하는 API
     @GetMapping
     fun getQuestionSheet(): DojoApiResponse<SheetResponse> {
-        val generateSheets = sheetUseCase.generateSheet()
+        val createSheets = sheetUseCase.createSheet()
         val response =
-            generateSheets.map { questionSheet ->
+            createSheets.map { questionSheet ->
                 SheetSingleResponse.create(
                     questionSheetId = questionSheet.questionSheetId,
                     currentQuestionIndex = questionSheet.currentQuestionIndex,
