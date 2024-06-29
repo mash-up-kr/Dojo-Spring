@@ -30,10 +30,11 @@ enum class QuestionCategory {
 }
 
 @JvmInline
-value class QuestionSheetId(val value: Long)
+value class QuestionSheetId(val value: String)
 
 data class QuestionSheet(
     val questionSheetId: QuestionSheetId,
+    // 문제지 조회를 위해 필요 !
     val questionSetId: QuestionSetId,
     val questionId: QuestionId,
     val resolverId: MemberId,
@@ -43,5 +44,6 @@ data class QuestionSheet(
 
 data class Candidate(
     val memberId: MemberId,
+    val memberName: String,
     val order: Int,
 )
