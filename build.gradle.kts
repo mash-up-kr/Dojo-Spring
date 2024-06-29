@@ -62,12 +62,12 @@ subprojects {
     }
 
     tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-        mainClass.set("com.mashup.dojo.DojoApplication") // 메인 클래스를 설정합니다
+        mainClass.set("com.mashup.dojo.DojoApplicationKt") // 메인 클래스를 설정합니다
     }
 }
 
 springBoot {
-    mainClass.set("com.mashup.dojo.DojoApplication")
+    mainClass.set("com.mashup.dojo.DojoApplicationKt")
 }
 
 project(":api") {
