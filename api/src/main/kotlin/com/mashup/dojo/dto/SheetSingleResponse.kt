@@ -7,7 +7,7 @@ data class SheetResponse(
 )
 
 data class SheetSingleResponse(
-    val questionSheetId: Long,
+    val questionSheetId: String,
     val currentQuestionIndex: Long,
     val totalIndex: Long,
     val question: Question,
@@ -17,7 +17,7 @@ data class SheetSingleResponse(
         private const val DEFAULT_TOTAL_INDEX: Long = 12L
 
         fun create(
-            questionSheetId: Long,
+            questionSheetId: String,
             currentQuestionIndex: Long,
             question: Question,
             candidates: List<Candidate>
@@ -34,7 +34,7 @@ data class SheetSingleResponse(
 }
 
 data class Question(
-    val id: Long,
+    val id: String,
     val content: String,
     val imageUrl: String
 )

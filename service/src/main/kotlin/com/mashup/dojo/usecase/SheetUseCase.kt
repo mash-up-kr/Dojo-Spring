@@ -6,6 +6,7 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.domain.QuestionOrder
 import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheet
@@ -20,9 +21,9 @@ interface SheetUseCase {
     fun generateSheet(): List<UseCaseQuestionSheet>
 
     data class UseCaseQuestionSheet(
-        val questionSheetId: Long,
+        val questionSheetId: String,
         val currentQuestionIndex: Long,
-        val questionId: Long,
+        val questionId: String,
         val questionContent: String,
         val imageUrl: String,
         val candidates: List<Candidate>,
@@ -35,10 +36,10 @@ class DefaultSheetUseCase(
 ) : SheetUseCase {
     override fun generateSheet(): List<UseCaseQuestionSheet> {
         // 스케줄러에서 생성된 질문 set 갖고옴. Mock
-        val mockEmojiImage = Image.MOCK_USER_IMAGE
+        val mockEmojiImage = Image.MOCK_IMAGE
         val question =
             Question(
-                QuestionId(0L),
+                QuestionId("1"),
                 "여기서 술을 제일 잘 먹을 것 같은 사람은?",
                 QuestionType.FRIEND,
                 QuestionCategory.FUN,
@@ -51,15 +52,18 @@ class DefaultSheetUseCase(
             questionIds.add(question.id)
         }
 
-        // Mock
-        val questionSet = QuestionSet(QuestionSetId(1L), questionIds, LocalDateTime.now())
+        val questionOrder1 = QuestionOrder(QuestionId("100"), 2)
+        val questionOrder2 = QuestionOrder(QuestionId("200"), 3)
 
-        val currentMemberId = MemberId(1L)
+        // Mock
+        val questionSet = QuestionSet(QuestionSetId("1"), listOf(questionOrder1, questionOrder2), LocalDateTime.now())
+
+        val currentMemberId = MemberId("1")
 
         // 후보자 4명 찾는 로직, 현재 Mock, 추후에 아래의 것을 스케줄러에서 생성한 것으로 대치
         val candidates = memberService.getCandidates(currentMemberId)
 
-        val questionSheetId = QuestionSheetId(1L)
+        val questionSheetId = QuestionSheetId("1")
         val questionSheet =
             QuestionSheet(
                 questionSheetId,
@@ -74,7 +78,7 @@ class DefaultSheetUseCase(
 
         val questionSheets = mutableListOf<UseCaseQuestionSheet>()
         repeat(12) {
-            questionSheets.add(UseCaseQuestionSheet(questionSheetId.value, question.id.value, currentQuestionIndex, question.content, mockEmojiImage.url, candidates))
+            questionSheets.add(UseCaseQuestionSheet(questionSheetId.value, currentQuestionIndex, question.id.value, question.content, mockEmojiImage.url, candidates))
         }
 
         return questionSheets

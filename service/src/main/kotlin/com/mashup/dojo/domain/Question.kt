@@ -30,7 +30,7 @@ enum class QuestionCategory {
 }
 
 @JvmInline
-value class QuestionSheetId(val value: Long)
+value class QuestionSheetId(val value: String)
 
 data class QuestionSheet(
     val questionSheetId: QuestionSheetId,
