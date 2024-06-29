@@ -23,7 +23,6 @@ class SheetController(
                 SheetSingleResponse.create(
                     questionSheetId = questionSheet.questionSheetId,
                     currentQuestionIndex = questionSheet.currentQuestionIndex,
-
                     Question(
                         id = questionSheet.questionId,
                         content = questionSheet.questionContent,
