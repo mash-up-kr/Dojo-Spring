@@ -3,7 +3,7 @@ package com.mashup.dojo.domain
 import java.time.LocalDateTime
 
 @JvmInline
-value class QuestionSetId(val value: Long)
+value class QuestionSetId(val value: String)
 
 data class QuestionOrder(
     val questionId: QuestionId,
