@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 interface SheetUseCase {
-    fun generateSheet(): List<UseCaseQuestionSheet>
+    fun createSheet(): List<UseCaseQuestionSheet>
 
     data class UseCaseQuestionSheet(
         val questionSheetId: String,
@@ -34,7 +34,7 @@ interface SheetUseCase {
 class DefaultSheetUseCase(
     private val memberService: MemberService,
 ) : SheetUseCase {
-    override fun generateSheet(): List<UseCaseQuestionSheet> {
+    override fun createSheet(): List<UseCaseQuestionSheet> {
         // 스케줄러에서 생성된 질문 set 갖고옴. Mock
         val mockEmojiImage = Image.MOCK_IMAGE
         val question =
