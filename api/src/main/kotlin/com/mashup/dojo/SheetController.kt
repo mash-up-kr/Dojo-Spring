@@ -20,7 +20,7 @@ class SheetController(
         val generateSheets = sheetUseCase.generateSheet()
         val response =
             generateSheets.map { questionSheet ->
-                SheetSingleResponse(
+                SheetSingleResponse.create(
                     questionSheetId = questionSheet.questionSheetId,
                     currentQuestionIndex = questionSheet.currentQuestionIndex,
 
