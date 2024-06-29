@@ -20,7 +20,6 @@ data class Member(
     val point: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-    val deletedAt: LocalDateTime?,
 ) {
     fun changeProfileImage(profileImageUrl: String): Member {
         return this.copy(profileImageUrl = profileImageUrl, updatedAt = LocalDateTime.now())
