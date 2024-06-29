@@ -8,7 +8,7 @@ data class Image(
     val url: String,
 ) {
     companion object {
-        val MOCK_USER_IMAGE =
+        val MOCK_IMAGE =
             Image(
                 id = ImageId("12345678"),
                 url = "https://example.com/image/1"

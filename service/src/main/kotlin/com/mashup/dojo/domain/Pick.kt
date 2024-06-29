@@ -3,7 +3,7 @@ package com.mashup.dojo.domain
 import java.time.LocalDateTime
 
 @JvmInline
-value class PickId(val value: Long)
+value class PickId(val value: String)
 
 data class Pick(
     val id: PickId,
