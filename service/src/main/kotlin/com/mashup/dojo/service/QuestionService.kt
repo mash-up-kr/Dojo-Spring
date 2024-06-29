@@ -4,6 +4,7 @@ import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.domain.QuestionOrder
 import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionType
@@ -76,18 +77,18 @@ class DefaultQuestionService : QuestionService {
             QuestionSet(
                 id = QuestionSetId(1),
                 questionIds = listOf(
-                    QuestionId(1),
-                    QuestionId(2),
-                    QuestionId(3),
-                    QuestionId(4),
-                    QuestionId(5),
-                    QuestionId(6),
-                    QuestionId(7),
-                    QuestionId(8),
-                    QuestionId(9),
-                    QuestionId(10),
-                    QuestionId(11),
-                    QuestionId(12)
+                    QuestionOrder(QuestionId(1), 1),
+                    QuestionOrder(QuestionId(2), 2),
+                    QuestionOrder(QuestionId(3), 3),
+                    QuestionOrder(QuestionId(4), 4),
+                    QuestionOrder(QuestionId(5), 5),
+                    QuestionOrder(QuestionId(6), 6),
+                    QuestionOrder(QuestionId(7), 7),
+                    QuestionOrder(QuestionId(8), 8),
+                    QuestionOrder(QuestionId(9), 9),
+                    QuestionOrder(QuestionId(10), 10),
+                    QuestionOrder(QuestionId(11), 11),
+                    QuestionOrder(QuestionId(12), 12)
                 ),
                 publishedAt = LocalDateTime.now(),
             )
