@@ -9,8 +9,12 @@ data class SheetResponse(
 data class SheetSingleResponse(
     val questionSheetId: Long,
     val currentQuestionIndex: Long,
-    val questionId: Long,
-    val questionContent: String,
-    val imageUrl: String,
+    val question: Question,
     val candidates: List<Candidate>,
+)
+
+data class Question(
+    val id: Long,
+    val content: String,
+    val imageUrl: String
 )
