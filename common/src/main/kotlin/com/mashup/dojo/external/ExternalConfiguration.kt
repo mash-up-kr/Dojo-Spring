@@ -14,9 +14,7 @@ import org.springframework.core.env.Environment
 @Configuration
 class ExternalConfiguration {
     @Bean
-    fun s3Client(
-        environment: Environment
-    ): AmazonS3Client {
+    fun s3Client(environment: Environment): AmazonS3Client {
         val accessKey = environment.getProperty("aws.access-key")
         val secretKey = environment.getProperty("aws.secret-key")
         val credential = BasicAWSCredentials(accessKey, secretKey)
