@@ -20,7 +20,7 @@ data class SheetSingleResponse(
             questionSheetId: String,
             currentQuestionIndex: Long,
             question: Question,
-            candidates: List<Candidate>
+            candidates: List<Candidate>,
         ): SheetSingleResponse {
             return SheetSingleResponse(
                 questionSheetId = questionSheetId,
@@ -36,5 +36,5 @@ data class SheetSingleResponse(
 data class Question(
     val id: String,
     val content: String,
-    val imageUrl: String
+    val imageUrl: String,
 )
