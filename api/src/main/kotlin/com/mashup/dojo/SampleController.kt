@@ -29,8 +29,8 @@ class SampleController(
         ]
     )
     fun test(
-        @PathVariable id: Long,
-    ): DojoApiResponse<Long> {
+        @PathVariable id: String,
+    ): DojoApiResponse<String> {
         return DojoApiResponse.success(sampleUseCase.getSampleId())
     }
 }
