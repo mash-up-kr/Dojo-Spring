@@ -1,6 +1,7 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
+import com.mashup.dojo.dto.Question
 import com.mashup.dojo.dto.SheetResponse
 import com.mashup.dojo.dto.SheetSingleResponse
 import com.mashup.dojo.usecase.SheetUseCase
@@ -22,9 +23,12 @@ class SheetController(
                 SheetSingleResponse(
                     questionSheetId = questionSheet.questionSheetId,
                     currentQuestionIndex = questionSheet.currentQuestionIndex,
-                    questionId = questionSheet.questionId,
-                    questionContent = questionSheet.questionContent,
-                    imageUrl = questionSheet.imageUrl,
+
+                    Question(
+                        id = questionSheet.questionId,
+                        content = questionSheet.questionContent,
+                        imageUrl = questionSheet.imageUrl
+                    ),
                     candidates = questionSheet.candidates
                 )
             }
