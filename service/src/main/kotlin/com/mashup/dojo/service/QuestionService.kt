@@ -21,7 +21,7 @@ interface QuestionService {
         emojiImageId: ImageId,
     ): Question
 
-    fun getPreviousQuestionSet(): QuestionSet?
+    fun getCurrentQuestionSet(): QuestionSet?
 
     fun createQuestionSet(previousQuestionSet: QuestionSet?): QuestionSet
 }
@@ -44,9 +44,9 @@ class DefaultQuestionService : QuestionService {
         return SAMPLE_QUESTION
     }
 
-    override fun getPreviousQuestionSet(): QuestionSet? {
+    override fun getCurrentQuestionSet(): QuestionSet? {
         // todo : bring out questionSet in redis
-        return null
+        return SAMPLE_QUESTION_SET
     }
 
     override fun createQuestionSet(previousQuestionSet: QuestionSet?): QuestionSet {
