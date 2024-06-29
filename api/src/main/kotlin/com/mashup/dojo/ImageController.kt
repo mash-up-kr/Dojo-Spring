@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
+private val logger = KotlinLogging.logger { }
+
 @Tag(name = "Image", description = "이미지 API")
 @RestController
 class ImageController(
@@ -43,8 +45,4 @@ class ImageController(
         val uuid: String,
         val uploadUrl: String,
     )
-
-    companion object {
-        private val logger = KotlinLogging.logger { }
-    }
 }
