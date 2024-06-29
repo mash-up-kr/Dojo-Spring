@@ -1,0 +1,2 @@
+### 이미지 업로드 url 조회하기
+GET {{host}}/image-upload-url?contentType=PNG
