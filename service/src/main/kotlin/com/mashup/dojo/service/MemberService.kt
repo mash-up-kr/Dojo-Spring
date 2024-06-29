@@ -12,12 +12,12 @@ import java.time.LocalDateTime
 
 interface MemberService {
     fun findFriendsIds(currentMemberId: MemberId): List<Candidate>
+
     fun findMemberById(memberId: MemberId): Member
 }
 
 @Service
 class MemberServiceImpl : MemberService {
-
     private fun initMemberRelation(to: Long): MemberRelation {
         // 후보자 생성
         // 여기에 필요한 로직을 추가하세요.
@@ -38,10 +38,10 @@ class MemberServiceImpl : MemberService {
         val targetMemberId3 = memberRelation3.to
         val targetMemberId4 = memberRelation4.to
 
-        val candidate1 = Candidate(targetMemberId1, 1)
-        val candidate2 = Candidate(targetMemberId2, 2)
-        val candidate3 = Candidate(targetMemberId3, 3)
-        val candidate4 = Candidate(targetMemberId4, 4)
+        val candidate1 = Candidate(targetMemberId1, "한씨", 1)
+        val candidate2 = Candidate(targetMemberId2, "오씨", 2)
+        val candidate3 = Candidate(targetMemberId3, "박씨", 3)
+        val candidate4 = Candidate(targetMemberId4, "김", 4)
 
         return listOf(candidate1, candidate2, candidate3, candidate4)
     }
@@ -51,8 +51,9 @@ class MemberServiceImpl : MemberService {
         return initMember(memberId)
     }
 
-    private fun initMember(memberId: MemberId) = Member(
-        memberId, "임준형", "ㅈ", "profile_image_url",
-        MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now()
-    )
+    private fun initMember(memberId: MemberId) =
+        Member(
+            memberId, "임준형", "ㅈ", "profile_image_url",
+            MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now()
+        )
 }

@@ -16,8 +16,9 @@ class PickService {
 
         val questionSetId = QuestionSetId(1L)
         return QuestionSet(
-            questionSetId, questionSetIds, LocalDateTime.now()
+            questionSetId,
+            questionSetIds,
+            LocalDateTime.now()
         )
     }
 }
-

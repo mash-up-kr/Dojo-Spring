@@ -16,7 +16,7 @@ interface SheetUseCase {
         val questionSetId: Long,
         val questionId: Long,
         val imageUrl: String,
-        val members: List<Candidate>
+        val members: List<Candidate>,
     )
 
     fun getCurrentQuestion(): QuestionSheet
@@ -26,10 +26,9 @@ interface SheetUseCase {
 class DefaultSheetUseCase(
     private val pickService: PickService,
     private val memberService: MemberService,
-    private val questionService: QuestionService
+    private val questionService: QuestionService,
 ) : SheetUseCase {
     override fun getCurrentQuestion(): QuestionSheet {
-
         // 스케줄러로 저장된 것에서 현재 질문 세트를 갖고온다고 가정
         val questionSet = pickService.initData()
 
@@ -38,7 +37,7 @@ class DefaultSheetUseCase(
 
         /*
         todo QuestionSet - QuestionSheet => 시간과 currentMemberId로 본인이 안한 질문 추출
-        아래는 뺐다고 가정 
+        아래는 뺐다고 가정
          */
 
         // 추출했다고 가정
@@ -55,10 +54,11 @@ class DefaultSheetUseCase(
 
         val friendsIds = memberService.findFriendsIds(currentMemberId)
 
-        val useCaseMemberResponses: List<Candidate> = friendsIds.map { friend ->
-            val findMember = memberService.findMemberById(friend.memberId)
-            Candidate(memberId = findMember.id, memberName = findMember.fullName, findMember.ordinal)
-        }
+        val useCaseMemberResponses: List<Candidate> =
+            friendsIds.map { friend ->
+                val findMember = memberService.findMemberById(friend.memberId)
+                Candidate(memberId = findMember.id, memberName = findMember.fullName, findMember.ordinal)
+            }
 
         return QuestionSheet(
             questionId = question.id.value,

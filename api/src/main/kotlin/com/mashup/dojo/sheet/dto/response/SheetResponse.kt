@@ -4,11 +4,11 @@ data class SheetResponse(
     val questionSetId: Long,
     val questionId: Long,
     val imageUrl: String,
-    val candidates: List<MemberResponse>
+    val candidates: List<MemberResponse>,
 )
 
 data class MemberResponse(
     val memberId: Long,
     val memberName: String,
-    val order: Int
+    val order: Int,
 )
