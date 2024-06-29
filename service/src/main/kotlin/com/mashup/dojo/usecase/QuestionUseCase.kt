@@ -2,6 +2,7 @@ package com.mashup.dojo.usecase
 
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
+import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.QuestionService
 import org.springframework.stereotype.Component
@@ -17,11 +18,13 @@ interface QuestionUseCase {
     fun create(command: CreateCommand): Question
 
     fun bulkCreate(commands: List<CreateCommand>): List<Question>
+
+    fun createQuestionSet(): QuestionSet
 }
 
 @Component
 @Transactional(readOnly = true)
-class QuestionCreateUseCase(
+class DefaultQuestionUseCase(
     private val questionService: QuestionService,
 ) : QuestionUseCase {
     override fun create(command: QuestionUseCase.CreateCommand): Question {
@@ -37,5 +40,11 @@ class QuestionCreateUseCase(
         return commands.map {
             questionService.createQuestion(it.content, it.type, it.emojiImageId)
         }
+    }
+
+    override fun createQuestionSet(): QuestionSet {
+        // 직전에 발행된 QuestionSet 확인 및 후보에서 제외 (redis 조회 필요)
+        val currentQuestionSet = questionService.getCurrentQuestionSet()
+        return questionService.createQuestionSet(currentQuestionSet)
     }
 }
