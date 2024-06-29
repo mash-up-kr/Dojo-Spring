@@ -29,12 +29,12 @@ class DefaultMemberService : MemberService {
     }
 
     override fun getCandidates(currentMemberId: MemberId): List<Candidate> {
-        val memberRelation1 = mockMemberRelation(currentMemberId, MemberId(20))
-        val memberRelation2 = mockMemberRelation(currentMemberId, MemberId(30))
-        val memberRelation3 = mockMemberRelation(currentMemberId, MemberId(40))
-        val memberRelation4 = mockMemberRelation(currentMemberId, MemberId(50))
-        val memberRelation5 = mockMemberRelation(currentMemberId, MemberId(60))
-        val memberRelation6 = mockMemberRelation(currentMemberId, MemberId(70))
+        val memberRelation1 = mockMemberRelation(currentMemberId, MemberId("20"))
+        val memberRelation2 = mockMemberRelation(currentMemberId, MemberId("30"))
+        val memberRelation3 = mockMemberRelation(currentMemberId, MemberId("40"))
+        val memberRelation4 = mockMemberRelation(currentMemberId, MemberId("50"))
+        val memberRelation5 = mockMemberRelation(currentMemberId, MemberId("60"))
+        val memberRelation6 = mockMemberRelation(currentMemberId, MemberId("70"))
 
         /**
          * ToDo
