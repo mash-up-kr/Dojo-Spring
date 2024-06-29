@@ -9,7 +9,7 @@ data class Question(
     val id: QuestionId,
     val content: String,
     val type: QuestionType,
-    // Todo 정책 확인하고 이름 확실하게 짓기
+    val category: QuestionCategory,
     val emojiImageId: ImageId,
     val createdAt: LocalDateTime,
     val deletedAt: LocalDateTime?,
@@ -18,6 +18,15 @@ data class Question(
 enum class QuestionType {
     FRIEND,
     ACCOMPANY,
+}
+
+// todo : category 상세 기획에 따라 변경 가능 (현재 임시)
+//  카테고리에 따라 emojiImageId 가 결정
+enum class QuestionCategory {
+    ROMANCE,
+    WORK,
+    FUN,
+    PERSONALITY,
 }
 
 @JvmInline

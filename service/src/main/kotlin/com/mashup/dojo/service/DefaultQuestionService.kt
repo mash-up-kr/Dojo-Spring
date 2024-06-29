@@ -2,6 +2,7 @@ package com.mashup.dojo.service
 
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
+import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionType
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -43,6 +44,7 @@ class DefaultQuestionService : QuestionService {
                 id = QuestionId(8181818),
                 content = "세상에서 제일 멋쟁이인 사람",
                 type = QuestionType.FRIEND,
+                category = QuestionCategory.ROMANCE,
                 emojiImageId = ImageId(1),
                 createdAt = LocalDateTime.now(),
                 deletedAt = null
