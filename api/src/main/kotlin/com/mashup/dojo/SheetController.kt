@@ -18,22 +18,27 @@ class SheetController(
     @GetMapping
     fun getQuestionSheet(): DojoApiResponse<SheetResponse> {
         val createSheets = sheetUseCase.createSheet()
-        val response =
+        val responses =
             createSheets.map { questionSheet ->
-                SheetSingleResponse.create(
-                    questionSheetId = questionSheet.questionSheetId,
+                SheetSingleResponse(
                     currentQuestionIndex = questionSheet.currentQuestionIndex,
+                    totalIndex = DEFAULT_TOTAL_INDEX,
                     Question(
                         id = questionSheet.questionId,
                         content = questionSheet.questionContent,
-                        imageUrl = questionSheet.imageUrl
+                        imageUrl = questionSheet.imageUrl,
+                        sheetId = questionSheet.questionSheetId
                     ),
                     candidates = questionSheet.candidates
                 )
             }
 
         return DojoApiResponse.success(
-            SheetResponse(response)
+            SheetResponse(responses)
         )
+    }
+
+    companion object {
+        private const val DEFAULT_TOTAL_INDEX: Long = 12L
     }
 }
