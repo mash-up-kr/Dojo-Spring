@@ -34,7 +34,7 @@ value class QuestionSheetId(val value: String)
 
 data class QuestionSheet(
     val questionSheetId: QuestionSheetId,
-    // 몇번째인지를 위해 SetId가 존재!
+    // 문제지 조회를 위해 필요 !
     val questionSetId: QuestionSetId,
     val questionId: QuestionId,
     val resolverId: MemberId,
