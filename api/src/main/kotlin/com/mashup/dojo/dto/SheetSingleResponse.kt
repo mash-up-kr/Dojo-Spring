@@ -9,9 +9,29 @@ data class SheetResponse(
 data class SheetSingleResponse(
     val questionSheetId: Long,
     val currentQuestionIndex: Long,
+    val totalIndex: Long,
     val question: Question,
     val candidates: List<Candidate>,
-)
+) {
+    companion object {
+        private const val DEFAULT_TOTAL_INDEX: Long = 12L
+
+        fun create(
+            questionSheetId: Long,
+            currentQuestionIndex: Long,
+            question: Question,
+            candidates: List<Candidate>
+        ): SheetSingleResponse {
+            return SheetSingleResponse(
+                questionSheetId = questionSheetId,
+                currentQuestionIndex = currentQuestionIndex,
+                totalIndex = DEFAULT_TOTAL_INDEX,
+                question = question,
+                candidates = candidates
+            )
+        }
+    }
+}
 
 data class Question(
     val id: Long,
