@@ -28,7 +28,7 @@ class DefaultImageService(
     ): ImageId {
         val entity = ImageEntity(id = uuid, url = imageUrl)
         val saved = imageRepository.save(entity)
-        return ImageId(saved.uuid)
+        return ImageId(saved.id)
     }
 
     override fun load(imageId: ImageId): Image {
