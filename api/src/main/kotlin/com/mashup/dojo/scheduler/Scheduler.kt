@@ -20,7 +20,7 @@ class Scheduler(
         questionUseCase.createQuestionSet()
         log.info { "=== Done Create questionSet at ${LocalDateTime.now()}. ===" }
     }
-    
+
     companion object {
         private const val SCHEDULED_CRON = "0 0 9,21 * * *"
     }
