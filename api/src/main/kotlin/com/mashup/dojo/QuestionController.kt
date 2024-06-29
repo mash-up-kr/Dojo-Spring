@@ -35,7 +35,7 @@ class QuestionController(
     }
 
     @Operation(summary = "bulk create Question API", description = "질문지 bulk 생성")
-    @PostMapping
+    @PostMapping("/bulk")
     fun bulkCreateQuestion(
         @Valid @RequestBody request: QuestionBulkCreateRequest,
     ): DojoApiResponse<List<QuestionId>> {
