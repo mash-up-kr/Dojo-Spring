@@ -2,7 +2,7 @@ name: CD
 on:
   push:
     branches:
-      - sewon/**
+      - test/**
 
 jobs:
   build:
@@ -39,8 +39,8 @@ jobs:
 
       - name: 배포 압축 파일 생성
         run: |
-          sed -i 's/{JASYPT_SECRET}/${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}/' ./deploy/Procfile
-          cp ./api/build/libs/api-1.0.0.jar ./deploy/application.jar
+          sed -i 's/{JASYPT_SECRET}/${{ secrets.JASYPT_SECRET }}/' ./deploy/Procfile
+          cp ./Dojo-Spring/build/libs/application.jar ./deploy
           cd deploy && zip -r deploy.zip .
 
       - name: 배포
@@ -50,7 +50,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
           application_name: dojo-backend-eb-app
           environment_name: dojo-backend-eb-env
-          version_label: dojo-${{ vars.GITHUB_SHA }}-${{steps.current-time.outputs.formattedTime}}
+          version_label: sulsul-${{ vars.GITHUB_SHA }}-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: ./deploy/deploy.zip
           wait_for_deployment: false
