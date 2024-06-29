@@ -24,7 +24,7 @@ interface QuestionService {
 
     fun getCurrentQuestionSet(): QuestionSet?
 
-    fun createQuestionSet(previousQuestionSet: QuestionSet?): QuestionSet
+    fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet
 }
 
 @Service
@@ -50,7 +50,7 @@ class DefaultQuestionService : QuestionService {
         return SAMPLE_QUESTION_SET
     }
 
-    override fun createQuestionSet(previousQuestionSet: QuestionSet?): QuestionSet {
+    override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet {
         /**
          * todo :
          * - get Question Set (12s) exclude previousQuestionSet
@@ -76,21 +76,22 @@ class DefaultQuestionService : QuestionService {
         val SAMPLE_QUESTION_SET =
             QuestionSet(
                 id = QuestionSetId(1),
-                questionIds = listOf(
-                    QuestionOrder(QuestionId(1), 1),
-                    QuestionOrder(QuestionId(2), 2),
-                    QuestionOrder(QuestionId(3), 3),
-                    QuestionOrder(QuestionId(4), 4),
-                    QuestionOrder(QuestionId(5), 5),
-                    QuestionOrder(QuestionId(6), 6),
-                    QuestionOrder(QuestionId(7), 7),
-                    QuestionOrder(QuestionId(8), 8),
-                    QuestionOrder(QuestionId(9), 9),
-                    QuestionOrder(QuestionId(10), 10),
-                    QuestionOrder(QuestionId(11), 11),
-                    QuestionOrder(QuestionId(12), 12)
-                ),
-                publishedAt = LocalDateTime.now(),
+                questionIds =
+                    listOf(
+                        QuestionOrder(QuestionId(1), 1),
+                        QuestionOrder(QuestionId(2), 2),
+                        QuestionOrder(QuestionId(3), 3),
+                        QuestionOrder(QuestionId(4), 4),
+                        QuestionOrder(QuestionId(5), 5),
+                        QuestionOrder(QuestionId(6), 6),
+                        QuestionOrder(QuestionId(7), 7),
+                        QuestionOrder(QuestionId(8), 8),
+                        QuestionOrder(QuestionId(9), 9),
+                        QuestionOrder(QuestionId(10), 10),
+                        QuestionOrder(QuestionId(11), 11),
+                        QuestionOrder(QuestionId(12), 12)
+                    ),
+                publishedAt = LocalDateTime.now()
             )
     }
 }
