@@ -10,7 +10,7 @@ interface ImageUseCase {
 }
 
 @Component
-class ImageUseCaseImpl(
+class DefaultImageUseCase(
     private val imageService: ImageService,
 ) : ImageUseCase {
     override fun loadImage(imageId: ImageId): Image {
