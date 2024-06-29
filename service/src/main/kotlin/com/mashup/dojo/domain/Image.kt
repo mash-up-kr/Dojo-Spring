@@ -1,7 +1,7 @@
 package com.mashup.dojo.domain
 
 @JvmInline
-value class ImageId(val value: Long)
+value class ImageId(val value: String)
 
 data class Image(
     val id: ImageId,
@@ -10,7 +10,7 @@ data class Image(
     companion object {
         val MOCK_USER_IMAGE =
             Image(
-                id = ImageId(1),
+                id = ImageId("12345678"),
                 url = "https://example.com/image/1"
             )
     }
