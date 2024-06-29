@@ -39,9 +39,10 @@ class DefaultMemberService : MemberService {
         /**
          * ToDo
          * 친구들 중 랜덤 4명 뽑기
+         * Mock, 랜덤으로 뽑은 4명.
+         *
          */
 
-        // Mock, 랜덤으로 뽑은 4명.
         val targetMemberId1 = memberRelation1.to
         val targetMemberId2 = memberRelation2.to
         val targetMemberId3 = memberRelation3.to
