@@ -2,6 +2,7 @@ package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.dto.QuestionBulkCreateRequest
 import com.mashup.dojo.dto.QuestionCreateRequest
 import com.mashup.dojo.usecase.QuestionUseCase
 import io.swagger.v3.oas.annotations.Operation
@@ -31,5 +32,21 @@ class QuestionController(
                 emojiImageId = request.emojiImageId
             )
         ).let { DojoApiResponse.success(it.id) }
+    }
+
+    @Operation(summary = "bulk create Question API", description = "질문지 bulk 생성")
+    @PostMapping
+    fun bulkCreateQuestion(
+        @Valid @RequestBody request: QuestionBulkCreateRequest,
+    ): DojoApiResponse<List<QuestionId>> {
+        val createCommands =
+            request.questionList.map {
+                QuestionUseCase.CreateCommand(it.content, it.type, it.emojiImageId)
+            }
+        val questionIds =
+            questionUseCase.bulkCreate(createCommands)
+                .map { it.id }
+
+        return DojoApiResponse.success(questionIds)
     }
 }
