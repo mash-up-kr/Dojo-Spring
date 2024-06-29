@@ -63,7 +63,6 @@ class DefaultMemberService : MemberService {
 
     private fun mockMember(memberId: MemberId) =
         Member(
-            memberId, "임준형", "ㅈ", "profile_image_url",
-            MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now()
+            memberId, "임준형", "ㅈ", "profile_image_url", MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
         )
 }
