@@ -1,3 +1,3 @@
 aws:
-  access-key: ${AWS_ACCESS_KEY}
-  secret-key: ${AWS_SECRET_KEY}
+  access-key: ENC(sXHKc4kjB/u1TzRt7PyU0TrCeIWky6l1xRd/GEF34w8=)
+  secret-key: ENC(hBqifNv9NvGZdhHgSUTN5SQfVH3W6mlFw27yvs4893ZEiQPgyX61Norw9l4QoUVoYd/kUww64Rg=)
