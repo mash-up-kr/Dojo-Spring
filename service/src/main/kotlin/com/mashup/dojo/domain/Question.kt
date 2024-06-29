@@ -10,7 +10,7 @@ data class Question(
     val content: String,
     val type: QuestionType,
     // Todo 정책 확인하고 이름 확실하게 짓기
-    val imageUrl: String,
+    val emojiImageId: ImageId,
     val createdAt: LocalDateTime,
     val deletedAt: LocalDateTime?,
 )
