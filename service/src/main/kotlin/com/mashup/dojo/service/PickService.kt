@@ -6,9 +6,13 @@ import com.mashup.dojo.domain.QuestionSetId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+interface PickService {
+    fun initData(): QuestionSet
+}
+
 @Service
-class PickService {
-    fun initData(): QuestionSet {
+class DefaultPickService : PickService {
+    override fun initData(): QuestionSet {
         val questionId1 = QuestionId(1L)
         val questionId2 = QuestionId(1L)
         val questionId3 = QuestionId(1L)
