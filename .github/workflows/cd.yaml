@@ -50,7 +50,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
           application_name: dojo-backend-eb-app
           environment_name: dojo-backend-eb-env
-          version_label: sulsul-${{ vars.GITHUB_SHA }}-${{steps.current-time.outputs.formattedTime}}
+          version_label: dojo-${{ vars.GITHUB_SHA }}-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: ./deploy/deploy.zip
           wait_for_deployment: false
