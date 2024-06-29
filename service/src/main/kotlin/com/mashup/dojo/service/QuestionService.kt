@@ -25,6 +25,11 @@ interface QuestionService {
     fun getCurrentQuestionSet(): QuestionSet?
 
     fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet
+
+    fun createQuestionSet(
+        questionIds: List<QuestionId>,
+        publishedAt: LocalDateTime,
+    ): QuestionSet
 }
 
 @Service
@@ -61,7 +66,21 @@ class DefaultQuestionService : QuestionService {
         return SAMPLE_QUESTION_SET
     }
 
+    override fun createQuestionSet(
+        questionIds: List<QuestionId>,
+        publishedAt: LocalDateTime,
+    ): QuestionSet {
+        require(questionIds.size == DEFAULT_QUESTION_SIZE) { "questions size for QuestionSet must be 12" }
+        require(publishedAt >= LocalDateTime.now()) { "publishedAt must be in the future" }
+
+        val questionOrders = questionIds.mapIndexed { idx, qId -> QuestionOrder(qId, idx + 1) }
+        // todo : getId by UUID String Generator
+        // questionSetRepository.save()
+        return SAMPLE_QUESTION_SET
+    }
+
     companion object {
+        private const val DEFAULT_QUESTION_SIZE: Int = 12
         val SAMPLE_QUESTION =
             Question(
                 id = QuestionId("1234564"),
