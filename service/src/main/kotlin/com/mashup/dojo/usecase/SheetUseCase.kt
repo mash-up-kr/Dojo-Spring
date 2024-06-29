@@ -25,23 +25,27 @@ interface SheetUseCase {
         val questionId: Long,
         val questionContent: String,
         val imageUrl: String,
-        val candidates: List<Candidate>
+        val candidates: List<Candidate>,
     )
 }
 
 @Component
 class DefaultSheetUseCase(
-    private val memberService: MemberService
+    private val memberService: MemberService,
 ) : SheetUseCase {
-
     override fun generateSheet(): List<UseCaseQuestionSheet> {
-
         // 스케줄러에서 생성된 질문 set 갖고옴. Mock
         val mockEmojiImage = Image.MOCK_USER_IMAGE
-        val question = Question(
-            QuestionId(0L), "여기서 술을 제일 잘 먹을 것 같은 사람은?", QuestionType.FRIEND,
-            QuestionCategory.FUN, mockEmojiImage.id, LocalDateTime.now(), LocalDateTime.now()
-        )
+        val question =
+            Question(
+                QuestionId(0L),
+                "여기서 술을 제일 잘 먹을 것 같은 사람은?",
+                QuestionType.FRIEND,
+                QuestionCategory.FUN,
+                mockEmojiImage.id,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+            )
         val questionIds = mutableListOf<QuestionId>()
         repeat(12) {
             questionIds.add(question.id)
@@ -56,9 +60,14 @@ class DefaultSheetUseCase(
         val candidates = memberService.getCandidates(currentMemberId)
 
         val questionSheetId = QuestionSheetId(1L)
-        val questionSheet = QuestionSheet(
-            questionSheetId, questionSet.id, questionIds[0], currentMemberId, candidates
-        )
+        val questionSheet =
+            QuestionSheet(
+                questionSheetId,
+                questionSet.id,
+                questionIds[0],
+                currentMemberId,
+                candidates
+            )
 
         // questionSet 활용하여 몇번째 질문인지 확인하기
         val currentQuestionIndex = 3L
