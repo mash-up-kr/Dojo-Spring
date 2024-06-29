@@ -10,26 +10,34 @@ import java.time.LocalDateTime
 
 private val log = KotlinLogging.logger {}
 
+interface QuestionService {
+    fun createQuestion(
+        content: String,
+        type: QuestionType,
+        imageUrl: String,
+    ): Question
+}
+
 @Service
 @Transactional(readOnly = true)
-class QuestionService {
+class DefaultQuestionService : QuestionService {
     @Transactional
-    fun createQuestion(
+    override fun createQuestion(
         content: String,
         type: QuestionType,
         imageUrl: String,
     ): Question {
         // todo create questionEntity
         // return QuestionRepository.save(content, type, imageUrl).toQuestion
-        val question = sampleQuestion
+        val question = SAMPLE_QUESTION
 
         log.info { "Create Question Success : $question" }
 
-        return sampleQuestion
+        return SAMPLE_QUESTION
     }
 
     companion object {
-        val sampleQuestion =
+        val SAMPLE_QUESTION =
             Question(
                 id = QuestionId(8181818),
                 content = "세상에서 제일 멋쟁이인 사람",
