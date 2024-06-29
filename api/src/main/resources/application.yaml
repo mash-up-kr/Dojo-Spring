@@ -4,3 +4,5 @@ spring:
   config:
     import:
       - classpath:/application-entity.yaml
+  profiles:
+    include: core

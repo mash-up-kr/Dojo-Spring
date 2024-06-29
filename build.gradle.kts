@@ -82,6 +82,7 @@ project(":service") {
     dependencies {
         api(project(":entity"))
         api(project(":common"))
+        implementation("org.springframework.boot:spring-boot-starter-data-redis")
     }
 }
 

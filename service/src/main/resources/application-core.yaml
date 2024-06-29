@@ -1,0 +1,6 @@
+spring:
+  data:
+    redis:
+      host: ENC(Sh3KE5kA8KNAterH44BGbCRRqnOtWZrt7tO2bJN0S3rK0sgCeIlhQLC0O/wnxLVL)
+      port: 6379
+      password: ENC(6iIhsSMFotxjLMAUURpAPzygcwyePLNMeukkuTtONk4JiDwPfx+oyaEuJHeiTtVAl2Ex1KA6lDqRkWn4Z13R4XJYaY5m30/O)
