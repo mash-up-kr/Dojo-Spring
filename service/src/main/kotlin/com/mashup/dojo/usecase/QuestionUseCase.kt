@@ -1,5 +1,6 @@
 package com.mashup.dojo.usecase
 
+import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.QuestionService
@@ -9,7 +10,7 @@ interface QuestionUseCase {
     data class CreateCommand(
         val content: String,
         val type: QuestionType,
-        val imageUrl: String,
+        val emojiImageId: ImageId,
     )
 
     fun create(command: CreateCommand): Question
@@ -23,7 +24,7 @@ class QuestionCreateUseCase(
         return questionService.createQuestion(
             command.content,
             command.type,
-            command.imageUrl
+            command.emojiImageId
         )
     }
 }

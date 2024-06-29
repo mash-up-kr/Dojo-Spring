@@ -1,5 +1,6 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionType
@@ -14,7 +15,7 @@ interface QuestionService {
     fun createQuestion(
         content: String,
         type: QuestionType,
-        imageUrl: String,
+        emojiImageId: ImageId,
     ): Question
 }
 
@@ -25,7 +26,7 @@ class DefaultQuestionService : QuestionService {
     override fun createQuestion(
         content: String,
         type: QuestionType,
-        imageUrl: String,
+        emojiImageId: ImageId,
     ): Question {
         // todo create questionEntity
         // return QuestionRepository.save(content, type, imageUrl).toQuestion
@@ -42,7 +43,7 @@ class DefaultQuestionService : QuestionService {
                 id = QuestionId(8181818),
                 content = "세상에서 제일 멋쟁이인 사람",
                 type = QuestionType.FRIEND,
-                imageUrl = "default:url",
+                emojiImageId = ImageId(1),
                 createdAt = LocalDateTime.now(),
                 deletedAt = null
             )

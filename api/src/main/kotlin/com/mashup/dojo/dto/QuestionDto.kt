@@ -1,5 +1,6 @@
 package com.mashup.dojo.dto
 
+import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.QuestionType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
@@ -12,8 +13,8 @@ data class QuestionCreateRequest(
     @field:NotNull
     val type: QuestionType,
     @field:NotBlank
-    @Schema(description = "질문 이미지")
-    val imageUrl: String,
+    @Schema(description = "질문 이모지 이미지 id")
+    val emojiImageId: ImageId,
 )
 
 @Schema(description = "질문 등록 bulk 요청")
