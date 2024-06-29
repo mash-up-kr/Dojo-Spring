@@ -1,6 +1,6 @@
 package com.mashup.dojo.sheet.dto.response
 
-data class SheetResponse(
+data class SheetSingleResponse(
     val questionSetId: Long,
     val questionId: Long,
     val imageUrl: String,
