@@ -34,5 +34,6 @@ data class QuestionSheet(
 
 data class Candidate(
     val memberId: MemberId,
+    val memberName: String,
     val order: Int,
 )
