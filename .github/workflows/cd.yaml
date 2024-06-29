@@ -40,7 +40,7 @@ jobs:
       - name: 배포 압축 파일 생성
         run: |
           sed -i 's/{JASYPT_SECRET}/${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}/' ./deploy/Procfile
-          cp ./api/build/libs/application.jar ./deploy
+          cp ./api/build/libs/api-1.0.0.jar ./deploy/application.jar
           cd deploy && zip -r deploy.zip .
 
       - name: 배포
