@@ -14,11 +14,6 @@ import java.time.LocalDateTime
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    val id: Long = 0L
-
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: LocalDateTime
