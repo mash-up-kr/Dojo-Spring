@@ -34,6 +34,7 @@ value class QuestionSheetId(val value: Long)
 
 data class QuestionSheet(
     val questionSheetId: QuestionSheetId,
+    // 몇번째인지를 위해 SetId가 존재!
     val questionSetId: QuestionSetId,
     val questionId: QuestionId,
     val resolverId: MemberId,
@@ -43,5 +44,6 @@ data class QuestionSheet(
 
 data class Candidate(
     val memberId: MemberId,
+    val memberName: String,
     val order: Int,
 )
