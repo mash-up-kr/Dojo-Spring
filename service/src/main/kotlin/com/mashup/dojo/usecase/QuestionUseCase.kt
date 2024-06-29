@@ -19,7 +19,6 @@ interface QuestionUseCase {
 class QuestionCreateUseCase(
     private val questionService: QuestionService,
 ) : QuestionUseCase {
-
     override fun create(command: QuestionUseCase.CreateCommand): Question {
         return questionService.createQuestion(
             command.content,

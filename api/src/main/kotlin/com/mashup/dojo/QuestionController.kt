@@ -15,7 +15,9 @@ class QuestionController(
 ) {
     // todo dto validation by @Valid
     @PostMapping
-    fun createQuestion(@RequestBody request: QuestionCreateRequest): DojoApiResponse<Unit> {
+    fun createQuestion(
+        @RequestBody request: QuestionCreateRequest,
+    ): DojoApiResponse<Unit> {
         questionUseCase.create(
             QuestionUseCase.CreateCommand(
                 content = request.content,
