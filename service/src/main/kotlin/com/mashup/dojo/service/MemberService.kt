@@ -17,21 +17,22 @@ interface MemberService {
 }
 
 @Service
-class MemberServiceImpl : MemberService {
-    private fun initMemberRelation(to: Long): MemberRelation {
+class DefaultMemberService : MemberService {
+    private fun initMemberRelation(
+        to: MemberId,
+        from: MemberId,
+    ): MemberRelation {
         // 후보자 생성
         // 여기에 필요한 로직을 추가하세요.
 
-        val currentMemberId = MemberId(90L)
-        val toMemberId = MemberId(to)
-        return MemberRelation(currentMemberId, toMemberId, RelationType.FRIEND)
+        return MemberRelation(to, from, RelationType.FRIEND)
     }
 
     override fun findFriendsIds(currentMemberId: MemberId): List<Candidate> {
-        val memberRelation1 = initMemberRelation(20L)
-        val memberRelation2 = initMemberRelation(30L)
-        val memberRelation3 = initMemberRelation(40L)
-        val memberRelation4 = initMemberRelation(50L)
+        val memberRelation1 = initMemberRelation(currentMemberId, MemberId(20))
+        val memberRelation2 = initMemberRelation(currentMemberId, MemberId(30))
+        val memberRelation3 = initMemberRelation(currentMemberId, MemberId(40))
+        val memberRelation4 = initMemberRelation(currentMemberId, MemberId(50))
 
         val targetMemberId1 = memberRelation1.to
         val targetMemberId2 = memberRelation2.to
