@@ -1,6 +1,5 @@
 spring:
   application:
     name: api
-  config:
-    import:
-      - classpath:/application-entity.yaml
+  profiles:
+    include: entity, common
