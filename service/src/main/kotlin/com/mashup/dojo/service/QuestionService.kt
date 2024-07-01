@@ -86,7 +86,7 @@ class DefaultQuestionService : QuestionService {
                 id = QuestionId("1234564"),
                 content = "세상에서 제일 멋쟁이인 사람",
                 type = QuestionType.FRIEND,
-                category = QuestionCategory.ROMANCE,
+                category = QuestionCategory.DATING,
                 emojiImageId = ImageId("345678"),
                 createdAt = LocalDateTime.now(),
                 deletedAt = null
