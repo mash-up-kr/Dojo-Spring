@@ -2,11 +2,13 @@ package com.mashup.dojo.usecase
 
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
+import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.QuestionService
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 interface QuestionUseCase {
     data class CreateCommand(
@@ -15,11 +17,18 @@ interface QuestionUseCase {
         val emojiImageId: ImageId,
     )
 
+    data class CreateQuestionSetCommand(
+        val questionIdList: List<QuestionId>,
+        val publishedAt: LocalDateTime,
+    )
+
     fun create(command: CreateCommand): Question
 
     fun bulkCreate(commands: List<CreateCommand>): List<Question>
 
     fun createQuestionSet(): QuestionSet
+
+    fun createCustomQuestionSet(command: CreateQuestionSetCommand): QuestionSet
 }
 
 @Component
@@ -46,5 +55,9 @@ class DefaultQuestionUseCase(
         // 직전에 발행된 QuestionSet 확인 및 후보에서 제외 (redis 조회 필요)
         val currentQuestionSet = questionService.getCurrentQuestionSet()
         return questionService.createQuestionSet(currentQuestionSet)
+    }
+
+    override fun createCustomQuestionSet(command: QuestionUseCase.CreateQuestionSetCommand): QuestionSet {
+        return questionService.createQuestionSet(command.questionIdList, command.publishedAt)
     }
 }
