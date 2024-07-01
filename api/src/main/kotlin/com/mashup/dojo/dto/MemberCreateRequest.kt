@@ -13,8 +13,9 @@ data class MemberCreateRequest(
     val profileImageId: ImageId?,
     @field:NotBlank
     val platform: MemberPlatform,
+    // 기수
     @field:NotBlank
-    val ordinal: Int, // 기수
+    val ordinal: Int,
     @field:NotBlank
     val gender: MemberGender,
 )

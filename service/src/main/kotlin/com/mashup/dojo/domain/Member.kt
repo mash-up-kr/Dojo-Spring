@@ -16,7 +16,8 @@ data class Member(
     val secondInitialName: String,
     val profileImageId: ImageId?,
     val platform: MemberPlatform,
-    val ordinal: Int, // 기수
+    // 기수
+    val ordinal: Int,
     val gender: MemberGender,
     val point: Int,
     val createdAt: LocalDateTime,
