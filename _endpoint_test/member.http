@@ -1,0 +1,11 @@
+### 멤버 생성하기 (가입하기)
+POST {{host}}/member
+Content-Type: application/json
+
+{
+    "fullName": "오예옹",
+    "profileImageId": "image-id",
+    "platform": "SPRING",
+    "ordinal": 14,
+    "gender": "FEMALE"
+}

@@ -1,6 +1,9 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.MemberEntity
+import com.mashup.dojo.MemberRepository
 import com.mashup.dojo.domain.Candidate
+import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
@@ -14,10 +17,22 @@ interface MemberService {
     fun getCandidates(currentMemberId: MemberId): List<Candidate>
 
     fun findMemberById(memberId: MemberId): Member
+
+    fun create(command: CreateMember): MemberId
+
+    data class CreateMember(
+        val fullName: String,
+        val profileImageId: ImageId?,
+        val platform: MemberPlatform,
+        val ordinal: Int,
+        val gender: MemberGender,
+    )
 }
 
 @Service
-class DefaultMemberService : MemberService {
+class DefaultMemberService(
+    private val memberRepository: MemberRepository,
+) : MemberService {
     private fun mockMemberRelation(
         to: MemberId,
         from: MemberId,
@@ -61,8 +76,35 @@ class DefaultMemberService : MemberService {
         return mockMember(memberId)
     }
 
+    override fun create(command: MemberService.CreateMember): MemberId {
+        val member =
+            Member.create(
+                fullName = command.fullName,
+                profileImageId = command.profileImageId,
+                platform = command.platform,
+                gender = command.gender,
+                ordinal = command.ordinal
+            )
+
+        val id = memberRepository.save(member.toEntity()).id
+        return MemberId(id)
+    }
+
     private fun mockMember(memberId: MemberId) =
         Member(
-            memberId, "임준형", "ㅈ", "profile_image_url", MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
+            memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
         )
+}
+
+private fun Member.toEntity(): MemberEntity {
+    return MemberEntity(
+        id = id.value,
+        fullName = fullName,
+        secondInitialName = secondInitialName,
+        profileImageId = profileImageId?.value,
+        platform = platform.name,
+        ordinal = ordinal,
+        gender = gender.name,
+        point = point
+    )
 }
