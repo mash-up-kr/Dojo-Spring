@@ -13,7 +13,7 @@ data class QuestionOrder(
 data class QuestionSet(
     val id: QuestionSetId,
     // 1 based-order
-    val questionIds: List<QuestionOrder>,
+    val questionOrders: List<QuestionOrder>,
     // 질문 발행일
     val publishedAt: LocalDateTime,
 )

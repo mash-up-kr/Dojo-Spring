@@ -1,9 +1,9 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
-import com.mashup.dojo.dto.Question
+import com.mashup.dojo.dto.QuestionResponse
+import com.mashup.dojo.dto.SheetListResponse
 import com.mashup.dojo.dto.SheetResponse
-import com.mashup.dojo.dto.SheetSingleResponse
 import com.mashup.dojo.usecase.SheetUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -26,29 +26,27 @@ class SheetController(
         ]
     )
     @GetMapping
-    fun getQuestionSheet(): DojoApiResponse<SheetResponse> {
-        val createSheets = sheetUseCase.createSheet()
+    fun getQuestionSheet(): DojoApiResponse<SheetListResponse> {
+        val sheetList = sheetUseCase.createSheet()
         val responses =
-            createSheets.map { questionSheet ->
-                SheetSingleResponse(
+            sheetList.map { questionSheet ->
+                SheetResponse(
                     currentQuestionIndex = questionSheet.currentQuestionIndex,
                     totalIndex = DEFAULT_TOTAL_INDEX,
-                    Question(
+                    QuestionResponse(
                         id = questionSheet.questionId,
                         content = questionSheet.questionContent,
-                        imageUrl = questionSheet.imageUrl,
+                        imageUrl = questionSheet.questionEmojiImageUrl,
                         sheetId = questionSheet.questionSheetId
                     ),
                     candidates = questionSheet.candidates
                 )
             }
 
-        return DojoApiResponse.success(
-            SheetResponse(responses)
-        )
+        return DojoApiResponse.success(SheetListResponse(responses))
     }
 
     companion object {
-        private const val DEFAULT_TOTAL_INDEX: Long = 12L
+        private const val DEFAULT_TOTAL_INDEX: Int = 12
     }
 }

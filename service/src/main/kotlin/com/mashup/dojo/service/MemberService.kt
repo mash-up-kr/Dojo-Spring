@@ -9,12 +9,13 @@ import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.MemberRelation
+import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.domain.RelationType
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 interface MemberService {
-    fun getCandidates(currentMemberId: MemberId): List<Candidate>
+    fun getCandidates(from: MemberId, questionType: QuestionType): List<Candidate>
 
     fun findMemberById(memberId: MemberId): Member
 
@@ -43,13 +44,15 @@ class DefaultMemberService(
         return MemberRelation(to, from, RelationType.FRIEND)
     }
 
-    override fun getCandidates(requestId: MemberId): List<Candidate> {
-        val memberRelation1 = mockMemberRelation(requestId, MemberId("20"))
-        val memberRelation2 = mockMemberRelation(requestId, MemberId("30"))
-        val memberRelation3 = mockMemberRelation(requestId, MemberId("40"))
-        val memberRelation4 = mockMemberRelation(requestId, MemberId("50"))
-        val memberRelation5 = mockMemberRelation(requestId, MemberId("60"))
-        val memberRelation6 = mockMemberRelation(requestId, MemberId("70"))
+    override fun getCandidates(from: MemberId, questionType: QuestionType): List<Candidate> {
+        val memberRelation1 = mockMemberRelation(MemberId("20"), from)
+        val memberRelation2 = mockMemberRelation(MemberId("30"), from)
+        val memberRelation3 = mockMemberRelation(MemberId("40"), from)
+        val memberRelation4 = mockMemberRelation(MemberId("50"), from)
+        
+        // todo : 친구 수가 8명이상이라면, 8명은 순서 랜덤으로 뽑아야함.
+        val memberRelation5 = mockMemberRelation(MemberId("60"), from)
+        val memberRelation6 = mockMemberRelation(MemberId("70"), from)
 
         /**
          * ToDo
