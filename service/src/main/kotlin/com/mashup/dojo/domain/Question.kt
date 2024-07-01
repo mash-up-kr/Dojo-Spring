@@ -20,13 +20,18 @@ enum class QuestionType {
     ACCOMPANY,
 }
 
-// todo : category 상세 기획에 따라 변경 가능 (현재 임시)
-//  카테고리에 따라 emojiImageId 가 결정
-enum class QuestionCategory {
-    ROMANCE,
-    WORK,
-    FUN,
-    PERSONALITY,
+enum class QuestionCategory(
+    private val value: String,
+) {
+    DATING("연애"),
+    FRIENDSHIP("사교"),
+    PERSONALITY("성격"),
+    ENTERTAINMENT("유흥"),
+    FITNESS("체력"),
+    APPEARANCE("외모"),
+    WORK("작업"),
+    HUMOR("유머"),
+    OTHER("기타"),
 }
 
 @JvmInline
