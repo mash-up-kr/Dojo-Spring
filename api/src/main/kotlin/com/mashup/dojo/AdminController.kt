@@ -64,7 +64,7 @@ class AdminController(
 
         return DojoApiResponse.success(questionIds)
     }
-    
+
     @Operation(summary = "create custom QuestionSet API", description = "QuestionSet 자체 생성")
     @PostMapping("/custom-question-set")
     fun createCustomQuestionSet(
