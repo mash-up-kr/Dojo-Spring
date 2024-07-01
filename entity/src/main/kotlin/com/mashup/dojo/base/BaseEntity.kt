@@ -12,16 +12,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 abstract class BaseEntity : BaseTimeEntity() {
     @CreatedBy
     @Column(updatable = false)
-    var createdBy: String? = null
-        private set
+    lateinit var createdBy: String
+        protected set
 
     @LastModifiedBy
-    var lastModifiedBy: String? = null
-        private set
+    lateinit var lastModifiedBy: String
+        protected set
 
     @Column(nullable = false)
     var isDeleted: Boolean = false
-        private set
+        protected set
 
     // 재활성화 - soft delete
     fun activate() {
