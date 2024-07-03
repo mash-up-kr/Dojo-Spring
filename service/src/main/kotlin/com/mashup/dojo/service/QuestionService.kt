@@ -103,20 +103,20 @@ class DefaultQuestionService : QuestionService {
             QuestionSet(
                 id = QuestionSetId("1"),
                 questionIds =
-                listOf(
-                    QuestionOrder(QuestionId("1"), 1),
-                    QuestionOrder(QuestionId("2"), 2),
-                    QuestionOrder(QuestionId("3"), 3),
-                    QuestionOrder(QuestionId("4"), 4),
-                    QuestionOrder(QuestionId("5"), 5),
-                    QuestionOrder(QuestionId("6"), 6),
-                    QuestionOrder(QuestionId("7"), 7),
-                    QuestionOrder(QuestionId("8"), 8),
-                    QuestionOrder(QuestionId("9"), 9),
-                    QuestionOrder(QuestionId("10"), 10),
-                    QuestionOrder(QuestionId("11"), 11),
-                    QuestionOrder(QuestionId("12"), 12)
-                ),
+                    listOf(
+                        QuestionOrder(QuestionId("1"), 1),
+                        QuestionOrder(QuestionId("2"), 2),
+                        QuestionOrder(QuestionId("3"), 3),
+                        QuestionOrder(QuestionId("4"), 4),
+                        QuestionOrder(QuestionId("5"), 5),
+                        QuestionOrder(QuestionId("6"), 6),
+                        QuestionOrder(QuestionId("7"), 7),
+                        QuestionOrder(QuestionId("8"), 8),
+                        QuestionOrder(QuestionId("9"), 9),
+                        QuestionOrder(QuestionId("10"), 10),
+                        QuestionOrder(QuestionId("11"), 11),
+                        QuestionOrder(QuestionId("12"), 12)
+                    ),
                 publishedAt = LocalDateTime.now()
             )
     }

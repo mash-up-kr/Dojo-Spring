@@ -45,25 +45,28 @@ class DefaultPickUseCase(
         val questionId = receivedPickList.first().questionId
         questionService.getQuestionById(questionId)
 
-        val result = receivedPickList.groupBy { it.questionId }
-            .map { (questionId, pickList) ->
-                val question = questionService.getQuestionById(questionId)
-                    ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [$questionId]")
+        val result =
+            receivedPickList.groupBy { it.questionId }
+                .map { (questionId, pickList) ->
+                    val question =
+                        questionService.getQuestionById(questionId)
+                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [$questionId]")
 
-                val url = imageService.load(question.emojiImageId)?.url
-                    ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. . EmojiImageId: [${question.emojiImageId}]")
+                    val url =
+                        imageService.load(question.emojiImageId)?.url
+                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. . EmojiImageId: [${question.emojiImageId}]")
 
-                val pickedTotalCount = pickList.size
-                val latestPickedAt = pickList.maxBy { it.createdAt }.createdAt
+                    val pickedTotalCount = pickList.size
+                    val latestPickedAt = pickList.maxBy { it.createdAt }.createdAt
 
-                GetReceivedPick(
-                    questionId = question.id,
-                    questionContent = question.content,
-                    questionEmojiImageUrl = url,
-                    totalReceivedPickCount = pickedTotalCount,
-                    latestPickedAt = latestPickedAt
-                )
-            }
+                    GetReceivedPick(
+                        questionId = question.id,
+                        questionContent = question.content,
+                        questionEmojiImageUrl = url,
+                        totalReceivedPickCount = pickedTotalCount,
+                        latestPickedAt = latestPickedAt
+                    )
+                }
 
         return when (command.sort) {
             PickSort.LATEST -> result.sortedByDescending { it.latestPickedAt }

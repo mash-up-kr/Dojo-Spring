@@ -32,6 +32,6 @@ enum class PickOpenItem(val value: String, val cost: Int) {
 }
 
 enum class PickSort {
-    LATEST, 
-    MOST_PICKED
+    LATEST,
+    MOST_PICKED,
 }

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-
 @Tag(name = "Pick", description = "픽!")
 @RestController
 @RequestMapping("/pick")
@@ -30,21 +29,22 @@ class PickController(
         ]
     )
     fun getReceivedPickList(
-        // todo : add userinfo     
-        @RequestParam(required = false, defaultValue = "LATEST") sort: PickSort
+        // todo : add userinfo
+        @RequestParam(required = false, defaultValue = "LATEST") sort: PickSort,
     ): DojoApiResponse<ReceivedPickListGetResponse> {
         val receivedPickList: List<PickUseCase.GetReceivedPick> =
             pickUseCase.getReceivedPickList(PickUseCase.GetReceivedPickListCommand(MemberId("1"), sort))
 
-        val pickResponseList = receivedPickList.map {
-            PickResponse(
-                questionId = it.questionId,
-                questionContent = it.questionContent,
-                questionEmojiImageUrl = it.questionEmojiImageUrl,
-                totalReceivedPickCount = it.totalReceivedPickCount,
-                latestPickedAt = it.latestPickedAt
-            )
-        }
+        val pickResponseList =
+            receivedPickList.map {
+                PickResponse(
+                    questionId = it.questionId,
+                    questionContent = it.questionContent,
+                    questionEmojiImageUrl = it.questionEmojiImageUrl,
+                    totalReceivedPickCount = it.totalReceivedPickCount,
+                    latestPickedAt = it.latestPickedAt
+                )
+            }
         return DojoApiResponse.success(ReceivedPickListGetResponse(pickResponseList, sort))
     }
 }

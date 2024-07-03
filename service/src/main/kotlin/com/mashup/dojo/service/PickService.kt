@@ -10,25 +10,29 @@ import java.time.LocalDateTime
 
 @Service
 class PickService {
-    fun getReceivedPickList(pickedMemberId: MemberId, sort: PickSort): List<Pick> {
+    fun getReceivedPickList(
+        pickedMemberId: MemberId,
+        sort: PickSort,
+    ): List<Pick> {
         /*val pickList: List<Pick> = pickRepository.findAllByMemberId(pickedMemberId)
              .map { PickEnity.buildDomain() }*/
         return listOf(DEFAULT_PICK)
     }
 
     companion object {
-        val DEFAULT_PICK = Pick(
-            id = PickId("pickmepickme"),
-            questionId = QuestionId("question"),
-            pickerId = MemberId("뽑은놈"),
-            pickedId = MemberId("뽑힌놈"),
-            isGenderOpen = false,
-            isPlatformOpen = false,
-            isMidInitialNameOpen = false,
-            isFullNameOpen = false,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now(),
-        )
+        val DEFAULT_PICK =
+            Pick(
+                id = PickId("pickmepickme"),
+                questionId = QuestionId("question"),
+                pickerId = MemberId("뽑은놈"),
+                pickedId = MemberId("뽑힌놈"),
+                isGenderOpen = false,
+                isPlatformOpen = false,
+                isMidInitialNameOpen = false,
+                isFullNameOpen = false,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
 //        private fun PickEntity.buildDomain(): Pick {
 //            return Pick(
 //                id = PickId("pickmepickme"),
