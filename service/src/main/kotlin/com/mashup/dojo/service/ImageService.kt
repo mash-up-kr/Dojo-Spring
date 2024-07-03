@@ -32,6 +32,10 @@ class DefaultImageService(
     }
 
     override fun load(imageId: ImageId): Image? {
-        TODO("Not yet implemented")
+        return SAMPLE_IMAGE
+    }
+    
+    companion object {
+        val SAMPLE_IMAGE = Image(ImageId("image"), "urlurl")
     }
 }
