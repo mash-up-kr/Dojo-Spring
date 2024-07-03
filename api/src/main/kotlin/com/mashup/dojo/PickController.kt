@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 class PickController(
     private val pickUseCase: PickUseCase,
 ) {
-    @GetMapping("/list")
+    @GetMapping("/picked-list")
     @Operation(
         summary = "내가 받은 픽 List API",
         description = "내가 받은 픽들을 정렬하여 보여주는 API. default sort : 최신 순",
