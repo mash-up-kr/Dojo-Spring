@@ -4,6 +4,7 @@ import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSet
+import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.QuestionService
 import org.springframework.stereotype.Component
@@ -29,6 +30,8 @@ interface QuestionUseCase {
     fun createQuestionSet(): QuestionSet
 
     fun createCustomQuestionSet(command: CreateQuestionSetCommand): QuestionSet
+
+    fun createQuestionSheet(): List<QuestionSheet>
 }
 
 @Component
@@ -59,5 +62,10 @@ class DefaultQuestionUseCase(
 
     override fun createCustomQuestionSet(command: QuestionUseCase.CreateQuestionSetCommand): QuestionSet {
         return questionService.createQuestionSet(command.questionIdList, command.publishedAt)
+    }
+
+    override fun createQuestionSheet(): List<QuestionSheet> {
+        val currentQuestionSet = questionService.getCurrentQuestionSet()
+        return questionService.createQuestionSheetsForAllMembers(currentQuestionSet)
     }
 }

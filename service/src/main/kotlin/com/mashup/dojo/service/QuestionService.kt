@@ -1,12 +1,16 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
+import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionOrder
 import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
+import com.mashup.dojo.domain.QuestionSheet
+import com.mashup.dojo.domain.QuestionSheetId
 import com.mashup.dojo.domain.QuestionType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -30,6 +34,8 @@ interface QuestionService {
         questionIds: List<QuestionId>,
         publishedAt: LocalDateTime,
     ): QuestionSet
+
+    fun createQuestionSheetsForAllMembers(excludedQuestionSheet: QuestionSet?): List<QuestionSheet>
 }
 
 @Service
@@ -79,6 +85,17 @@ class DefaultQuestionService : QuestionService {
         return SAMPLE_QUESTION_SET
     }
 
+    override fun createQuestionSheetsForAllMembers(questionSet: QuestionSet?): List<QuestionSheet> {
+        /**
+         * TODO:
+         * - Get QuestionSheet by member for all members
+         * - Create a QuestionSheet with the candidates and resolver
+         * - cache put -> QuestionSet and return
+         * - Temporarily set to create for all members, discuss details later
+         */
+        return LIST_SAMPLE_QUESTION_SHEET
+    }
+
     companion object {
         private const val DEFAULT_QUESTION_SIZE: Int = 12
         val SAMPLE_QUESTION =
@@ -112,5 +129,24 @@ class DefaultQuestionService : QuestionService {
                     ),
                 publishedAt = LocalDateTime.now()
             )
+
+        private val SAMPLE_QUESTION_SHEET =
+            QuestionSheet(
+                questionSheetId = QuestionSheetId("1"),
+                questionSetId = SAMPLE_QUESTION_SET.id,
+                questionId = QuestionId("1"),
+                resolverId = MemberId("1"),
+                candidates =
+                    listOf(
+                        Candidate(MemberId("2"), "임준형", 1),
+                        Candidate(MemberId("3"), "한씨", 1),
+                        Candidate(MemberId("4"), "박씨", 1),
+                        Candidate(MemberId("5"), "오씨", 1)
+                    )
+            )
+
+        // TODO: Set to 3 sheets initially. Need to modify for all users later.
+        val LIST_SAMPLE_QUESTION_SHEET =
+            listOf(SAMPLE_QUESTION_SHEET, SAMPLE_QUESTION_SHEET, SAMPLE_QUESTION_SHEET)
     }
 }
