@@ -3,6 +3,7 @@ package com.mashup.dojo.usecase
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionSet
+import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.QuestionService
 import org.springframework.stereotype.Component
@@ -20,6 +21,8 @@ interface QuestionUseCase {
     fun bulkCreate(commands: List<CreateCommand>): List<Question>
 
     fun createQuestionSet(): QuestionSet
+
+    fun createQuestionSheet(): List<QuestionSheet>
 }
 
 @Component
@@ -46,5 +49,10 @@ class DefaultQuestionUseCase(
         // 직전에 발행된 QuestionSet 확인 및 후보에서 제외 (redis 조회 필요)
         val currentQuestionSet = questionService.getCurrentQuestionSet()
         return questionService.createQuestionSet(currentQuestionSet)
+    }
+
+    override fun createQuestionSheet(): List<QuestionSheet> {
+        val currentQuestionSet = questionService.getCurrentQuestionSet()
+        return questionService.createQuestionSheetsForAllMembers(currentQuestionSet)
     }
 }

@@ -22,4 +22,15 @@ class SchedulerConfig {
             setWaitForTasksToCompleteOnShutdown(true)
         }
     }
+
+    @Bean(name = ["questionSheetSchedulerExecutor"])
+    fun questionSheetSchedulerExecutor(): Executor {
+        return ThreadPoolTaskExecutor().apply {
+            corePoolSize = 5
+            maxPoolSize = 5
+            queueCapacity = 20
+            setThreadNamePrefix("questionSheetScheduler-")
+            setWaitForTasksToCompleteOnShutdown(true)
+        }
+    }
 }
