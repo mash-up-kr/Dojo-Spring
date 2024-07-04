@@ -30,6 +30,8 @@ interface QuestionService {
         questionIds: List<QuestionId>,
         publishedAt: LocalDateTime,
     ): QuestionSet
+
+    fun getQuestionById(id: QuestionId): Question?
 }
 
 @Service
@@ -77,6 +79,11 @@ class DefaultQuestionService : QuestionService {
         // todo : getId by UUID String Generator
         // questionSetRepository.save()
         return SAMPLE_QUESTION_SET
+    }
+
+    override fun getQuestionById(id: QuestionId): Question? {
+        // TODO("Not yet implemented")
+        return SAMPLE_QUESTION
     }
 
     companion object {

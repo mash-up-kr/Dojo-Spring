@@ -6,7 +6,7 @@ import com.mashup.dojo.service.ImageService
 import org.springframework.stereotype.Component
 
 interface ImageUseCase {
-    fun loadImage(imageId: ImageId): Image
+    fun loadImage(imageId: ImageId): Image?
 
     fun uploadImage(
         uuid: String,
@@ -18,7 +18,7 @@ interface ImageUseCase {
 class DefaultImageUseCase(
     private val imageService: ImageService,
 ) : ImageUseCase {
-    override fun loadImage(imageId: ImageId): Image {
+    override fun loadImage(imageId: ImageId): Image? {
         return imageService.load(imageId)
     }
 

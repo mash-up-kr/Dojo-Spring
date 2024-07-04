@@ -30,3 +30,8 @@ enum class PickOpenItem(val value: String, val cost: Int) {
     MID_INITIAL_NAME("초성 1자 (중간 이름)", 50),
     FULL_NAME("이름", 150),
 }
+
+enum class PickSort {
+    LATEST,
+    MOST_PICKED,
+}
