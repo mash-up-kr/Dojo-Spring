@@ -20,6 +20,8 @@ interface MemberService {
 
     fun create(command: CreateMember): MemberId
 
+    fun findAllMember(): List<Member>
+
     data class CreateMember(
         val fullName: String,
         val profileImageId: ImageId?,
@@ -88,6 +90,26 @@ class DefaultMemberService(
 
         val id = memberRepository.save(member.toEntity()).id
         return MemberId(id)
+    }
+
+    override fun findAllMember(): List<Member> {
+        return memberRepository.findAll().stream().map { m ->
+            val platform = MemberPlatform.findByValue(m.platform)
+            val gender = MemberGender.findByValue(m.gender)
+            val imageId = m.profileImageId?.let { profileImageId -> ImageId(profileImageId) }
+            Member.convertToMember(
+                m.id,
+                m.fullName,
+                m.secondInitialName,
+                imageId,
+                m.ordinal,
+                platform,
+                gender,
+                m.point,
+                m.createdAt,
+                m.updatedAt
+            )
+        }.toList()
     }
 
     private fun mockMember(memberId: MemberId) =

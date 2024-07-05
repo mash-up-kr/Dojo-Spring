@@ -16,4 +16,6 @@ enum class DojoExceptionType(
     ACCESS_DENIED("Access denied. Check authentication.", "C007_ACCESS_DENIED", 403),
     AUTHENTICATION_FAILURE("Authentication failed. Check login.", "C008_AUTHENTICATION_FAILURE", 401),
     ARGUMENT_NOT_VALID("Method Argument Not Valid. Check argument validation.", "C009_ARGUMENT_NOT_VALID", 400),
+    INVALID_MEMBER_GENDER("The gender does not exist.", "C011_INVALID_MEMBER_GENDER", 400),
+    INVALID_MEMBER_PLATFORM("The platform does not exist.", "C010_INVALID_MEMBER_PLATFORM", 400),
 }

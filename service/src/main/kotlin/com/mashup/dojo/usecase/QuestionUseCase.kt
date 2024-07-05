@@ -6,6 +6,7 @@ import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionType
+import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.QuestionService
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -38,6 +39,7 @@ interface QuestionUseCase {
 @Transactional(readOnly = true)
 class DefaultQuestionUseCase(
     private val questionService: QuestionService,
+    private val memberService: MemberService,
 ) : QuestionUseCase {
     override fun create(command: QuestionUseCase.CreateCommand): Question {
         return questionService.createQuestion(
@@ -66,6 +68,7 @@ class DefaultQuestionUseCase(
 
     override fun createQuestionSheet(): List<QuestionSheet> {
         val currentQuestionSet = questionService.getCurrentQuestionSet()
-        return questionService.createQuestionSheetsForAllMembers(currentQuestionSet)
+        val allMemberRecords = memberService.findAllMember()
+        return questionService.createQuestionSheets(currentQuestionSet, allMemberRecords)
     }
 }

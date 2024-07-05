@@ -2,6 +2,7 @@ package com.mashup.dojo.service
 
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
+import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
@@ -35,7 +36,10 @@ interface QuestionService {
         publishedAt: LocalDateTime,
     ): QuestionSet
 
-    fun createQuestionSheetsForAllMembers(excludedQuestionSheet: QuestionSet?): List<QuestionSheet>
+    fun createQuestionSheets(
+        questionSet: QuestionSet?,
+        members: List<Member>,
+    ): List<QuestionSheet>
 }
 
 @Service
@@ -85,11 +89,17 @@ class DefaultQuestionService : QuestionService {
         return SAMPLE_QUESTION_SET
     }
 
-    override fun createQuestionSheetsForAllMembers(questionSet: QuestionSet?): List<QuestionSheet> {
+    override fun createQuestionSheets(
+        questionSet: QuestionSet?,
+        members: List<Member>,
+    ): List<QuestionSheet> {
         /**
          * TODO:
-         * - Get QuestionSheet by member for all members
-         * - Create a QuestionSheet with the candidates and resolver
+         * target : members
+         * question : QuestionSet
+         * candidate : member.candidate()
+         *
+         * - make friend logic, get Candidate logic
          * - cache put -> QuestionSet and return
          * - Temporarily set to create for all members, discuss details later
          */
