@@ -1,6 +1,5 @@
 package com.mashup.dojo.service
 
-import com.mashup.dojo.MemberEntity
 import com.mashup.dojo.MemberRepository
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
@@ -10,6 +9,7 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.MemberRelation
 import com.mashup.dojo.domain.RelationType
+import com.mashup.dojo.member.MemberEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -97,14 +97,13 @@ class DefaultMemberService(
 }
 
 private fun Member.toEntity(): MemberEntity {
-    return MemberEntity(
+    return MemberEntity.createMemberEntity(
         id = id.value,
         fullName = fullName,
         secondInitialName = secondInitialName,
         profileImageId = profileImageId?.value,
-        platform = platform.name,
-        ordinal = ordinal,
-        gender = gender.name,
-        point = point
+        platformString = platform.name,
+        genderString = gender.name,
+        ordinal = ordinal
     )
 }
