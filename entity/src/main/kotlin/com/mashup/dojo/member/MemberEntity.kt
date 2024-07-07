@@ -50,12 +50,10 @@ class MemberEntity(
             fullName: String,
             secondInitialName: String,
             profileImageId: String?,
-            platformString: String,
-            genderString: String,
+            platform: Platform,
+            gender: Gender,
             ordinal: Int,
         ): MemberEntity {
-            val platform = Platform.findByValue(platformString)
-            val gender = Gender.findByValue(genderString)
             return MemberEntity(
                 id = id,
                 fullName = fullName,

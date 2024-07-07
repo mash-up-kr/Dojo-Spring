@@ -1,6 +1,9 @@
 package com.mashup.dojo.domain
 
 import com.mashup.dojo.UUIDGenerator
+import com.mashup.dojo.member.Gender
+import com.mashup.dojo.member.Platform
+import java.lang.RuntimeException
 import java.time.LocalDateTime
 
 /**
@@ -72,6 +75,16 @@ data class Member(
 enum class MemberGender {
     MALE,
     FEMALE,
+    ;
+
+    companion object {
+        fun findByValue(value: String): Gender {
+            return Gender.entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw RuntimeException("ToDo change to DoJoException")
+            // ToDo
+            // DojoException.of(DojoExceptionType.INVALID_MEMBER_PLATFORM)
+        }
+    }
 }
 
 enum class MemberPlatform {
@@ -81,4 +94,14 @@ enum class MemberPlatform {
     ANDROID,
     IOS,
     DESIGN,
+    ;
+
+    companion object {
+        fun findByValue(value: String): Platform {
+            return Platform.entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw RuntimeException("ToDo change to DoJoException")
+            // ToDo
+            // DojoException.of(DojoExceptionType.INVALID_MEMBER_PLATFORM)
+        }
+    }
 }
