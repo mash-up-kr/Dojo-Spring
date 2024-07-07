@@ -1,8 +1,8 @@
 package com.mashup.dojo.domain
 
+import com.mashup.dojo.Gender
+import com.mashup.dojo.Platform
 import com.mashup.dojo.UUIDGenerator
-import com.mashup.dojo.member.Gender
-import com.mashup.dojo.member.Platform
 import java.lang.RuntimeException
 import java.time.LocalDateTime
 

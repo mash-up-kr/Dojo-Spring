@@ -1,5 +1,6 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.MemberEntity
 import com.mashup.dojo.MemberRepository
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
@@ -9,7 +10,6 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.MemberRelation
 import com.mashup.dojo.domain.RelationType
-import com.mashup.dojo.member.MemberEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 

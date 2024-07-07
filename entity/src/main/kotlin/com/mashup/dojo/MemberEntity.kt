@@ -1,7 +1,6 @@
-package com.mashup.dojo.member
+package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseTimeEntity
-import com.mashup.dojo.pick.PickEntity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -66,4 +65,17 @@ class MemberEntity(
             )
         }
     }
+}
+
+enum class Platform {
+    PRODUCT_DESIGN,
+    WEB,
+    IOS,
+    ANDROID,
+    SPRING,
+}
+
+enum class Gender {
+    MALE,
+    FEMALE,
 }

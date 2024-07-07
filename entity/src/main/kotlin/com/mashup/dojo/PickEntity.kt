@@ -1,7 +1,6 @@
-package com.mashup.dojo.pick
+package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseTimeEntity
-import com.mashup.dojo.member.MemberEntity
 import com.mashup.dojo.question.QuestionEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

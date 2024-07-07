@@ -1,7 +1,7 @@
 package com.mashup.dojo.question
 
+import com.mashup.dojo.PickEntity
 import com.mashup.dojo.base.BaseTimeEntity
-import com.mashup.dojo.pick.PickEntity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
