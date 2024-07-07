@@ -30,11 +30,12 @@ class MemberEntity(
     @Enumerated(EnumType.STRING)
     val gender: Gender,
     point: Int = DEFAULT_POINT,
-    @OneToMany(mappedBy = "fromMemberEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val fromPickEntities: MutableList<PickEntity> = mutableListOf(),
-    @OneToMany(mappedBy = "toMemberEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val toPickEntities: MutableList<PickEntity> = mutableListOf(),
-) : BaseTimeEntity() {
+    @OneToMany(mappedBy = "picker", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val pickers: MutableList<PickEntity> = mutableListOf(),
+    @OneToMany(mappedBy = "picked", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val picked: MutableList<PickEntity> = mutableListOf(),
+
+    ) : BaseTimeEntity() {
     @Column(name = "point", nullable = false)
     var point: Int = point
         protected set

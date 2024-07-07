@@ -19,10 +19,10 @@ class PickEntity(
     @JoinColumn(name = "question_id")
     val questionEntity: QuestionEntity,
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_member_id")
+    @JoinColumn(name = "picker_id", referencedColumnName = "id")
     val picker: MemberEntity,
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_member_id")
+    @JoinColumn(name = "picked_id", referencedColumnName = "id")
     val picked: MemberEntity,
     @Column(name = "is_gender_open")
     val isGenderOpen: Boolean,
