@@ -97,13 +97,16 @@ class DefaultMemberService(
 }
 
 private fun Member.toEntity(): MemberEntity {
+    val platform = MemberPlatform.findByValue(platform.name)
+    val gender = MemberGender.findByValue(gender.name)
+
     return MemberEntity.createMemberEntity(
         id = id.value,
         fullName = fullName,
         secondInitialName = secondInitialName,
         profileImageId = profileImageId?.value,
-        platformString = platform.name,
-        genderString = gender.name,
+        platform = platform,
+        gender = gender,
         ordinal = ordinal
     )
 }
