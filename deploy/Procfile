@@ -1,0 +1,1 @@
+web: java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod -Dserver.port=5000 -DJASYPT_ENCRYPTOR_PASSWORD={JASYPT_SECRET} ./application.jar
