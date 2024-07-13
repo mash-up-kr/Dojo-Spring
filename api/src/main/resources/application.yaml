@@ -3,3 +3,7 @@ spring:
     name: api
   profiles:
     include: entity, common
+
+scheduler:
+  cron: "0 0 9,21 * * *"
+  sheet-cron: "0 5 9,21 * * *"
