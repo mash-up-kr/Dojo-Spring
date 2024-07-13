@@ -36,7 +36,6 @@ interface QuestionService {
         publishedAt: LocalDateTime,
     ): QuestionSet
 
-
     fun createQuestionSheets(
         questionSet: QuestionSet?,
         members: List<Member>,
@@ -91,7 +90,6 @@ class DefaultQuestionService : QuestionService {
         // questionSetRepository.save()
         return SAMPLE_QUESTION_SET
     }
-
 
     override fun createQuestionSheets(
         questionSet: QuestionSet?,
