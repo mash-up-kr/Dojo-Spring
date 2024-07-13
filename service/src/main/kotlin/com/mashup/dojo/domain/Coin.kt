@@ -8,8 +8,8 @@ value class CoinId(val value: String)
 data class Coin(
     val id: CoinId,
     val memberId: MemberId,
-    val lastUpdatedAt: LocalDateTime,
     val amount: Long,
+    val lastUpdatedAt: LocalDateTime,
 )
 
 @JvmInline
@@ -20,10 +20,10 @@ data class CoinUseDetail(
     val coinId: CoinId,
     val useType: CoinUseType,
     val reason: String,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
 )
 
 enum class CoinUseType {
     USED,
-    EARNED
+    EARNED,
 }
