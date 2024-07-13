@@ -93,23 +93,25 @@ class DefaultMemberService(
     }
 
     override fun findAllMember(): List<Member> {
-        return memberRepository.findAll().stream().map { m ->
-            val platform = MemberPlatform.findByValue(m.platform)
-            val gender = MemberGender.findByValue(m.gender)
-            val imageId = m.profileImageId?.let { profileImageId -> ImageId(profileImageId) }
-            Member.convertToMember(
-                m.id,
-                m.fullName,
-                m.secondInitialName,
-                imageId,
-                m.ordinal,
-                platform,
-                gender,
-                m.point,
-                m.createdAt,
-                m.updatedAt
-            )
-        }.toList()
+        return memberRepository.findAll()
+            .map { m ->
+                val platform = MemberPlatform.findByValue(m.platform)
+                val gender = MemberGender.findByValue(m.gender)
+                val imageId = m.profileImageId?.let { ImageId(it) }
+
+                Member.convertToMember(
+                    id = m.id,
+                    fullName = m.fullName,
+                    secondInitialName = m.secondInitialName,
+                    profileImageId = imageId,
+                    ordinal = m.ordinal,
+                    platform = platform,
+                    gender = gender,
+                    point = m.point,
+                    createdAt = m.createdAt,
+                    updatedAt = m.updatedAt
+                )
+            }
     }
 
     private fun mockMember(memberId: MemberId) =
