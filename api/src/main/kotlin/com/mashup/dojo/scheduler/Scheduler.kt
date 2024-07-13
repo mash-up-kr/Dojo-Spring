@@ -13,7 +13,7 @@ private val log = KotlinLogging.logger {}
 class Scheduler(
     private val questionUseCase: QuestionUseCase,
 ) {
-    @Scheduled(cron = SCHEDULED_CRON)
+    @Scheduled(cron = "\${scheduler.cron}")
     @Async("questionSetSchedulerExecutor")
     fun createQuestionSet() {
         log.info { "=== Start Create questionSet at ${LocalDateTime.now()}. ===" }
@@ -21,7 +21,11 @@ class Scheduler(
         log.info { "=== Done Create questionSet at ${LocalDateTime.now()}. ===" }
     }
 
-    companion object {
-        private const val SCHEDULED_CRON = "0 0 9,21 * * *"
+    @Scheduled(cron = "\${scheduler.sheet-cron}")
+    @Async("questionSheetSchedulerExecutor")
+    fun createQuestionSheet() {
+        log.info { "=== Start Create questionSheet at ${LocalDateTime.now()}. ===" }
+        questionUseCase.createQuestionSheet()
+        log.info { "=== Done Create questionSheet at ${LocalDateTime.now()}. ===" }
     }
 }
