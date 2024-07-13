@@ -36,10 +36,13 @@ interface QuestionService {
         publishedAt: LocalDateTime,
     ): QuestionSet
 
+
     fun createQuestionSheets(
         questionSet: QuestionSet?,
         members: List<Member>,
     ): List<QuestionSheet>
+
+    fun getQuestionById(id: QuestionId): Question?
 }
 
 @Service
@@ -89,6 +92,7 @@ class DefaultQuestionService : QuestionService {
         return SAMPLE_QUESTION_SET
     }
 
+
     override fun createQuestionSheets(
         questionSet: QuestionSet?,
         members: List<Member>,
@@ -104,6 +108,11 @@ class DefaultQuestionService : QuestionService {
          * - Temporarily set to create for all members, discuss details later
          */
         return LIST_SAMPLE_QUESTION_SHEET
+    }
+
+    override fun getQuestionById(id: QuestionId): Question? {
+        // TODO("Not yet implemented")
+        return SAMPLE_QUESTION
     }
 
     companion object {

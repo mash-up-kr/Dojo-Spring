@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface ImageService {
-    fun load(imageId: ImageId): Image
+    fun load(imageId: ImageId): Image?
 
     fun save(
         uuid: String,
@@ -31,7 +31,11 @@ class DefaultImageService(
         return ImageId(saved.id)
     }
 
-    override fun load(imageId: ImageId): Image {
-        TODO("Not yet implemented")
+    override fun load(imageId: ImageId): Image? {
+        return SAMPLE_IMAGE
+    }
+
+    companion object {
+        val SAMPLE_IMAGE = Image(ImageId("image"), "urlurl")
     }
 }
