@@ -19,3 +19,8 @@ data class MemberCreateRequest(
     @field:NotBlank
     val gender: MemberGender,
 )
+
+@Schema(description = "멤버 정보 수정 요청 / 수정이 필요한 요소만 not-null 값으로 받아요")
+data class MemberUpdateRequest(
+    val profileImageId: ImageId?,
+)
