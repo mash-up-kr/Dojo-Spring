@@ -17,7 +17,14 @@ interface MemberUseCase {
         val gender: MemberGender,
     )
 
+    data class UpdateCommand(
+        val memberId: MemberId,
+        val profileImageId: ImageId?,
+    )
+
     fun create(command: CreateCommand): MemberId
+
+    fun update(command: UpdateCommand): MemberId
 }
 
 @Component
@@ -34,6 +41,16 @@ class DefaultMemberUseCase(
                 platform = command.platform,
                 ordinal = command.ordinal,
                 gender = command.gender
+            )
+        )
+    }
+
+    @Transactional
+    override fun update(command: MemberUseCase.UpdateCommand): MemberId {
+        return memberService.update(
+            MemberService.UpdateMember(
+                memberId = command.memberId,
+                profileImageId = command.profileImageId
             )
         )
     }

@@ -16,9 +16,12 @@ import java.time.LocalDateTime
 interface MemberService {
     fun getCandidates(currentMemberId: MemberId): List<Candidate>
 
+    // Todo 논의 필요: 요 메소드는 리턴값 nullable하지 않아도 될지?
     fun findMemberById(memberId: MemberId): Member
 
     fun create(command: CreateMember): MemberId
+
+    fun update(command: UpdateMember): MemberId
 
     fun findAllMember(): List<Member>
 
@@ -28,6 +31,11 @@ interface MemberService {
         val platform: MemberPlatform,
         val ordinal: Int,
         val gender: MemberGender,
+    )
+
+    data class UpdateMember(
+        val memberId: MemberId,
+        val profileImageId: ImageId?,
     )
 }
 
@@ -89,6 +97,19 @@ class DefaultMemberService(
             )
 
         val id = memberRepository.save(member.toEntity()).id
+        return MemberId(id)
+    }
+
+    override fun update(command: MemberService.UpdateMember): MemberId {
+        val member = findMemberById(command.memberId) // Todo nullable validation
+
+        val id =
+            memberRepository.save(
+                member.update(
+                    profileImageId = command.profileImageId
+                ).toEntity()
+            ).id
+
         return MemberId(id)
     }
 
