@@ -5,7 +5,9 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface PickRepository : JpaRepository<PickEntity, String>
+interface PickRepository : JpaRepository<PickEntity, String> {
+    fun findAllByPickedId(pickedId: String): List<PickEntity>
+}
 
 @Entity
 class PickEntity(
@@ -14,8 +16,8 @@ class PickEntity(
     val questionId: String,
     val pickerId: String,
     val pickedId: String,
-    val isGenderOpen: Boolean,
-    val isPlatformOpen: Boolean,
-    val isMidInitialNameOpen: Boolean,
-    val isFullNameOpen: Boolean,
+    val isGenderOpen: Boolean = false,
+    val isPlatformOpen: Boolean = false,
+    val isMidInitialNameOpen: Boolean = false,
+    val isFullNameOpen: Boolean = false,
 ) : BaseTimeEntity()

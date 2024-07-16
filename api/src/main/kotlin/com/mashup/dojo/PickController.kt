@@ -53,9 +53,11 @@ class PickController(
     }
 
     @PostMapping
-    fun create(@RequestBody request: CreatePickRequest): DojoApiResponse<PickId> {
+    fun create(
+        @RequestBody request: CreatePickRequest,
+    ): DojoApiResponse<PickId> {
         val pickId = pickUseCase.createPick(PickUseCase.CreatePickCommand(request.questionId, MemberId("1"), request.pickedId))
-        
+
         return DojoApiResponse.success(pickId)
     }
 }

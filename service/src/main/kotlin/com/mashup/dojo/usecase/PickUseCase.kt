@@ -4,6 +4,7 @@ import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Pick
+import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.service.ImageService
@@ -28,7 +29,15 @@ interface PickUseCase {
         val latestPickedAt: LocalDateTime,
     )
 
+    data class CreatePickCommand(
+        val questionId: QuestionId,
+        val pickerId: MemberId,
+        val pickedId: MemberId,
+    )
+
     fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
+
+    fun createPick(command: CreatePickCommand): PickId
 }
 
 @Component
@@ -72,6 +81,14 @@ class DefaultPickUseCase(
             PickSort.LATEST -> result.sortedByDescending { it.latestPickedAt }
             PickSort.MOST_PICKED -> result.sortedByDescending { it.totalReceivedPickCount }
         }
+    }
+
+    override fun createPick(command: PickUseCase.CreatePickCommand): PickId {
+        return pickService.create(
+            questionId = command.questionId,
+            pickerMemberId = command.pickerId,
+            pickedMemberId = command.pickedId
+        )
     }
 
     companion object {

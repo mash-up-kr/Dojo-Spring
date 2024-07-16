@@ -1,51 +1,76 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.PickEntity
+import com.mashup.dojo.PickRepository
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
-@Service
-class PickService {
+interface PickService {
+    val pickRepository: PickRepository
+
     fun getReceivedPickList(
         pickedMemberId: MemberId,
         sort: PickSort,
+    ): List<Pick>
+
+    fun create(
+        questionId: QuestionId,
+        pickerMemberId: MemberId,
+        pickedMemberId: MemberId,
+    ): PickId
+}
+
+@Service
+class DefaultPickService(
+    override val pickRepository: PickRepository,
+) : PickService {
+    override fun getReceivedPickList(
+        pickedMemberId: MemberId,
+        sort: PickSort,
     ): List<Pick> {
-        /*val pickList: List<Pick> = pickRepository.findAllByMemberId(pickedMemberId)
-             .map { PickEnity.buildDomain() }*/
-        return listOf(DEFAULT_PICK)
+        return pickRepository.findAllByPickedId(pickedMemberId.value)
+            .map { it.buildDomain() }
+    }
+
+    override fun create(
+        questionId: QuestionId,
+        pickerMemberId: MemberId,
+        pickedMemberId: MemberId,
+    ): PickId {
+        val pick =
+            Pick.create(
+                questionId = questionId,
+                pickerId = pickerMemberId,
+                pickedId = pickedMemberId
+            )
+
+        val id: String = pickRepository.save(pick.toEntity()).id
+        return PickId(id)
     }
 
     companion object {
-        val DEFAULT_PICK =
-            Pick(
+        private fun PickEntity.buildDomain(): Pick {
+            return Pick(
                 id = PickId("pickmepickme"),
                 questionId = QuestionId("question"),
                 pickerId = MemberId("뽑은놈"),
                 pickedId = MemberId("뽑힌놈"),
-                isGenderOpen = false,
-                isPlatformOpen = false,
-                isMidInitialNameOpen = false,
-                isFullNameOpen = false,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
+                createdAt = createdAt,
+                updatedAt = updatedAt
             )
-//        private fun PickEntity.buildDomain(): Pick {
-//            return Pick(
-//                id = PickId("pickmepickme"),
-//                questionId = QuestionId("question"),
-//                pickerId = MemberId("뽑은놈"),
-//                pickedId = MemberId("뽑힌놈"),
-//                isGenderOpen = false,
-//                isPlatformOpen = false,
-//                isMidInitialNameOpen = false,
-//                isFullNameOpen = false,
-//                createdAt = createdAt,
-//                updatedAt = updatedAt,
-//            )
-//        }
+        }
+
+        private fun Pick.toEntity(): PickEntity {
+            return PickEntity(
+                id = id.value,
+                questionId = questionId.value,
+                pickerId = pickerId.value,
+                pickedId = pickedId.value
+            )
+        }
     }
 }

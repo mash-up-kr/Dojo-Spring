@@ -7,8 +7,9 @@ import java.time.LocalDateTime
 
 data class CreatePickRequest(
     val questionId: QuestionId,
-    val pickedId: MemberId, 
+    val pickedId: MemberId,
 )
+
 data class ReceivedPickListGetResponse(
     val pickList: List<PickResponse>,
     val sort: PickSort,
