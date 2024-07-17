@@ -8,6 +8,8 @@ plugins {
     kotlin("plugin.spring") version "1.9.24"
     kotlin("plugin.jpa") version "2.0.0"
 
+    kotlin("kapt") version "1.9.24"
+
     // lint
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 
@@ -36,6 +38,7 @@ subprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("org.jlleitschuh.gradle.ktlint")
+        plugin("kotlin-kapt") // 추가
         plugin("idea")
     }
 
@@ -96,15 +99,36 @@ project(":entity") {
         // Jasypt
         implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${properties["jasyptSpringBootStarterVersion"]}")
 
-        // Querydsl
-        implementation("io.github.openfeign.querydsl:querydsl-core:${properties["queryDslVersion"]}")
-        implementation("io.github.openfeign.querydsl:querydsl-jpa:${properties["queryDslVersion"]}")
-        annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:${properties["queryDslVersion"]}:jpa")
-        annotationProcessor("jakarta.annotation:jakarta.annotation-api")
-        annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+        // QueryDSL
+        implementation("com.querydsl:querydsl-jpa:${properties["queryDslVersion"]}:jakarta")
+        kapt("com.querydsl:querydsl-apt:${properties["queryDslVersion"]}:jakarta")
+        kapt("jakarta.annotation:jakarta.annotation-api")
+        kapt("jakarta.persistence:jakarta.persistence-api")
 
         // query 값 정렬
         implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:${properties["p6spyVersion"]}")
+    }
+
+    val generated = file("src/main/generated")
+
+    tasks.withType<JavaCompile> {
+        options.generatedSourceOutputDirectory.set(generated)
+    }
+
+    sourceSets {
+        main {
+            kotlin.srcDirs += generated
+        }
+    }
+
+    tasks.named("clean") {
+        doLast {
+            generated.deleteRecursively()
+        }
+    }
+
+    kapt {
+        generateStubs = true
     }
 }
 
