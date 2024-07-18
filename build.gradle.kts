@@ -38,7 +38,7 @@ subprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("org.jlleitschuh.gradle.ktlint")
-        plugin("kotlin-kapt") // 추가
+        plugin("kotlin-kapt")
         plugin("idea")
     }
 
