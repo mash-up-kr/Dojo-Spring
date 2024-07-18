@@ -62,7 +62,14 @@ class PickController(
         return DojoApiResponse.success(ReceivedPickListGetResponse(pickResponseList, sort))
     }
 
-    @GetMapping("/pickDetail")
+    @GetMapping("/picked-detail")
+    @Operation(
+        summary = "내가 받은 픽 중 특정 질문 페이징 API",
+        description = "내가 픽 중 특정 질문을 페이징하여 보여주는 API. questionId : 특정 질문의 Id",
+        responses = [
+            ApiResponse(responseCode = "200", description = "내가 받은 픽 중 특정 질문의 페이징")
+        ]
+    )
     fun getPickDetail(
         @RequestParam questionId: String,
         @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
