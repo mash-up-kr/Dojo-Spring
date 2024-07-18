@@ -6,7 +6,7 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
-import com.mashup.dojo.dto.PagingPick
+import com.mashup.dojo.dto.PickPaging
 import com.mashup.dojo.dto.PickResponse
 import com.mashup.dojo.dto.ReceivedPickDetail
 import com.mashup.dojo.dto.ReceivedPickListGetResponse
@@ -66,7 +66,7 @@ class PickController(
     fun getPickDetail(
         @RequestParam questionId: String,
         @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
-    ): DojoApiResponse<PagingPick> {
+    ): DojoApiResponse<PickPaging> {
         val pickPaging: PickUseCase.GetPagingPick =
             pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(MemberId("1"), QuestionId(questionId), pageNumber))
 
@@ -89,7 +89,7 @@ class PickController(
                 )
             }
         val pickPagingResponse =
-            PagingPick(
+            PickPaging(
                 questionId = pickPaging.questionId,
                 questionContent = pickPaging.questionContent,
                 questionEmojiImageUrl = pickPaging.questionEmojiImageUrl,

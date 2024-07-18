@@ -35,7 +35,7 @@ data class PickResponse(
     val latestPickedAt: LocalDateTime,
 )
 
-data class PagingPick(
+data class PickPaging(
     val questionId: QuestionId,
     val questionContent: String,
     val questionEmojiImageUrl: String,
