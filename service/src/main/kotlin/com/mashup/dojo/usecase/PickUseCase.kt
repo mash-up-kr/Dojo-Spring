@@ -110,12 +110,6 @@ class DefaultPickUseCase(
 
         if (receivedPickList.isEmpty()) return EMPTY_RECEIVED_PICK
 
-        /*
-        ToDo 지워도 될까욥
-        val questionId = receivedPickList.first().questionId
-        questionService.getQuestionById(questionId)
-         */
-
         val result =
             receivedPickList.groupBy { it.questionId }
                 .flatMap { (questionId, pickList) ->
