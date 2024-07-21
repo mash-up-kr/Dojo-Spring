@@ -197,11 +197,11 @@ class DefaultPickUseCase(
                 val fullNameOpen = pick.isFullNameOpen
                 val pickerIdOpen = fullNameOpen && genderOpen && platformOpen && secondInitialNameOpen
 
-                val pickerId = getPickerId(pickerIdOpen, findMember.id)
-                val pickerGender = getPickerGender(genderOpen, findMember.gender)
-                val pickerPlatform = getPickerPlatform(platformOpen, findMember.platform)
-                val pickerSecondInitialName = getPickerSecondInitialName(secondInitialNameOpen, findMember.secondInitialName)
-                val pickerFullName = getPickerFullName(fullNameOpen, findMember.fullName)
+                val pickerId = transformPickerId(pickerIdOpen, findMember.id)
+                val pickerGender = transformPickerGender(genderOpen, findMember.gender)
+                val pickerPlatform = transformPickerPlatform(platformOpen, findMember.platform)
+                val pickerSecondInitialName = transformPickerSecondInitialName(secondInitialNameOpen, findMember.secondInitialName)
+                val pickerFullName = transformPickerFullName(fullNameOpen, findMember.fullName)
 
                 PickUseCase.GetReceivedPickDetail(
                     pickId = pick.id,
@@ -233,7 +233,7 @@ class DefaultPickUseCase(
         )
     }
 
-    fun getPickerId(
+    fun transformPickerId(
         pickerIdOpen: Boolean,
         pickerId: MemberId,
     ): MemberId {
@@ -243,7 +243,7 @@ class DefaultPickUseCase(
         }
     }
 
-    fun getPickerGender(
+    fun transformPickerGender(
         pickerGenderOpen: Boolean,
         pickerGender: MemberGender,
     ): MemberGender {
@@ -253,7 +253,7 @@ class DefaultPickUseCase(
         }
     }
 
-    fun getPickerPlatform(
+    fun transformPickerPlatform(
         pickerPlatformOpen: Boolean,
         pickerPlatform: MemberPlatform,
     ): MemberPlatform {
@@ -263,7 +263,7 @@ class DefaultPickUseCase(
         }
     }
 
-    fun getPickerSecondInitialName(
+    fun transformPickerSecondInitialName(
         pickerSecondInitialNameOpen: Boolean,
         secondInitialName: String,
     ): String {
@@ -273,7 +273,7 @@ class DefaultPickUseCase(
         }
     }
 
-    fun getPickerFullName(
+    fun transformPickerFullName(
         pickerFullNameOpen: Boolean,
         fullName: String,
     ): String {
@@ -284,7 +284,7 @@ class DefaultPickUseCase(
     }
 
     companion object {
-        val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
+        private val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
         private const val PAGE_SIZE = 10 // 페이지 당 데이터 수
     }
 }
