@@ -1,5 +1,7 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.MemberEntity
 import com.mashup.dojo.MemberRepository
 import com.mashup.dojo.domain.Candidate
@@ -16,8 +18,10 @@ import java.time.LocalDateTime
 interface MemberService {
     fun getCandidates(currentMemberId: MemberId): List<Candidate>
 
-    // Todo 논의 필요: 요 메소드는 리턴값 nullable하지 않아도 될지?
-    fun findMemberById(memberId: MemberId): Member
+    /**
+     * memberId 에 해당하는 member가 없다면 null 리턴
+     */
+    fun findMemberById(memberId: MemberId): Member?
 
     fun create(command: CreateMember): MemberId
 
@@ -81,7 +85,7 @@ class DefaultMemberService(
         return listOf(candidate1, candidate2, candidate3, candidate4)
     }
 
-    override fun findMemberById(memberId: MemberId): Member {
+    override fun findMemberById(memberId: MemberId): Member? {
         // memberRepository find(MemberId)
         return mockMember(memberId)
     }
@@ -101,7 +105,7 @@ class DefaultMemberService(
     }
 
     override fun update(command: MemberService.UpdateMember): MemberId {
-        val member = findMemberById(command.memberId) // Todo nullable validation
+        val member = findMemberById(command.memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
 
         val id =
             memberRepository.save(
