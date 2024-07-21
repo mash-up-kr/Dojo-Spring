@@ -82,7 +82,7 @@ class PickController(
     )
     fun openPick(
         // todo: add userInfo
-        @Valid @RequestBody request: PickOpenRequest
+        @Valid @RequestBody request: PickOpenRequest,
     ): DojoApiResponse<PickOpenResponse> {
         return pickUseCase.openPick(
             PickUseCase.OpenPickCommand(pickId = request.pickId, pickedId = MemberId("MOCK_MEMBER_ID"), pickOpenItem = request.pickOpenItem)

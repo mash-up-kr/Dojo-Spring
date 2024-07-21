@@ -42,17 +42,17 @@ interface PickUseCase {
     data class OpenPickCommand(
         val pickId: PickId,
         val pickedId: MemberId,
-        val pickOpenItem: PickOpenItem
+        val pickOpenItem: PickOpenItem,
     )
 
-    data class PickOpenInfo (
+    data class PickOpenInfo(
         val pickId: PickId,
         val pickOpenItem: PickOpenItem,
-        val value: String
+        val value: String,
     )
-    
-    fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
 
+    fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
+    
     fun createPick(command: CreatePickCommand): PickId
     fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
 }
@@ -118,7 +118,7 @@ class DefaultPickUseCase(
 
     override fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo {
         return pickService.openPick(
-            openPickCommand.pickId, 
+            openPickCommand.pickId,
             openPickCommand.pickedId,
             openPickCommand.pickOpenItem
         ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it) }

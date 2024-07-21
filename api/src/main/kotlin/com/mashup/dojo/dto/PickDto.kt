@@ -37,11 +37,11 @@ data class PickOpenRequest(
     @field:NotBlank
     val pickId: PickId,
     @field:NotNull
-    val pickOpenItem: PickOpenItem
+    val pickOpenItem: PickOpenItem,
 )
 
 data class PickOpenResponse(
     val pickId: PickId,
     val pickOpenItem: PickOpenItem,
-    val value: String
+    val value: String,
 )
