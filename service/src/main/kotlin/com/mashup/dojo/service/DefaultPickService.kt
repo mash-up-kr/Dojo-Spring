@@ -8,6 +8,7 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 interface PickService {
     val pickRepository: PickRepository
@@ -25,6 +26,7 @@ interface PickService {
 }
 
 @Service
+@Transactional(readOnly = true)
 class DefaultPickService(
     override val pickRepository: PickRepository,
 ) : PickService {
@@ -36,6 +38,7 @@ class DefaultPickService(
             .map { it.buildDomain() }
     }
 
+    @Transactional
     override fun create(
         questionId: QuestionId,
         pickerMemberId: MemberId,

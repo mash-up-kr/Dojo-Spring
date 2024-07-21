@@ -8,6 +8,7 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.service.ImageService
+import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPick
@@ -45,6 +46,7 @@ class DefaultPickUseCase(
     private val pickService: PickService,
     private val questionService: QuestionService,
     private val imageService: ImageService,
+    private val memberService: MemberService,
 ) : PickUseCase {
     override fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick> {
         val receivedPickList: List<Pick> = pickService.getReceivedPickList(command.memberId, command.sort)
@@ -84,10 +86,17 @@ class DefaultPickUseCase(
     }
 
     override fun createPick(command: PickUseCase.CreatePickCommand): PickId {
+        val question =
+            questionService.getQuestionById(command.questionId)
+                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST QUESTION ID ${command.questionId}")
+        val pickedMember =
+            memberService.findMemberById(command.pickedId)
+                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID ${command.pickedId}")
+
         return pickService.create(
-            questionId = command.questionId,
+            questionId = question.id,
             pickerMemberId = command.pickerId,
-            pickedMemberId = command.pickedId
+            pickedMemberId = pickedMember.id
         )
     }
 
