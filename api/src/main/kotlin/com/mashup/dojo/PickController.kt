@@ -53,6 +53,13 @@ class PickController(
     }
 
     @PostMapping
+    @Operation(
+        summary = "픽 생성 API",
+        description = "질문에 대해 상대방을 선택 시, Pick 정보가 생성됩니다.",
+        responses = [
+            ApiResponse(responseCode = "200", description = "생성된 pick Id")
+        ]
+    )
     fun create(
         @RequestBody request: CreatePickRequest,
     ): DojoApiResponse<PickId> {
