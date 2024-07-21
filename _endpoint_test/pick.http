@@ -11,3 +11,14 @@ Content-Type: application/json
     "questionId": "1234564",
     "pickedId": "1"
 }
+
+### 픽 정보 오픈하기
+
+POST {{host}}/pick/open
+Content-Type: application/json
+
+{
+    "pickId": "pickId",
+    "pickOpenItem": "GENDER"
+}
+
