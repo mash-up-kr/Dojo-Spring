@@ -5,6 +5,7 @@ import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
+import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.service.ImageService
@@ -13,6 +14,8 @@ import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPick
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickListCommand
+import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
+import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -36,9 +39,22 @@ interface PickUseCase {
         val pickedId: MemberId,
     )
 
+    data class OpenPickCommand(
+        val pickId: PickId,
+        val pickedId: MemberId,
+        val pickOpenItem: PickOpenItem
+    )
+
+    data class PickOpenInfo (
+        val pickId: PickId,
+        val pickOpenItem: PickOpenItem,
+        val value: String
+    )
+    
     fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
 
     fun createPick(command: CreatePickCommand): PickId
+    fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
 }
 
 @Component
@@ -98,6 +114,14 @@ class DefaultPickUseCase(
             pickerMemberId = command.pickerId,
             pickedMemberId = pickedMember.id
         )
+    }
+
+    override fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo {
+        return pickService.openPick(
+            openPickCommand.pickId, 
+            openPickCommand.pickedId,
+            openPickCommand.pickOpenItem
+        ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it) }
     }
 
     companion object {

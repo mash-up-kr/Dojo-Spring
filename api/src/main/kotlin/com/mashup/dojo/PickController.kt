@@ -5,12 +5,15 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.dto.CreatePickRequest
+import com.mashup.dojo.dto.PickOpenRequest
+import com.mashup.dojo.dto.PickOpenResponse
 import com.mashup.dojo.dto.PickResponse
 import com.mashup.dojo.dto.ReceivedPickListGetResponse
 import com.mashup.dojo.usecase.PickUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -67,5 +70,22 @@ class PickController(
         val pickId = pickUseCase.createPick(PickUseCase.CreatePickCommand(request.questionId, MemberId("1"), request.pickedId))
 
         return DojoApiResponse.success(pickId)
+    }
+    
+    @PostMapping("/open")
+    @Operation(
+        summary = "내가 받은 픽 정보 오픈 API",
+        description = "내가 받은 픽의 정보 중 하나를 오픈하는 API. 픽 오픈 정보 : 성별, 플랫폼, 초성 1자(중간 이름), 이름",
+        responses = [
+            ApiResponse(responseCode = "200", description = "픽 정보")
+        ]
+    )
+    fun openPick(
+        // todo: add userInfo
+        @Valid @RequestBody request: PickOpenRequest
+    ): DojoApiResponse<PickOpenResponse> {
+        return pickUseCase.openPick(
+            PickUseCase.OpenPickCommand(pickId = request.pickId, pickedId = MemberId("MOCK_MEMBER_ID"), pickOpenItem = request.pickOpenItem)
+        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId, it.pickOpenItem, it.value)) }
     }
 }
