@@ -14,11 +14,14 @@ Content-Type: application/json
 
 ### 픽 정보 오픈하기
 
-POST {{host}}/pick/open
+POST {{host}}/pick/{{id}}/open
 Content-Type: application/json
 
 {
-    "pickId": "pickId",
     "pickOpenItem": "GENDER"
 }
+
+### Variables
+@id=1
+
 
