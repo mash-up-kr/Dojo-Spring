@@ -1,5 +1,9 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
+import com.mashup.dojo.PickEntity
+import com.mashup.dojo.PickRepository
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
@@ -25,7 +29,10 @@ interface PickService {
 
 @Transactional(readOnly = true)
 @Service
-class DefaultPickService : PickService {
+class DefaultPickService(
+    private val pickRepository: PickRepository,
+    private val memberService: MemberService,
+) : PickService {
     override fun getReceivedPickList(
         pickedMemberId: MemberId,
         sort: PickSort,
@@ -41,15 +48,39 @@ class DefaultPickService : PickService {
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
     ): String {
-        // todo : 로직 구현
-        // Pick 조회
-        // - pickId에 해당하는 Pick이 존재하지 않을 때 : 예외 반환
-        // Pick 유효성 검사
-        // - 전달된 pickedId와 조회된 Pick.pickedId 값이 같지 않을 때 : 예외 반환
-        // Pick Open 처리
-        // - 오픈하지 않은 정보일 때 : 해당 정보 오픈 처리, 해당 정보 반환
-        // - 이미 오픈한 정보일 때 : 예외 반환
-        return "MOCK_PICK_INFO_VALUE"
+        val pick = findPickById(pickId) ?: throw DojoException.of(DojoExceptionType.PICK_NOT_FOUND)
+
+        if (pick.pickedId != pickedId) {
+            throw DojoException.of(DojoExceptionType.ACCESS_DENIED)
+        }
+
+        if (pick.isOpened(pickOpenItem)) {
+            throw DojoException.of(DojoExceptionType.PICK_ALREADY_OPENED)
+        }
+
+        pickRepository.save(
+            pick.open(pickOpenItem).toEntity()
+        )
+
+        val picker = memberService.findMemberById(pick.pickerId)
+        return pick.getOpenItem(pickOpenItem, picker)
+    }
+
+    private fun findPickById(pickId: PickId): Pick? {
+        return pickRepository.findById(pickId.value).map {
+            Pick.of(
+                it.id,
+                it.questionId,
+                it.pickerId,
+                it.pickedId,
+                it.isGenderOpen,
+                it.isPlatformOpen,
+                it.isMidInitialNameOpen,
+                it.isFullNameOpen,
+                it.createdAt,
+                it.updatedAt
+            )
+        }.orElse(null)
     }
 
     companion object {
@@ -81,4 +112,17 @@ class DefaultPickService : PickService {
 //            )
 //        }
     }
+}
+
+private fun Pick.toEntity(): PickEntity {
+    return PickEntity(
+        id = id.value,
+        questionId = questionId.value,
+        pickerId = pickerId.value,
+        pickedId = pickedId.value,
+        isGenderOpen = isGenderOpen,
+        isPlatformOpen = isPlatformOpen,
+        isMidInitialNameOpen = isMidInitialNameOpen,
+        isFullNameOpen = isFullNameOpen
+    )
 }
