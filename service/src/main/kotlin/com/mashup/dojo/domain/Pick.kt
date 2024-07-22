@@ -1,5 +1,6 @@
 package com.mashup.dojo.domain
 
+import com.mashup.dojo.UUIDGenerator
 import java.time.LocalDateTime
 
 @JvmInline
@@ -13,16 +14,35 @@ data class Pick(
     // 골라진 멤버
     val pickedId: MemberId,
     // 성별 공개 여부
-    val isGenderOpen: Boolean,
+    val isGenderOpen: Boolean = false,
     // 플랫폼 공개 여부
-    val isPlatformOpen: Boolean,
+    val isPlatformOpen: Boolean = false,
     // 이름 중간 글자 공개 여부
-    val isMidInitialNameOpen: Boolean,
+    val isMidInitialNameOpen: Boolean = false,
     // 이름 전체 공개 여부
-    val isFullNameOpen: Boolean,
+    val isFullNameOpen: Boolean = false,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-)
+) {
+    companion object {
+        internal fun create(
+            questionId: QuestionId,
+            pickerId: MemberId,
+            pickedId: MemberId,
+        ): Pick {
+            val uuid = UUIDGenerator.generate()
+
+            return Pick(
+                id = PickId(uuid),
+                questionId = questionId,
+                pickerId = pickerId,
+                pickedId = pickedId,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
+        }
+    }
+}
 
 enum class PickOpenItem(val value: String, val cost: Int) {
     GENDER("성별", 10),

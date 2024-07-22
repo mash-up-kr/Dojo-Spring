@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 interface MemberService {
     fun getCandidates(currentMemberId: MemberId): List<Candidate>
 
-    fun findMemberById(memberId: MemberId): Member
+    fun findMemberById(memberId: MemberId): Member?
 
     fun create(command: CreateMember): MemberId
 
@@ -73,7 +73,7 @@ class DefaultMemberService(
         return listOf(candidate1, candidate2, candidate3, candidate4)
     }
 
-    override fun findMemberById(memberId: MemberId): Member {
+    override fun findMemberById(memberId: MemberId): Member? {
         // memberRepository find(MemberId)
         return mockMember(memberId)
     }
