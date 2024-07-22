@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -72,7 +73,7 @@ class PickController(
         return DojoApiResponse.success(pickId)
     }
     
-    @PostMapping("/open")
+    @PostMapping("/{id}/open")
     @Operation(
         summary = "내가 받은 픽 정보 오픈 API",
         description = "내가 받은 픽의 정보 중 하나를 오픈하는 API. 픽 오픈 정보 : 성별, 플랫폼, 초성 1자(중간 이름), 이름",
@@ -82,10 +83,15 @@ class PickController(
     )
     fun openPick(
         // todo: add userInfo
+        @PathVariable id: String,
         @Valid @RequestBody request: PickOpenRequest,
     ): DojoApiResponse<PickOpenResponse> {
+        // todd: pickedId에 실제 유저 id 전달
         return pickUseCase.openPick(
-            PickUseCase.OpenPickCommand(pickId = request.pickId, pickedId = MemberId("MOCK_MEMBER_ID"), pickOpenItem = request.pickOpenItem)
+            PickUseCase.OpenPickCommand(
+                pickId = PickId(id), 
+                pickedId = MemberId("MOCK_MEMBER_ID"), 
+                pickOpenItem = request.pickOpenItem)
         ).let { DojoApiResponse.success(PickOpenResponse(it.pickId, it.pickOpenItem, it.value)) }
     }
 }
