@@ -6,7 +6,6 @@ import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
@@ -34,8 +33,6 @@ data class PickResponse(
 
 @Schema(description = "픽 오픈 요청")
 data class PickOpenRequest(
-    @field:NotBlank
-    val pickId: PickId,
     @field:NotNull
     val pickOpenItem: PickOpenItem,
 )
