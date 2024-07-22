@@ -42,6 +42,39 @@ data class Pick(
             )
         }
     }
+
+    internal fun isOpened(pickOpenItem: PickOpenItem): Boolean {
+        return when {
+            PickOpenItem.GENDER.value == pickOpenItem.value -> isGenderOpen
+            PickOpenItem.PLATFORM.value == pickOpenItem.value -> isPlatformOpen
+            PickOpenItem.MID_INITIAL_NAME.value == pickOpenItem.value -> isMidInitialNameOpen
+            PickOpenItem.FULL_NAME.value == pickOpenItem.value -> isFullNameOpen
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    internal fun open(pickOpenItem: PickOpenItem): Pick {
+        return when {
+            PickOpenItem.GENDER.value == pickOpenItem.value -> copy(isGenderOpen = true)
+            PickOpenItem.PLATFORM.value == pickOpenItem.value -> copy(isPlatformOpen = true)
+            PickOpenItem.MID_INITIAL_NAME.value == pickOpenItem.value -> copy(isMidInitialNameOpen = true)
+            PickOpenItem.FULL_NAME.value == pickOpenItem.value -> copy(isFullNameOpen = true)
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    internal fun getOpenItem(
+        pickOpenItem: PickOpenItem,
+        picker: Member,
+    ): String {
+        return when {
+            PickOpenItem.GENDER.value == pickOpenItem.value -> picker.gender.name
+            PickOpenItem.PLATFORM.value == pickOpenItem.value -> picker.platform.name
+            PickOpenItem.MID_INITIAL_NAME.value == pickOpenItem.value -> picker.secondInitialName
+            PickOpenItem.FULL_NAME.value == pickOpenItem.value -> picker.fullName
+            else -> throw IllegalArgumentException()
+        }
+    }
 }
 
 enum class PickOpenItem(val value: String, val cost: Int) {
