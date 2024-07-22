@@ -63,6 +63,7 @@ class PickController(
     fun create(
         @RequestBody request: CreatePickRequest,
     ): DojoApiResponse<PickId> {
+        // todo : update memberId to AuthInfo
         val pickId = pickUseCase.createPick(PickUseCase.CreatePickCommand(request.questionId, MemberId("1"), request.pickedId))
 
         return DojoApiResponse.success(pickId)
