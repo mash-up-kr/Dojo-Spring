@@ -1,5 +1,7 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.MemberEntity
 import com.mashup.dojo.MemberRepository
 import com.mashup.dojo.domain.Candidate
@@ -20,6 +22,8 @@ interface MemberService {
 
     fun create(command: CreateMember): MemberId
 
+    fun update(command: UpdateMember): MemberId
+
     fun findAllMember(): List<Member>
 
     data class CreateMember(
@@ -28,6 +32,11 @@ interface MemberService {
         val platform: MemberPlatform,
         val ordinal: Int,
         val gender: MemberGender,
+    )
+
+    data class UpdateMember(
+        val memberId: MemberId,
+        val profileImageId: ImageId?,
     )
 }
 
@@ -89,6 +98,19 @@ class DefaultMemberService(
             )
 
         val id = memberRepository.save(member.toEntity()).id
+        return MemberId(id)
+    }
+
+    override fun update(command: MemberService.UpdateMember): MemberId {
+        val member = findMemberById(command.memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+
+        val id =
+            memberRepository.save(
+                member.update(
+                    profileImageId = command.profileImageId
+                ).toEntity()
+            ).id
+
         return MemberId(id)
     }
 

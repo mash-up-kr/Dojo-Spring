@@ -39,6 +39,13 @@ data class Member(
         return this.copy(point = this.point - point, updatedAt = LocalDateTime.now())
     }
 
+    fun update(profileImageId: ImageId?): Member {
+        // null 값이면 기존 값 유지해요.
+        return copy(
+            profileImageId = profileImageId ?: this.profileImageId
+        )
+    }
+
     companion object {
         private const val MEMBER_INIT_POINT = 200
 

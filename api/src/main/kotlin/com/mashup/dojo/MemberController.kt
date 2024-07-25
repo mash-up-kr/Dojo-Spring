@@ -3,23 +3,28 @@ package com.mashup.dojo
 import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.dto.MemberCreateRequest
+import com.mashup.dojo.dto.MemberUpdateRequest
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 private val logger = KotlinLogging.logger { }
 
 @Tag(name = "Member", description = "멤버")
 @RestController
+@RequestMapping("/member")
 class MemberController(
     private val memberUseCase: MemberUseCase,
 ) {
-    @PostMapping("/member")
+    @PostMapping
     @Operation(
         summary = "멤버 가입 API",
         description = "멤버 가입 시 사용하는 API. 현재 ID 제외(auto generation) 별도의 unique 값은 없어요.",
@@ -46,7 +51,36 @@ class MemberController(
         return DojoApiResponse.success(MemberCreateResponse(memberId))
     }
 
+    @PatchMapping("/{id}")
+    @Operation(
+        summary = "멤버 정보 갱신 API",
+        description = "멤버 정보 수정 시 사용하는 API. 수정될 요소만 not-null로 받아요. null로 들어온 프로퍼티는 기존 값을 유지해요.",
+        responses = [
+            ApiResponse(responseCode = "200", description = "갱신된 멤버의 ID")
+        ]
+    )
+    fun update(
+        @PathVariable id: String,
+        @RequestBody request: MemberUpdateRequest,
+    ): DojoApiResponse<MemberUpdateResponse> {
+        logger.info { "update member, member-id: $id, request: $request" }
+
+        val memberId =
+            memberUseCase.update(
+                MemberUseCase.UpdateCommand(
+                    memberId = MemberId(id),
+                    profileImageId = request.profileImageId
+                )
+            )
+
+        return DojoApiResponse.success(MemberUpdateResponse(memberId))
+    }
+
     data class MemberCreateResponse(
+        val id: MemberId,
+    )
+
+    data class MemberUpdateResponse(
         val id: MemberId,
     )
 }
