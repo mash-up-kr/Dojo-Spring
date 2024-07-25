@@ -18,9 +18,6 @@ import java.time.LocalDateTime
 interface MemberService {
     fun getCandidates(currentMemberId: MemberId): List<Candidate>
 
-    /**
-     * memberId 에 해당하는 member가 없다면 null 리턴
-     */
     fun findMemberById(memberId: MemberId): Member?
 
     fun create(command: CreateMember): MemberId

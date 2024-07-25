@@ -1,8 +1,18 @@
 package com.mashup.dojo.dto
 
+import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
+
+@Schema(description = "Pick 생성 요청")
+data class CreatePickRequest(
+    @Schema(description = "질문 id")
+    val questionId: QuestionId,
+    @Schema(description = "후보자 중 선택한 대상 멤버 id")
+    val pickedId: MemberId,
+)
 
 data class ReceivedPickListGetResponse(
     val pickList: List<PickResponse>,
