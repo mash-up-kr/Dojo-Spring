@@ -10,6 +10,7 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -67,20 +68,7 @@ class DefaultPickService(
     }
 
     private fun findPickById(pickId: PickId): Pick? {
-        return pickRepository.findById(pickId.value).map {
-            Pick.of(
-                it.id,
-                it.questionId,
-                it.pickerId,
-                it.pickedId,
-                it.isGenderOpen,
-                it.isPlatformOpen,
-                it.isMidInitialNameOpen,
-                it.isFullNameOpen,
-                it.createdAt,
-                it.updatedAt
-            )
-        }.orElse(null)
+        return pickRepository.findByIdOrNull(pickId.value)?.toPick()
     }
 
     companion object {
@@ -124,5 +112,20 @@ private fun Pick.toEntity(): PickEntity {
         isPlatformOpen = isPlatformOpen,
         isMidInitialNameOpen = isMidInitialNameOpen,
         isFullNameOpen = isFullNameOpen
+    )
+}
+
+private fun PickEntity.toPick(): Pick {
+    return Pick(
+        id = PickId(id),
+        questionId = QuestionId(questionId),
+        pickerId = MemberId(pickerId),
+        pickedId = MemberId(pickedId),
+        isGenderOpen = isGenderOpen,
+        isPlatformOpen = isPlatformOpen,
+        isMidInitialNameOpen = isMidInitialNameOpen,
+        isFullNameOpen = isFullNameOpen,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
