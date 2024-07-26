@@ -44,22 +44,20 @@ data class Pick(
     }
 
     internal fun isOpened(pickOpenItem: PickOpenItem): Boolean {
-        return when {
-            PickOpenItem.GENDER.value == pickOpenItem.value -> isGenderOpen
-            PickOpenItem.PLATFORM.value == pickOpenItem.value -> isPlatformOpen
-            PickOpenItem.MID_INITIAL_NAME.value == pickOpenItem.value -> isMidInitialNameOpen
-            PickOpenItem.FULL_NAME.value == pickOpenItem.value -> isFullNameOpen
-            else -> throw IllegalArgumentException()
+        return when (pickOpenItem) {
+            PickOpenItem.GENDER -> isGenderOpen
+            PickOpenItem.PLATFORM -> isPlatformOpen
+            PickOpenItem.MID_INITIAL_NAME -> isMidInitialNameOpen
+            PickOpenItem.FULL_NAME -> isFullNameOpen
         }
     }
 
     internal fun open(pickOpenItem: PickOpenItem): Pick {
-        return when {
-            PickOpenItem.GENDER.value == pickOpenItem.value -> copy(isGenderOpen = true)
-            PickOpenItem.PLATFORM.value == pickOpenItem.value -> copy(isPlatformOpen = true)
-            PickOpenItem.MID_INITIAL_NAME.value == pickOpenItem.value -> copy(isMidInitialNameOpen = true)
-            PickOpenItem.FULL_NAME.value == pickOpenItem.value -> copy(isFullNameOpen = true)
-            else -> throw IllegalArgumentException()
+        return when(pickOpenItem) {
+            PickOpenItem.GENDER -> copy(isGenderOpen = true)
+            PickOpenItem.PLATFORM -> copy(isPlatformOpen = true)
+            PickOpenItem.MID_INITIAL_NAME -> copy(isMidInitialNameOpen = true)
+            PickOpenItem.FULL_NAME -> copy(isFullNameOpen = true)
         }
     }
 
@@ -67,12 +65,11 @@ data class Pick(
         pickOpenItem: PickOpenItem,
         picker: Member,
     ): String {
-        return when {
-            PickOpenItem.GENDER.value == pickOpenItem.value -> picker.gender.name
-            PickOpenItem.PLATFORM.value == pickOpenItem.value -> picker.platform.name
-            PickOpenItem.MID_INITIAL_NAME.value == pickOpenItem.value -> picker.secondInitialName
-            PickOpenItem.FULL_NAME.value == pickOpenItem.value -> picker.fullName
-            else -> throw IllegalArgumentException()
+        return when(pickOpenItem) {
+            PickOpenItem.GENDER -> picker.gender.name
+            PickOpenItem.PLATFORM -> picker.platform.name
+            PickOpenItem.MID_INITIAL_NAME -> picker.secondInitialName
+            PickOpenItem.FULL_NAME -> picker.fullName
         }
     }
 }
