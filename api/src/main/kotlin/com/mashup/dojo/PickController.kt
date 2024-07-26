@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @Tag(name = "Pick", description = "픽!")
 @RestController
@@ -127,6 +129,20 @@ class PickController(
         val pickId = pickUseCase.createPick(PickUseCase.CreatePickCommand(request.questionId, MemberId("1"), request.pickedId))
 
         return DojoApiResponse.success(pickId)
+    }
+
+    @GetMapping("/next-pick-time")
+    @Operation(
+        summary = "다음 투표 시간 조회 API",
+        description = "한국 시간 기준 다음 투표 시간을 반환합니다.",
+        responses = [
+            ApiResponse(responseCode = "200", description = "다음 투표 시간")
+        ]
+    )
+    fun getNextPickTime(): DojoApiResponse<LocalDateTime> {
+        val currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
+        val nextPickTime = pickUseCase.getNextPickTime(currentTime)
+        return DojoApiResponse.success(nextPickTime)
     }
 
     @PostMapping("/{id}/open")
