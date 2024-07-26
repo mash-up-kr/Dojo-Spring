@@ -60,7 +60,7 @@ class DefaultPickService(
         }
 
         pickRepository.save(
-            pick.open(pickOpenItem).toEntity()
+            pick.updateOpenItem(pickOpenItem).toEntity()
         )
 
         val picker = memberService.findMemberById(pick.pickerId)

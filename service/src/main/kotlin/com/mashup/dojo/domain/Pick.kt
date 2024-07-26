@@ -52,7 +52,7 @@ data class Pick(
         }
     }
 
-    internal fun open(pickOpenItem: PickOpenItem): Pick {
+    internal fun updateOpenItem(pickOpenItem: PickOpenItem): Pick {
         return when(pickOpenItem) {
             PickOpenItem.GENDER -> copy(isGenderOpen = true)
             PickOpenItem.PLATFORM -> copy(isPlatformOpen = true)
