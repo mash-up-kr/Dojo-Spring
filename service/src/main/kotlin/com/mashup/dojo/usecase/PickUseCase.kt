@@ -94,6 +94,7 @@ interface PickUseCase {
     fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
 
     fun createPick(command: CreatePickCommand): PickId
+
     fun getNextPickTime(currentTime: LocalDateTime): LocalDateTime
 
     fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
@@ -283,12 +284,13 @@ class DefaultPickUseCase(
     override fun getNextPickTime(currentTime: LocalDateTime): LocalDateTime {
         // fixme: phase1 기준 하루에 2번 투표가 오픈되는데 투표 오픈 시간 값을 어디에 저장해둘지? 하드코딩 or DB 저장
         val pickTimes = listOf(LocalTime.of(9, 0), LocalTime.of(18, 0))
-        
+
         val today = currentTime.toLocalDate()
-        
-        val nextPickTime = pickTimes
-            .map { today.atTime(it) }
-            .firstOrNull { it.isAfter(currentTime) }
+
+        val nextPickTime =
+            pickTimes
+                .map { today.atTime(it) }
+                .firstOrNull { it.isAfter(currentTime) }
 
         // 다음 투표 시간이 오늘 안에 있다면 반환, 아니면 내일 첫 투표 시간 반환
         return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
