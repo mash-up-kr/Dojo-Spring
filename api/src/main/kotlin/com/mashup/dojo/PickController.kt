@@ -89,9 +89,10 @@ class PickController(
         // todd: pickedId에 실제 유저 id 전달
         return pickUseCase.openPick(
             PickUseCase.OpenPickCommand(
-                pickId = PickId(id), 
-                pickedId = MemberId("MOCK_MEMBER_ID"), 
-                pickOpenItem = request.pickOpenItem)
+                pickId = PickId(id),
+                pickedId = MemberId("MOCK_MEMBER_ID"),
+                pickOpenItem = request.pickOpenItem
+            )
         ).let { DojoApiResponse.success(PickOpenResponse(it.pickId, it.pickOpenItem, it.value)) }
     }
 }
