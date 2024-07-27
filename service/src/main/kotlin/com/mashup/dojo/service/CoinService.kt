@@ -1,31 +1,34 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.CoinEntity
+import com.mashup.dojo.CoinRepository
+import com.mashup.dojo.CoinUseDetailRepository
 import com.mashup.dojo.domain.Coin
 import com.mashup.dojo.domain.CoinId
 import com.mashup.dojo.domain.MemberId
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 interface CoinService {
-    fun getCoin(memberId: MemberId): Coin
+    fun getCoin(memberId: MemberId): Coin?
 }
 
 @Service
 class DefaultCoinService(
-    // TODO :  private val coinRepository: CoinRepository
+    private val coinRepository: CoinRepository,
+    private val coinUseDetailRepository: CoinUseDetailRepository,
 ) : CoinService {
-    override fun getCoin(memberId: MemberId): Coin {
-        // return coinRepository.findByMemberId(memberId)
-        return DEFAULT_COIN_INFO
+    override fun getCoin(memberId: MemberId): Coin? {
+        return coinRepository.findByMemberId(memberId.value)?.toDomain()
     }
 
     companion object {
-        val DEFAULT_COIN_INFO =
-            Coin(
-                id = CoinId("1"),
-                memberId = MemberId("1"),
-                amount = 200L,
-                lastUpdatedAt = LocalDateTime.now()
+        private fun CoinEntity.toDomain(): Coin {
+            return Coin(
+                id = CoinId(id),
+                memberId = MemberId(memberId),
+                amount = amount,
+                lastUpdatedAt = updatedAt
             )
+        }
     }
 }
