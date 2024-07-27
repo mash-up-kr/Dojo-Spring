@@ -5,8 +5,8 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
-import com.mashup.dojo.dto.PickOpenItemDto
 import com.mashup.dojo.dto.CreatePickRequest
+import com.mashup.dojo.dto.PickOpenItemDto
 import com.mashup.dojo.dto.PickOpenRequest
 import com.mashup.dojo.dto.PickOpenResponse
 import com.mashup.dojo.dto.PickResponse
@@ -74,7 +74,7 @@ class PickController(
 
         return DojoApiResponse.success(pickId)
     }
-    
+
     @PostMapping("/{id}/open")
     @Operation(
         summary = "내가 받은 픽 정보 오픈 API",
