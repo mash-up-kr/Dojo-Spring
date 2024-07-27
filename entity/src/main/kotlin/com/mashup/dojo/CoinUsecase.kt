@@ -6,11 +6,13 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CoinUseDetailRepository : JpaRepository<CoinUseDetailEntity, String>
 
 @Entity
+@Table("coin_use_detail")
 class CoinUseDetailEntity(
     @Id
     @Column(name = "id", nullable = false)
