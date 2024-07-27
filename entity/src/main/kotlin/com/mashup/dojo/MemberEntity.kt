@@ -34,7 +34,12 @@ class MemberEntity(
     val pickers: MutableList<PickEntity> = mutableListOf(),
     @OneToMany(mappedBy = "picked", cascade = [CascadeType.ALL], orphanRemoval = true)
     val picked: MutableList<PickEntity> = mutableListOf(),
-) : BaseTimeEntity() {
+    @OneToMany(mappedBy = "from", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val fromRelations: MutableList<MemberRelationEntity> = mutableListOf(),
+    @OneToMany(mappedBy = "to", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val toRelations: MutableList<MemberRelationEntity> = mutableListOf(),
+
+    ) : BaseTimeEntity() {
     @Column(name = "point", nullable = false)
     var point: Int = point
         protected set
