@@ -5,12 +5,15 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface MemberRepository : JpaRepository<MemberEntity, String>
+interface MemberRepository : JpaRepository<MemberEntity, String> {
+    fun findByToken(token: String): MemberEntity?
+}
 
 @Entity
 class MemberEntity(
     @Id
     val id: String,
+    val token: String,
     val fullName: String,
     val secondInitialName: String,
     val profileImageId: String?,

@@ -11,6 +11,7 @@ import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.MemberRelation
+import com.mashup.dojo.domain.MemberToken
 import com.mashup.dojo.domain.RelationType
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -117,34 +118,20 @@ class DefaultMemberService(
     override fun findAllMember(): List<Member> {
         return memberRepository.findAll()
             .map { m ->
-                val platform = MemberPlatform.findByValue(m.platform)
-                val gender = MemberGender.findByValue(m.gender)
-                val imageId = m.profileImageId?.let { ImageId(it) }
-
-                Member.convertToMember(
-                    id = m.id,
-                    fullName = m.fullName,
-                    secondInitialName = m.secondInitialName,
-                    profileImageId = imageId,
-                    ordinal = m.ordinal,
-                    platform = platform,
-                    gender = gender,
-                    point = m.point,
-                    createdAt = m.createdAt,
-                    updatedAt = m.updatedAt
-                )
+                m.toMember()
             }
     }
 
     private fun mockMember(memberId: MemberId) =
         Member(
-            memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
+            MemberToken("12345"), memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
         )
 }
 
 private fun Member.toEntity(): MemberEntity {
     return MemberEntity(
         id = id.value,
+        token = token.value,
         fullName = fullName,
         secondInitialName = secondInitialName,
         profileImageId = profileImageId?.value,
@@ -152,5 +139,21 @@ private fun Member.toEntity(): MemberEntity {
         ordinal = ordinal,
         gender = gender.name,
         point = point
+    )
+}
+
+private fun MemberEntity.toMember(): Member {
+    return Member(
+        id = MemberId(this.id),
+        token = MemberToken(this.token),
+        fullName = fullName,
+        secondInitialName = secondInitialName,
+        profileImageId = profileImageId?.let { ImageId(it) },
+        ordinal = ordinal,
+        platform = MemberPlatform.findByValue(platform),
+        gender = MemberGender.findByValue(gender),
+        point = point,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }

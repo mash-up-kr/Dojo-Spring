@@ -12,7 +12,12 @@ import java.time.LocalDateTime
 @JvmInline
 value class MemberId(val value: String)
 
+@JvmInline
+value class MemberToken(val value: String)
+
 data class Member(
+    // Do not access !
+    val token: MemberToken,
     val id: MemberId,
     val fullName: String,
     val secondInitialName: String,
@@ -57,6 +62,7 @@ data class Member(
             ordinal: Int,
         ): Member {
             val uuid = UUIDGenerator.generate()
+            val token = UUIDGenerator.generate()
 
             // validate fullName length
             if (fullName.length < 2) throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
@@ -64,6 +70,7 @@ data class Member(
 
             return Member(
                 id = MemberId(uuid),
+                token = MemberToken(token),
                 fullName = fullName,
                 secondInitialName = secondInitialName,
                 profileImageId = profileImageId,
@@ -73,32 +80,6 @@ data class Member(
                 point = MEMBER_INIT_POINT,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
-            )
-        }
-
-        internal fun convertToMember(
-            id: String,
-            fullName: String,
-            secondInitialName: String,
-            profileImageId: ImageId?,
-            ordinal: Int,
-            platform: MemberPlatform,
-            gender: MemberGender,
-            point: Int,
-            createdAt: LocalDateTime,
-            updatedAt: LocalDateTime,
-        ): Member {
-            return Member(
-                id = MemberId(id),
-                fullName = fullName,
-                secondInitialName = secondInitialName,
-                profileImageId = profileImageId,
-                ordinal = ordinal,
-                platform = platform,
-                gender = gender,
-                point = point,
-                createdAt = createdAt,
-                updatedAt = updatedAt
             )
         }
     }
