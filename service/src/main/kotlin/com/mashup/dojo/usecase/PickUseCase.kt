@@ -52,8 +52,9 @@ interface PickUseCase {
     )
 
     fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
-    
+
     fun createPick(command: CreatePickCommand): PickId
+
     fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
 }
 

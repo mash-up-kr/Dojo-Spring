@@ -1,8 +1,8 @@
 package com.mashup.dojo.domain
 
-import com.mashup.dojo.UUIDGenerator
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
+import com.mashup.dojo.UUIDGenerator
 import java.time.LocalDateTime
 
 @JvmInline
