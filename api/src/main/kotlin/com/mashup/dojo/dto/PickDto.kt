@@ -3,6 +3,8 @@ package com.mashup.dojo.dto
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import io.swagger.v3.oas.annotations.media.Schema
@@ -34,11 +36,26 @@ data class PickResponse(
 @Schema(description = "픽 오픈 요청")
 data class PickOpenRequest(
     @field:NotNull
-    val pickOpenItem: PickOpenItem,
+    val pickOpenItemDto: PickOpenItemDto,
 )
 
 data class PickOpenResponse(
-    val pickId: PickId,
-    val pickOpenItem: PickOpenItem,
+    val pickId: String,
+    val pickOpenItemDto: PickOpenItemDto,
     val value: String,
 )
+
+enum class PickOpenItemDto(val value: String) {
+    GENDER("성별"),
+    PLATFORM("플랫폼"),
+    MID_INITIAL_NAME("초성 1자 (중간 이름)"),
+    FULL_NAME("이름"),
+    ;
+
+    companion object {
+        fun findByValue(value: String): PickOpenItemDto {
+            return PickOpenItemDto.entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw DojoException.of(DojoExceptionType.INVALID_PICK_OPEN_ITEM)
+        }
+    }
+}
