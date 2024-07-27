@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface CoinUseDetailRepository : JpaRepository<CoinUseDetailEntity, String>
 
 @Entity
-@Table("coin_use_detail")
+@Table(name = "coin_use_detail")
 class CoinUseDetailEntity(
     @Id
     @Column(name = "id", nullable = false)
