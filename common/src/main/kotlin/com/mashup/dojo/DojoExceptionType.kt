@@ -18,7 +18,10 @@ enum class DojoExceptionType(
     ARGUMENT_NOT_VALID("Method Argument Not Valid. Check argument validation.", "C009_ARGUMENT_NOT_VALID", 400),
     INVALID_MEMBER_GENDER("The gender does not exist.", "C011_INVALID_MEMBER_GENDER", 400),
     INVALID_MEMBER_PLATFORM("The platform does not exist.", "C010_INVALID_MEMBER_PLATFORM", 400),
-    PICK_NOT_FOUND("Pick not found", "C013_PICK_NOT_FOUND", 400),
-    PICK_ALREADY_OPENED("Pick already opened", "C015_PICK_ALREADY_OPENED", 400),
     MEMBER_NOT_FOUND("Member not found", "C012_MEMBER_NOT_FOUND", 400),
+
+    // pick
+    PICK_NOT_FOUND("Pick not found", "C050_PICK_NOT_FOUND", 400),
+    PICK_ALREADY_OPENED("Pick already opened", "C051_PICK_ALREADY_OPENED", 400),
+    INVALID_PICK_OPEN_ITEM("Pick open item does not exist", "CO52_INVALID_PICK_OPEN_ITEM", 400),
 }

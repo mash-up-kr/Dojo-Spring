@@ -1,6 +1,8 @@
 package com.mashup.dojo.domain
 
 import com.mashup.dojo.UUIDGenerator
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import java.time.LocalDateTime
 
 @JvmInline
@@ -53,7 +55,7 @@ data class Pick(
     }
 
     internal fun updateOpenItem(pickOpenItem: PickOpenItem): Pick {
-        return when(pickOpenItem) {
+        return when (pickOpenItem) {
             PickOpenItem.GENDER -> copy(isGenderOpen = true)
             PickOpenItem.PLATFORM -> copy(isPlatformOpen = true)
             PickOpenItem.MID_INITIAL_NAME -> copy(isMidInitialNameOpen = true)
@@ -65,7 +67,7 @@ data class Pick(
         pickOpenItem: PickOpenItem,
         picker: Member,
     ): String {
-        return when(pickOpenItem) {
+        return when (pickOpenItem) {
             PickOpenItem.GENDER -> picker.gender.name
             PickOpenItem.PLATFORM -> picker.platform.name
             PickOpenItem.MID_INITIAL_NAME -> picker.secondInitialName
@@ -79,6 +81,14 @@ enum class PickOpenItem(val value: String, val cost: Int) {
     PLATFORM("플랫폼", 50),
     MID_INITIAL_NAME("초성 1자 (중간 이름)", 50),
     FULL_NAME("이름", 150),
+    ;
+
+    companion object {
+        fun findByValue(value: String): PickOpenItem {
+            return entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw DojoException.of(DojoExceptionType.INVALID_PICK_OPEN_ITEM)
+        }
+    }
 }
 
 enum class PickSort {

@@ -3,7 +3,9 @@ package com.mashup.dojo
 import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
+import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
+import com.mashup.dojo.dto.PickOpenItemDto
 import com.mashup.dojo.dto.CreatePickRequest
 import com.mashup.dojo.dto.PickOpenRequest
 import com.mashup.dojo.dto.PickOpenResponse
@@ -91,8 +93,8 @@ class PickController(
             PickUseCase.OpenPickCommand(
                 pickId = PickId(id),
                 pickedId = MemberId("MOCK_MEMBER_ID"),
-                pickOpenItem = request.pickOpenItem
+                pickOpenItem = PickOpenItem.findByValue(request.pickOpenItemDto.value)
             )
-        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId, it.pickOpenItem, it.value)) }
+        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId.value, PickOpenItemDto.findByValue(it.pickOpenItem.value), it.value)) }
     }
 }
