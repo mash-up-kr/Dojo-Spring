@@ -1,5 +1,7 @@
 package com.mashup.dojo.usecase
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
@@ -70,7 +72,7 @@ class DefaultQuestionUseCase(
     }
 
     override fun createQuestionSheet(): List<QuestionSheet> {
-        val currentQuestionSet = questionService.getCurrentQuestionSet()
+        val currentQuestionSet = questionService.getCurrentQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
         val allMemberRecords = memberService.findAllMember()
         return questionService.createQuestionSheets(currentQuestionSet, allMemberRecords)
     }

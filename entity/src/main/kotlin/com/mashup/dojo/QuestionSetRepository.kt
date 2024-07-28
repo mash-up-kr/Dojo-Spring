@@ -10,7 +10,9 @@ import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 
-interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String>
+interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
+    fun findFirstByPublishedYnFalseOrderByPublishedAtAsc() : QuestionSetEntity?
+}
 
 @Entity
 @Table(name = "question_set")

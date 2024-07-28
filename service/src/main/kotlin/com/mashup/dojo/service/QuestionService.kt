@@ -2,7 +2,9 @@ package com.mashup.dojo.service
 
 import com.mashup.dojo.QuestionEntity
 import com.mashup.dojo.QuestionRepository
+import com.mashup.dojo.QuestionSetEntity
 import com.mashup.dojo.QuestionSetRepository
+import com.mashup.dojo.QuestionSheetRepository
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
@@ -26,6 +28,7 @@ private val log = KotlinLogging.logger {}
 interface QuestionService {
     val questionRepository: QuestionRepository
     val questionSetRepository: QuestionSetRepository
+    val questionSheetRepository: QuestionSheetRepository
 
     fun createQuestion(
         content: String,
@@ -44,7 +47,7 @@ interface QuestionService {
     ): QuestionSet
 
     fun createQuestionSheets(
-        questionSet: QuestionSet?,
+        questionSet: QuestionSet,
         members: List<Member>,
     ): List<QuestionSheet>
 
@@ -56,6 +59,7 @@ interface QuestionService {
 class DefaultQuestionService(
     override val questionRepository: QuestionRepository,
     override val questionSetRepository: QuestionSetRepository,
+    override val questionSheetRepository: QuestionSheetRepository
 ) : QuestionService {
     @Transactional
     override fun createQuestion(
@@ -79,8 +83,11 @@ class DefaultQuestionService(
     }
 
     override fun getCurrentQuestionSet(): QuestionSet? {
-        // todo : bring out questionSet in redis
-        return SAMPLE_QUESTION_SET
+        return questionSetRepository.findFirstByPublishedYnFalseOrderByPublishedAtAsc()
+            ?.toQuestionSet() ?: run {
+            log.warn { "Not Published And Prepared QuestionSet Entity not found" }
+            null
+        }
     }
 
     override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet {
@@ -108,7 +115,7 @@ class DefaultQuestionService(
     }
 
     override fun createQuestionSheets(
-        questionSet: QuestionSet?,
+        questionSet: QuestionSet,
         members: List<Member>,
     ): List<QuestionSheet> {
         /**
@@ -229,5 +236,20 @@ private fun QuestionEntity.toQuestion(): Question {
             com.mashup.dojo.QuestionCategory.OTHER -> QuestionCategory.OTHER
         },
         emojiImageId = ImageId(emojiImageId)
+    )
+}
+
+private fun QuestionSetEntity.toQuestionSet(): QuestionSet {
+    val questionOrders = questionIds.mapIndexed { index, id ->
+        QuestionOrder(
+            questionId = QuestionId(id),
+            order = index
+        )
+    }.toList()
+
+    return QuestionSet(
+        id = QuestionSetId(id),
+        questionIds = questionOrders,
+        publishedAt = publishedAt
     )
 }
