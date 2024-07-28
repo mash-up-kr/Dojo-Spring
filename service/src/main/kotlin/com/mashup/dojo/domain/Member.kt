@@ -3,7 +3,11 @@ package com.mashup.dojo.domain
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.UUIDGenerator
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.LocalDateTime
+
+
+private val logger = KotlinLogging.logger { }
 
 /**
  * 멤버
@@ -47,7 +51,7 @@ data class Member(
 
             // validate fullName length
             if (fullName.length < 2) throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
-            val secondInitialName = fullName.substring(1, 2)
+            val secondInitialName = InitialParser.parse(fullName.substring(1, 2)[0]) ?: throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
 
             return Member(
                 id = MemberId(uuid),
@@ -115,5 +119,22 @@ enum class MemberPlatform {
             return entries.find { it.name.equals(value, ignoreCase = true) }
                 ?: throw DojoException.of(DojoExceptionType.INVALID_MEMBER_PLATFORM)
         }
+    }
+}
+
+object InitialParser {
+    private val INITIAL_LIST = arrayOf(
+        'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+    )
+
+    fun parse(input: Char): String? {
+        if (input !in ('가'..'힣')) {
+            logger.error { "한글이 아닌 경우 파싱이 불가능합니다. input : $input" }
+            return null
+        }
+        val unicode = input.code - 0xAC00
+        val index = unicode / (21 * 28)
+
+        return INITIAL_LIST[index].toString()
     }
 }
