@@ -24,4 +24,8 @@ enum class DojoExceptionType(
     PICK_NOT_FOUND("Pick not found", "C050_PICK_NOT_FOUND", 400),
     PICK_ALREADY_OPENED("Pick already opened", "C051_PICK_ALREADY_OPENED", 400),
     INVALID_PICK_OPEN_ITEM("Pick open item does not exist", "CO52_INVALID_PICK_OPEN_ITEM", 400),
+
+    // friend
+    FRIEND_NOT_FOUND("Friend not found", "C070_FRIEND_NOT_FOUND", 400),
+    ALREADY_FRIEND("Already Friend", "C071_ALREADY_FRIEND", 400),
 }

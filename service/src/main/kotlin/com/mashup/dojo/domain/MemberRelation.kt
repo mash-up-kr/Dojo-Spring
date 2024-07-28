@@ -1,15 +1,39 @@
 package com.mashup.dojo.domain
 
+import com.mashup.dojo.UUIDGenerator
+import java.time.LocalDateTime
+
 /**
  * 멤버와 멤버간 관계
  */
+
+@JvmInline
+value class MemberRelationId(val value: String)
+
 data class MemberRelation(
-    val from: MemberId,
-    val to: MemberId,
+    val id: MemberRelationId,
+    val fromId: MemberId,
+    val toId: MemberId,
     val relation: RelationType = RelationType.ACCOMPANY,
+    val lastUpdatedAt: LocalDateTime,
 ) {
-    fun changeRelation(relation: RelationType): MemberRelation {
-        return this.copy(relation = relation)
+    companion object {
+        fun create(
+            fromId: MemberId,
+            toId: MemberId,
+        ): MemberRelation {
+            return MemberRelation(
+                id = MemberRelationId(UUIDGenerator.generate()),
+                fromId = fromId,
+                toId = toId,
+                relation = RelationType.ACCOMPANY,
+                lastUpdatedAt = LocalDateTime.now()
+            )
+        }
+    }
+
+    fun updateToFriend(): MemberRelation {
+        return this.copy(relation = RelationType.FRIEND, lastUpdatedAt = LocalDateTime.now())
     }
 }
 
