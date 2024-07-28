@@ -23,7 +23,7 @@ class QuestionSheet(
     val resolverId: String,
     @Convert(converter = CandidateConverter::class)
     @Column(name = "candidates", nullable = false)
-    val candidates: List<String>
+    val candidates: List<String>,
 )
 
 class CandidateConverter : AttributeConverter<List<String>, String> {
@@ -39,4 +39,3 @@ class CandidateConverter : AttributeConverter<List<String>, String> {
         private const val DELIMITER = ","
     }
 }
-

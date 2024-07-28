@@ -59,7 +59,7 @@ interface QuestionService {
 class DefaultQuestionService(
     override val questionRepository: QuestionRepository,
     override val questionSetRepository: QuestionSetRepository,
-    override val questionSheetRepository: QuestionSheetRepository
+    override val questionSheetRepository: QuestionSheetRepository,
 ) : QuestionService {
     @Transactional
     override fun createQuestion(
@@ -68,12 +68,13 @@ class DefaultQuestionService(
         category: QuestionCategory,
         emojiImageId: ImageId,
     ): Question {
-        val question = Question.create(
-            content = content,
-            type = type,
-            category = category,
-            emojiImageId = emojiImageId
-        )
+        val question =
+            Question.create(
+                content = content,
+                type = type,
+                category = category,
+                emojiImageId = emojiImageId
+            )
 
         questionRepository.save(question.toEntity())
 
@@ -101,6 +102,7 @@ class DefaultQuestionService(
         return SAMPLE_QUESTION_SET
     }
 
+    @Transactional
     override fun createQuestionSet(
         questionIds: List<QuestionId>,
         publishedAt: LocalDateTime,
@@ -109,9 +111,10 @@ class DefaultQuestionService(
         require(publishedAt >= LocalDateTime.now()) { "publishedAt must be in the future" }
 
         val questionOrders = questionIds.mapIndexed { idx, qId -> QuestionOrder(qId, idx + 1) }
-        // todo : getId by UUID String Generator
-        // questionSetRepository.save()
-        return SAMPLE_QUESTION_SET
+        val questionSet = QuestionSet.create(questionOrders, publishedAt)
+
+        questionSetRepository.save(questionSet.toEntity())
+        return questionSet
     }
 
     override fun createQuestionSheets(
@@ -151,20 +154,20 @@ class DefaultQuestionService(
             QuestionSet(
                 id = QuestionSetId("1"),
                 questionIds =
-                listOf(
-                    QuestionOrder(QuestionId("1"), 1),
-                    QuestionOrder(QuestionId("2"), 2),
-                    QuestionOrder(QuestionId("3"), 3),
-                    QuestionOrder(QuestionId("4"), 4),
-                    QuestionOrder(QuestionId("5"), 5),
-                    QuestionOrder(QuestionId("6"), 6),
-                    QuestionOrder(QuestionId("7"), 7),
-                    QuestionOrder(QuestionId("8"), 8),
-                    QuestionOrder(QuestionId("9"), 9),
-                    QuestionOrder(QuestionId("10"), 10),
-                    QuestionOrder(QuestionId("11"), 11),
-                    QuestionOrder(QuestionId("12"), 12)
-                ),
+                    listOf(
+                        QuestionOrder(QuestionId("1"), 1),
+                        QuestionOrder(QuestionId("2"), 2),
+                        QuestionOrder(QuestionId("3"), 3),
+                        QuestionOrder(QuestionId("4"), 4),
+                        QuestionOrder(QuestionId("5"), 5),
+                        QuestionOrder(QuestionId("6"), 6),
+                        QuestionOrder(QuestionId("7"), 7),
+                        QuestionOrder(QuestionId("8"), 8),
+                        QuestionOrder(QuestionId("9"), 9),
+                        QuestionOrder(QuestionId("10"), 10),
+                        QuestionOrder(QuestionId("11"), 11),
+                        QuestionOrder(QuestionId("12"), 12)
+                    ),
                 publishedAt = LocalDateTime.now()
             )
 
@@ -175,12 +178,12 @@ class DefaultQuestionService(
                 questionId = QuestionId("1"),
                 resolverId = MemberId("1"),
                 candidates =
-                listOf(
-                    Candidate(MemberId("2"), "임준형", 1),
-                    Candidate(MemberId("3"), "한씨", 1),
-                    Candidate(MemberId("4"), "박씨", 1),
-                    Candidate(MemberId("5"), "오씨", 1)
-                )
+                    listOf(
+                        Candidate(MemberId("2"), "임준형", 1),
+                        Candidate(MemberId("3"), "한씨", 1),
+                        Candidate(MemberId("4"), "박씨", 1),
+                        Candidate(MemberId("5"), "오씨", 1)
+                    )
             )
 
         // TODO: Set to 3 sheets initially. Need to modify for all users later.
@@ -194,22 +197,22 @@ private fun Question.toEntity(): QuestionEntity {
         id = id.value,
         content = content,
         type =
-        when (type) {
-            QuestionType.FRIEND -> com.mashup.dojo.QuestionType.FRIEND
-            QuestionType.ACCOMPANY -> com.mashup.dojo.QuestionType.ACCOMPANY
-        },
+            when (type) {
+                QuestionType.FRIEND -> com.mashup.dojo.QuestionType.FRIEND
+                QuestionType.ACCOMPANY -> com.mashup.dojo.QuestionType.ACCOMPANY
+            },
         category =
-        when (category) {
-            QuestionCategory.DATING -> com.mashup.dojo.QuestionCategory.DATING
-            QuestionCategory.FRIENDSHIP -> com.mashup.dojo.QuestionCategory.FRIENDSHIP
-            QuestionCategory.PERSONALITY -> com.mashup.dojo.QuestionCategory.PERSONALITY
-            QuestionCategory.ENTERTAINMENT -> com.mashup.dojo.QuestionCategory.ENTERTAINMENT
-            QuestionCategory.FITNESS -> com.mashup.dojo.QuestionCategory.FITNESS
-            QuestionCategory.APPEARANCE -> com.mashup.dojo.QuestionCategory.APPEARANCE
-            QuestionCategory.WORK -> com.mashup.dojo.QuestionCategory.WORK
-            QuestionCategory.HUMOR -> com.mashup.dojo.QuestionCategory.HUMOR
-            QuestionCategory.OTHER -> com.mashup.dojo.QuestionCategory.OTHER
-        },
+            when (category) {
+                QuestionCategory.DATING -> com.mashup.dojo.QuestionCategory.DATING
+                QuestionCategory.FRIENDSHIP -> com.mashup.dojo.QuestionCategory.FRIENDSHIP
+                QuestionCategory.PERSONALITY -> com.mashup.dojo.QuestionCategory.PERSONALITY
+                QuestionCategory.ENTERTAINMENT -> com.mashup.dojo.QuestionCategory.ENTERTAINMENT
+                QuestionCategory.FITNESS -> com.mashup.dojo.QuestionCategory.FITNESS
+                QuestionCategory.APPEARANCE -> com.mashup.dojo.QuestionCategory.APPEARANCE
+                QuestionCategory.WORK -> com.mashup.dojo.QuestionCategory.WORK
+                QuestionCategory.HUMOR -> com.mashup.dojo.QuestionCategory.HUMOR
+                QuestionCategory.OTHER -> com.mashup.dojo.QuestionCategory.OTHER
+            },
         emojiImageId = emojiImageId.value
     )
 }
@@ -219,33 +222,43 @@ private fun QuestionEntity.toQuestion(): Question {
         id = QuestionId(id),
         content = content,
         type =
-        when (type) {
-            com.mashup.dojo.QuestionType.FRIEND -> QuestionType.FRIEND
-            com.mashup.dojo.QuestionType.ACCOMPANY -> QuestionType.ACCOMPANY
-        },
+            when (type) {
+                com.mashup.dojo.QuestionType.FRIEND -> QuestionType.FRIEND
+                com.mashup.dojo.QuestionType.ACCOMPANY -> QuestionType.ACCOMPANY
+            },
         category =
-        when (category) {
-            com.mashup.dojo.QuestionCategory.DATING -> QuestionCategory.DATING
-            com.mashup.dojo.QuestionCategory.FRIENDSHIP -> QuestionCategory.FRIENDSHIP
-            com.mashup.dojo.QuestionCategory.PERSONALITY -> QuestionCategory.PERSONALITY
-            com.mashup.dojo.QuestionCategory.ENTERTAINMENT -> QuestionCategory.ENTERTAINMENT
-            com.mashup.dojo.QuestionCategory.FITNESS -> QuestionCategory.FITNESS
-            com.mashup.dojo.QuestionCategory.APPEARANCE -> QuestionCategory.APPEARANCE
-            com.mashup.dojo.QuestionCategory.WORK -> QuestionCategory.WORK
-            com.mashup.dojo.QuestionCategory.HUMOR -> QuestionCategory.HUMOR
-            com.mashup.dojo.QuestionCategory.OTHER -> QuestionCategory.OTHER
-        },
+            when (category) {
+                com.mashup.dojo.QuestionCategory.DATING -> QuestionCategory.DATING
+                com.mashup.dojo.QuestionCategory.FRIENDSHIP -> QuestionCategory.FRIENDSHIP
+                com.mashup.dojo.QuestionCategory.PERSONALITY -> QuestionCategory.PERSONALITY
+                com.mashup.dojo.QuestionCategory.ENTERTAINMENT -> QuestionCategory.ENTERTAINMENT
+                com.mashup.dojo.QuestionCategory.FITNESS -> QuestionCategory.FITNESS
+                com.mashup.dojo.QuestionCategory.APPEARANCE -> QuestionCategory.APPEARANCE
+                com.mashup.dojo.QuestionCategory.WORK -> QuestionCategory.WORK
+                com.mashup.dojo.QuestionCategory.HUMOR -> QuestionCategory.HUMOR
+                com.mashup.dojo.QuestionCategory.OTHER -> QuestionCategory.OTHER
+            },
         emojiImageId = ImageId(emojiImageId)
     )
 }
 
+private fun QuestionSet.toEntity(): QuestionSetEntity {
+    val questionIds = questionIds.map { it.questionId.value }.toList()
+    return QuestionSetEntity(
+        id = id.value,
+        questionIds = questionIds,
+        publishedAt = publishedAt
+    )
+}
+
 private fun QuestionSetEntity.toQuestionSet(): QuestionSet {
-    val questionOrders = questionIds.mapIndexed { index, id ->
-        QuestionOrder(
-            questionId = QuestionId(id),
-            order = index
-        )
-    }.toList()
+    val questionOrders =
+        questionIds.mapIndexed { index, id ->
+            QuestionOrder(
+                questionId = QuestionId(id),
+                order = index
+            )
+        }.toList()
 
     return QuestionSet(
         id = QuestionSetId(id),

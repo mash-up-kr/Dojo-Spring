@@ -54,7 +54,7 @@ class DefaultSheetUseCase(
         val questionOrder2 = QuestionOrder(QuestionId("200"), 3)
 
         // Mock
-        val questionSet = QuestionSet(QuestionSetId("1"), listOf(questionOrder1, questionOrder2), LocalDateTime.now())
+        val questionSet = QuestionSet(QuestionSetId("1"), listOf(questionOrder1, questionOrder2), false, LocalDateTime.now())
 
         val currentMemberId = MemberId("1")
 
