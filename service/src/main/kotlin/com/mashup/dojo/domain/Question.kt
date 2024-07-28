@@ -1,6 +1,6 @@
 package com.mashup.dojo.domain
 
-import java.time.LocalDateTime
+import com.mashup.dojo.UUIDGenerator
 
 @JvmInline
 value class QuestionId(val value: String)
@@ -11,9 +11,24 @@ data class Question(
     val type: QuestionType,
     val category: QuestionCategory,
     val emojiImageId: ImageId,
-    val createdAt: LocalDateTime,
-    val deletedAt: LocalDateTime?,
-)
+) {
+    companion object {
+        fun create(
+            content: String,
+            type: QuestionType,
+            category: QuestionCategory,
+            emojiImageId: ImageId,
+        ): Question {
+            return Question(
+                id = QuestionId(UUIDGenerator.generate()),
+                content = content,
+                type = type,
+                category = category,
+                emojiImageId = emojiImageId
+            )
+        }
+    }
+}
 
 enum class QuestionType {
     FRIEND,

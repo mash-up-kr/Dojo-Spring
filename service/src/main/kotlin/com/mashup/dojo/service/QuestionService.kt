@@ -1,5 +1,8 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.QuestionEntity
+import com.mashup.dojo.QuestionRepository
+import com.mashup.dojo.QuestionSetRepository
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
@@ -21,9 +24,13 @@ import java.time.LocalDateTime
 private val log = KotlinLogging.logger {}
 
 interface QuestionService {
+    val questionRepository: QuestionRepository
+    val questionSetRepository: QuestionSetRepository
+
     fun createQuestion(
         content: String,
         type: QuestionType,
+        category: QuestionCategory,
         emojiImageId: ImageId,
     ): Question
 
@@ -46,20 +53,29 @@ interface QuestionService {
 
 @Service
 @Transactional(readOnly = true)
-class DefaultQuestionService : QuestionService {
+class DefaultQuestionService(
+    override val questionRepository: QuestionRepository,
+    override val questionSetRepository: QuestionSetRepository,
+) : QuestionService {
     @Transactional
     override fun createQuestion(
         content: String,
         type: QuestionType,
+        category: QuestionCategory,
         emojiImageId: ImageId,
     ): Question {
-        // todo create questionEntity
-        // return QuestionRepository.save(content, type, imageUrl).toQuestion
-        val question = SAMPLE_QUESTION
+        val question = Question.create(
+            content = content,
+            type = type,
+            category = category,
+            emojiImageId = emojiImageId
+        )
 
-        log.info { "Create Question Success : $question" }
+        questionRepository.save(question.toEntity())
 
-        return SAMPLE_QUESTION
+        log.info { "=== Create Question Success : $question ===" }
+
+        return question
     }
 
     override fun getCurrentQuestionSet(): QuestionSet? {
@@ -121,29 +137,27 @@ class DefaultQuestionService : QuestionService {
                 content = "세상에서 제일 멋쟁이인 사람",
                 type = QuestionType.FRIEND,
                 category = QuestionCategory.DATING,
-                emojiImageId = ImageId("345678"),
-                createdAt = LocalDateTime.now(),
-                deletedAt = null
+                emojiImageId = ImageId("345678")
             )
 
         val SAMPLE_QUESTION_SET =
             QuestionSet(
                 id = QuestionSetId("1"),
                 questionIds =
-                    listOf(
-                        QuestionOrder(QuestionId("1"), 1),
-                        QuestionOrder(QuestionId("2"), 2),
-                        QuestionOrder(QuestionId("3"), 3),
-                        QuestionOrder(QuestionId("4"), 4),
-                        QuestionOrder(QuestionId("5"), 5),
-                        QuestionOrder(QuestionId("6"), 6),
-                        QuestionOrder(QuestionId("7"), 7),
-                        QuestionOrder(QuestionId("8"), 8),
-                        QuestionOrder(QuestionId("9"), 9),
-                        QuestionOrder(QuestionId("10"), 10),
-                        QuestionOrder(QuestionId("11"), 11),
-                        QuestionOrder(QuestionId("12"), 12)
-                    ),
+                listOf(
+                    QuestionOrder(QuestionId("1"), 1),
+                    QuestionOrder(QuestionId("2"), 2),
+                    QuestionOrder(QuestionId("3"), 3),
+                    QuestionOrder(QuestionId("4"), 4),
+                    QuestionOrder(QuestionId("5"), 5),
+                    QuestionOrder(QuestionId("6"), 6),
+                    QuestionOrder(QuestionId("7"), 7),
+                    QuestionOrder(QuestionId("8"), 8),
+                    QuestionOrder(QuestionId("9"), 9),
+                    QuestionOrder(QuestionId("10"), 10),
+                    QuestionOrder(QuestionId("11"), 11),
+                    QuestionOrder(QuestionId("12"), 12)
+                ),
                 publishedAt = LocalDateTime.now()
             )
 
@@ -154,16 +168,66 @@ class DefaultQuestionService : QuestionService {
                 questionId = QuestionId("1"),
                 resolverId = MemberId("1"),
                 candidates =
-                    listOf(
-                        Candidate(MemberId("2"), "임준형", 1),
-                        Candidate(MemberId("3"), "한씨", 1),
-                        Candidate(MemberId("4"), "박씨", 1),
-                        Candidate(MemberId("5"), "오씨", 1)
-                    )
+                listOf(
+                    Candidate(MemberId("2"), "임준형", 1),
+                    Candidate(MemberId("3"), "한씨", 1),
+                    Candidate(MemberId("4"), "박씨", 1),
+                    Candidate(MemberId("5"), "오씨", 1)
+                )
             )
 
         // TODO: Set to 3 sheets initially. Need to modify for all users later.
         val LIST_SAMPLE_QUESTION_SHEET =
             listOf(SAMPLE_QUESTION_SHEET, SAMPLE_QUESTION_SHEET, SAMPLE_QUESTION_SHEET)
     }
+}
+
+private fun Question.toEntity(): QuestionEntity {
+    return QuestionEntity(
+        id = id.value,
+        content = content,
+        type =
+        when (type) {
+            QuestionType.FRIEND -> com.mashup.dojo.QuestionType.FRIEND
+            QuestionType.ACCOMPANY -> com.mashup.dojo.QuestionType.ACCOMPANY
+        },
+        category =
+        when (category) {
+            QuestionCategory.DATING -> com.mashup.dojo.QuestionCategory.DATING
+            QuestionCategory.FRIENDSHIP -> com.mashup.dojo.QuestionCategory.FRIENDSHIP
+            QuestionCategory.PERSONALITY -> com.mashup.dojo.QuestionCategory.PERSONALITY
+            QuestionCategory.ENTERTAINMENT -> com.mashup.dojo.QuestionCategory.ENTERTAINMENT
+            QuestionCategory.FITNESS -> com.mashup.dojo.QuestionCategory.FITNESS
+            QuestionCategory.APPEARANCE -> com.mashup.dojo.QuestionCategory.APPEARANCE
+            QuestionCategory.WORK -> com.mashup.dojo.QuestionCategory.WORK
+            QuestionCategory.HUMOR -> com.mashup.dojo.QuestionCategory.HUMOR
+            QuestionCategory.OTHER -> com.mashup.dojo.QuestionCategory.OTHER
+        },
+        emojiImageId = emojiImageId.value
+    )
+}
+
+private fun QuestionEntity.toQuestion(): Question {
+    return Question(
+        id = QuestionId(id),
+        content = content,
+        type =
+        when (type) {
+            com.mashup.dojo.QuestionType.FRIEND -> QuestionType.FRIEND
+            com.mashup.dojo.QuestionType.ACCOMPANY -> QuestionType.ACCOMPANY
+        },
+        category =
+        when (category) {
+            com.mashup.dojo.QuestionCategory.DATING -> QuestionCategory.DATING
+            com.mashup.dojo.QuestionCategory.FRIENDSHIP -> QuestionCategory.FRIENDSHIP
+            com.mashup.dojo.QuestionCategory.PERSONALITY -> QuestionCategory.PERSONALITY
+            com.mashup.dojo.QuestionCategory.ENTERTAINMENT -> QuestionCategory.ENTERTAINMENT
+            com.mashup.dojo.QuestionCategory.FITNESS -> QuestionCategory.FITNESS
+            com.mashup.dojo.QuestionCategory.APPEARANCE -> QuestionCategory.APPEARANCE
+            com.mashup.dojo.QuestionCategory.WORK -> QuestionCategory.WORK
+            com.mashup.dojo.QuestionCategory.HUMOR -> QuestionCategory.HUMOR
+            com.mashup.dojo.QuestionCategory.OTHER -> QuestionCategory.OTHER
+        },
+        emojiImageId = ImageId(emojiImageId)
+    )
 }

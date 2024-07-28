@@ -43,9 +43,7 @@ class DefaultSheetUseCase(
                 "여기서 술을 제일 잘 먹을 것 같은 사람은?",
                 QuestionType.FRIEND,
                 QuestionCategory.ENTERTAINMENT,
-                mockEmojiImage.id,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                mockEmojiImage.id
             )
         val questionIds = mutableListOf<QuestionId>()
         repeat(12) {
