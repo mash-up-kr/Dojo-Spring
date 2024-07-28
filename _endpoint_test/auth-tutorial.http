@@ -1,0 +1,6 @@
+### (임시) 토큰 만들기
+GET {{host}}/public/generate-token/fake
+
+### principal 정보 받기
+GET {{host}}/authentication/test
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJfaWQiOiJmYWtlIiwiZXhwIjo0MzE0MTgzMTUyLCJpYXQiOjE3MjIxODMxNTJ9.Z4swd9nJ2BiizXP2zvHBqWQ_6XmxdYKKorQChJPZfws
