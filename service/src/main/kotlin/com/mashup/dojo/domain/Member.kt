@@ -3,7 +3,10 @@ package com.mashup.dojo.domain
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.UUIDGenerator
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.LocalDateTime
+
+private val logger = KotlinLogging.logger { }
 
 /**
  * 멤버
@@ -21,22 +24,11 @@ data class Member(
     // 기수
     val ordinal: Int,
     val gender: MemberGender,
-    val point: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
     fun changeProfileImage(profileImageId: ImageId): Member {
         return this.copy(profileImageId = profileImageId, updatedAt = LocalDateTime.now())
-    }
-
-    fun earnPoint(point: Int): Member {
-        return this.copy(point = this.point + point, updatedAt = LocalDateTime.now())
-    }
-
-    fun spendPoint(point: Int): Member {
-        // Todo Exception 객체 쓰기
-        if (this.point < point) throw IllegalArgumentException("포인트가 부족합니다.")
-        return this.copy(point = this.point - point, updatedAt = LocalDateTime.now())
     }
 
     fun update(profileImageId: ImageId?): Member {
@@ -47,8 +39,6 @@ data class Member(
     }
 
     companion object {
-        private const val MEMBER_INIT_POINT = 200
-
         internal fun create(
             fullName: String,
             profileImageId: ImageId?,
@@ -60,7 +50,7 @@ data class Member(
 
             // validate fullName length
             if (fullName.length < 2) throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
-            val secondInitialName = fullName.substring(1, 2)
+            val secondInitialName = InitialParser.parse(fullName.substring(1, 2)[0]) ?: throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
 
             return Member(
                 id = MemberId(uuid),
@@ -70,7 +60,6 @@ data class Member(
                 platform = platform,
                 gender = gender,
                 ordinal = ordinal,
-                point = MEMBER_INIT_POINT,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
             )
@@ -84,7 +73,6 @@ data class Member(
             ordinal: Int,
             platform: MemberPlatform,
             gender: MemberGender,
-            point: Int,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime,
         ): Member {
@@ -96,7 +84,6 @@ data class Member(
                 ordinal = ordinal,
                 platform = platform,
                 gender = gender,
-                point = point,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -131,5 +118,23 @@ enum class MemberPlatform {
             return entries.find { it.name.equals(value, ignoreCase = true) }
                 ?: throw DojoException.of(DojoExceptionType.INVALID_MEMBER_PLATFORM)
         }
+    }
+}
+
+object InitialParser {
+    private val INITIAL_LIST =
+        arrayOf(
+            'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+        )
+
+    fun parse(input: Char): String? {
+        if (input !in ('가'..'힣')) {
+            logger.error { "한글이 아닌 경우 파싱이 불가능합니다. input : $input" }
+            return null
+        }
+        val unicode = input.code - 0xAC00
+        val index = unicode / (21 * 28)
+
+        return INITIAL_LIST[index].toString()
     }
 }

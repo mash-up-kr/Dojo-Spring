@@ -7,3 +7,10 @@ spring:
 scheduler:
   cron: "0 0 9,21 * * *"
   sheet-cron: "0 5 9,21 * * *"
+
+cloud:
+  aws:
+    cloudwatch:
+      access-key: ${CLOUDWATCH_ACCESS_KEY}
+      secret-key: ${CLOUDWATCH_SECRET_KEY}
+      

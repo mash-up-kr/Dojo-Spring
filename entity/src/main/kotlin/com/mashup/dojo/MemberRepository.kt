@@ -17,5 +17,4 @@ class MemberEntity(
     val platform: String,
     val ordinal: Int,
     val gender: String,
-    val point: Int,
 ) : BaseEntity()

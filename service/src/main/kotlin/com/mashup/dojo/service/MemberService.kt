@@ -11,7 +11,7 @@ import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.MemberRelation
-import com.mashup.dojo.domain.RelationType
+import com.mashup.dojo.domain.MemberRelationId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -45,13 +45,18 @@ class DefaultMemberService(
     private val memberRepository: MemberRepository,
 ) : MemberService {
     private fun mockMemberRelation(
-        to: MemberId,
-        from: MemberId,
+        fromId: MemberId,
+        toId: MemberId,
     ): MemberRelation {
         // 후보자 생성
         // 여기에 필요한 로직을 추가하세요.
 
-        return MemberRelation(to, from, RelationType.FRIEND)
+        return MemberRelation(
+            id = MemberRelationId("MemberRelationId"),
+            fromId = fromId,
+            toId = toId,
+            lastUpdatedAt = LocalDateTime.now()
+        )
     }
 
     override fun getCandidates(requestId: MemberId): List<Candidate> {
@@ -69,10 +74,10 @@ class DefaultMemberService(
          *
          */
 
-        val targetMemberId1 = memberRelation1.to
-        val targetMemberId2 = memberRelation2.to
-        val targetMemberId3 = memberRelation3.to
-        val targetMemberId4 = memberRelation4.to
+        val targetMemberId1 = memberRelation1.toId
+        val targetMemberId2 = memberRelation2.toId
+        val targetMemberId3 = memberRelation3.toId
+        val targetMemberId4 = memberRelation4.toId
 
         val candidate1 = Candidate(targetMemberId1, "한씨", 1)
         val candidate2 = Candidate(targetMemberId2, "오씨", 2)
@@ -129,7 +134,6 @@ class DefaultMemberService(
                     ordinal = m.ordinal,
                     platform = platform,
                     gender = gender,
-                    point = m.point,
                     createdAt = m.createdAt,
                     updatedAt = m.updatedAt
                 )
@@ -138,7 +142,7 @@ class DefaultMemberService(
 
     private fun mockMember(memberId: MemberId) =
         Member(
-            memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
+            memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, LocalDateTime.now(), LocalDateTime.now()
         )
 }
 
@@ -150,7 +154,6 @@ private fun Member.toEntity(): MemberEntity {
         profileImageId = profileImageId?.value,
         platform = platform.name,
         ordinal = ordinal,
-        gender = gender.name,
-        point = point
+        gender = gender.name
     )
 }
