@@ -6,7 +6,6 @@ import com.mashup.dojo.UUIDGenerator
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.LocalDateTime
 
-
 private val logger = KotlinLogging.logger { }
 
 /**
@@ -123,9 +122,10 @@ enum class MemberPlatform {
 }
 
 object InitialParser {
-    private val INITIAL_LIST = arrayOf(
-        'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
-    )
+    private val INITIAL_LIST =
+        arrayOf(
+            'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+        )
 
     fun parse(input: Char): String? {
         if (input !in ('가'..'힣')) {
