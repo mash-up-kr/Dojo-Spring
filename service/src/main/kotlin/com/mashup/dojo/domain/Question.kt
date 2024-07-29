@@ -67,3 +67,23 @@ data class Candidate(
     val memberName: String,
     val order: Int,
 )
+
+
+data class QuestionSheetWithCandidatesId(
+    val questionSheetId: QuestionSheetId,
+    // 문제지 조회를 위해 필요 !
+    val questionSetId: QuestionSetId,
+    val questionId: QuestionId,
+    val resolverId: MemberId,
+    val candidates: List<MemberId>,
+) {
+    fun toQuestionSheet(candidates: List<Candidate>): QuestionSheet {
+        return QuestionSheet(
+            questionSheetId = questionSheetId,
+            questionSetId = questionSetId,
+            questionId = questionId,
+            resolverId = resolverId,
+            candidates = candidates
+        )
+    }
+}
