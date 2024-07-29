@@ -134,7 +134,6 @@ class DefaultMemberService(
                     ordinal = m.ordinal,
                     platform = platform,
                     gender = gender,
-                    point = m.point,
                     createdAt = m.createdAt,
                     updatedAt = m.updatedAt
                 )
@@ -143,7 +142,7 @@ class DefaultMemberService(
 
     private fun mockMember(memberId: MemberId) =
         Member(
-            memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, 200, LocalDateTime.now(), LocalDateTime.now()
+            memberId, "임준형", "ㅈ", ImageId("123456"), MemberPlatform.SPRING, 14, MemberGender.MALE, LocalDateTime.now(), LocalDateTime.now()
         )
 }
 
@@ -155,7 +154,6 @@ private fun Member.toEntity(): MemberEntity {
         profileImageId = profileImageId?.value,
         platform = platform.name,
         ordinal = ordinal,
-        gender = gender.name,
-        point = point
+        gender = gender.name
     )
 }
