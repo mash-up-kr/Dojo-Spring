@@ -1,6 +1,7 @@
 package com.mashup.dojo.dto
 
 import com.mashup.dojo.domain.ImageId
+import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionType
 import io.swagger.v3.oas.annotations.media.Schema
@@ -15,6 +16,8 @@ data class QuestionCreateRequest(
     val content: String,
     @field:NotNull
     val type: QuestionType,
+    @field:NotNull
+    val category: QuestionCategory,
     @field:NotBlank
     @Schema(description = "질문 이모지 이미지 id")
     val emojiImageId: ImageId,

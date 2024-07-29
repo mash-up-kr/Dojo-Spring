@@ -38,6 +38,7 @@ class AdminController(
             QuestionUseCase.CreateCommand(
                 content = request.content,
                 type = request.type,
+                category = request.category,
                 emojiImageId = request.emojiImageId
             )
         ).let { DojoApiResponse.success(it.id) }
@@ -56,7 +57,7 @@ class AdminController(
     ): DojoApiResponse<List<QuestionId>> {
         val createCommands =
             request.questionList.map {
-                QuestionUseCase.CreateCommand(it.content, it.type, it.emojiImageId)
+                QuestionUseCase.CreateCommand(it.content, it.type, it.category, it.emojiImageId)
             }
         val questionIds =
             questionUseCase.bulkCreate(createCommands)
