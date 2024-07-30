@@ -17,6 +17,5 @@ QuestionController(
     fun getQuestionSheet(
         // todo add auth for memberId
     ) {
-        
     }
 }

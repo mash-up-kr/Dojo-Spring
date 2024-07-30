@@ -41,7 +41,6 @@ data class QuestionSetCustomCreateRequest(
     val publishedAt: LocalDateTime,
 )
 
-
 @Schema(description = "질문지 (투표 용지) 한 다스 조회 응답")
 data class QuestionSheetsGetResponse(
     @Schema(description = "응답자 id")
@@ -53,7 +52,7 @@ data class QuestionSheetsGetResponse(
     @Schema(description = "유저가 풀어야하는 질문지 순서(1based). 기존에 푼 적이 없다면 1부터 ~ sheetTotalCount 까지")
     val startingQuestionIndex: Int,
     @Schema(description = "질문지 상세 리스트")
-    val questionList: List<QuestionSheetResponse>
+    val questionSheetList: List<QuestionSheetResponse>,
 )
 
 @Schema(description = "질문지 상세")
@@ -71,38 +70,15 @@ data class QuestionSheetResponse(
     @Schema(description = "질문 카테고리")
     val questionCategory: String,
     @Schema(description = "질문 카테고리에 맞는 이모지 이미지")
-    val questionEmojiImage : ByteArray,
+    val questionEmojiImageUrl: String,
     @Schema(description = "질문에 대한 후보자 list")
-    val candidates: List<QuestionSheetCandidate>
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    val candidates: List<QuestionSheetCandidate>,
+)
 
-        other as QuestionSheetResponse
-
-        if (questionSheetId != other.questionSheetId) return false
-        if (resolverId != other.resolverId) return false
-        if (questionId != other.questionId) return false
-        if (questionOrder != other.questionOrder) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = questionSheetId.hashCode()
-        result = 31 * result + resolverId.hashCode()
-        result = 31 * result + questionId.hashCode()
-        result = 31 * result + questionOrder
-        return result
-    }
-}
 @Schema(description = "질문에 대한 후보자")
 data class QuestionSheetCandidate(
     @Schema(description = "후보자 id")
     val memberId: MemberId,
-    @Schema(description = "후보자 리스트 중 해당 후보자의 순서")
-    val order: Int,
     @Schema(description = "후보자 이름")
     val memberName: String,
     @Schema(description = "후보자 플랫폼")

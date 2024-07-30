@@ -9,7 +9,10 @@ import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface QuestionSheetRepository : JpaRepository<QuestionSheetEntity, String> {
-    fun findAllByQuestionSetIdAndResolverId(questionSetId: String, resolverId: String): List<QuestionSheetEntity>
+    fun findAllByQuestionSetIdAndResolverId(
+        questionSetId: String,
+        resolverId: String,
+    ): List<QuestionSheetEntity>
 }
 
 @Entity

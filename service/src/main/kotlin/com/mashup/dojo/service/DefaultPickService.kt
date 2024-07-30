@@ -70,7 +70,10 @@ class DefaultPickService(
         // return listOf(DEFAULT_PICK)
     }
 
-    override fun getSolvedPickList(pickerMemberId: MemberId, questionSetId: QuestionSetId): List<Pick> {
+    override fun getSolvedPickList(
+        pickerMemberId: MemberId,
+        questionSetId: QuestionSetId,
+    ): List<Pick> {
         TODO("Not yet implemented")
     }
 
