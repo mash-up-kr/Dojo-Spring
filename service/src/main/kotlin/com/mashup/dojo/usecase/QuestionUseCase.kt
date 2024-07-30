@@ -31,6 +31,12 @@ interface QuestionUseCase {
         val publishedAt: LocalDateTime,
     )
 
+    data class GetQuestionSheetsResult(
+        val resolverId: MemberId,
+        // 문제지 전체 
+        val sheetTotalIndex: Int, 
+        val startResolveIndex: Int, 
+    )
     fun create(command: CreateCommand): Question
 
     fun bulkCreate(commands: List<CreateCommand>): List<Question>
@@ -42,6 +48,7 @@ interface QuestionUseCase {
     fun createQuestionSheet(): List<QuestionSheet>
 
     fun getQuestionSheetList(memberId: MemberId): List<QuestionSheet>
+    
 }
 
 @Component
@@ -85,24 +92,26 @@ class DefaultQuestionUseCase(
 
     override fun getQuestionSheetList(memberId: MemberId): List<QuestionSheet> {
         // 운영중인 questionSet 조회 (todo : scheduler 가 최신 QuestionSet 을 발행 시각 2분전에 publishedYn Y 로 변경 예정)
-        val operatingQSet = questionService.getOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_OPERATING_NOT_EXIST)
+        val operatingQSet = questionService.getOperatingQuestionSet()
+            ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_OPERATING_NOT_EXIST)
 
         // QuestionSetId & solverId 를 통해 현재 운영중인 QuestionSet 에서 푼 문제가 어디까지 인지 확인 
         // todo : Pick 정보에 QuestionSetId 필요함 (QuestionSet 이 없는 경우, 동일 질문 다른 후보자에 대한 정보와 분간 X) 
-        val solvedQuestionId = pickService.getSolvedPickList(memberId, operatingQSet.id).map { it.questionId }
+        val solvedQuestionIds = pickService.getSolvedPickList(memberId, operatingQSet.id)
+            .map { it.questionId }
 
         // QuestionSheet 조회 후 푼 문제지 필터링 
         return questionService.getQuestionSheets(memberId, operatingQSet.id)
-            .filter { it.questionId !in solvedQuestionId }
+            .filterNot { it.questionId in solvedQuestionIds }
             .map { qSheet ->
                 val candidates = qSheet.candidates.mapIndexed { index, memberId ->
-                    val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
-
-                    Candidate(
-                        memberId = member.id,
-                        memberName = member.fullName,
-                        order = index
-                    )
+                    memberService.findMemberById(memberId)?.let { member ->
+                        Candidate(
+                            memberId = member.id,
+                            memberName = member.fullName,
+                            order = index
+                        )
+                    } ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
                 }
 
                 qSheet.toQuestionSheet(candidates)
