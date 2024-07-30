@@ -37,7 +37,7 @@ interface QuestionService {
 
     fun getOperatingQuestionSet(): QuestionSet?
 
-    fun getReadyToOperatingQuestionSet(): QuestionSet?
+    fun getNextOperatingQuestionSet(): QuestionSet?
 
     fun getQuestionSheets(
         resolverId: MemberId,
@@ -95,7 +95,7 @@ class DefaultQuestionService(
 
     // 현재 운영중인 QuestionSet
     override fun getOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAtAsc()
+        return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAt()
             ?.toQuestionSet() ?: run {
             log.error { "Published And Operating QuestionSet Entity not found" }
             null
@@ -103,7 +103,7 @@ class DefaultQuestionService(
     }
 
     // 발행 출격 준비 완료 QuestionSet
-    override fun getReadyToOperatingQuestionSet(): QuestionSet? {
+    override fun getNextOperatingQuestionSet(): QuestionSet? {
         return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt()
             ?.toQuestionSet() ?: run {
             log.error { "Published And Prepared for sortie QuestionSet Entity not found" }

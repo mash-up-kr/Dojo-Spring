@@ -5,6 +5,7 @@ import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
@@ -113,13 +114,15 @@ class DefaultQuestionUseCase(
     }
 
     override fun createQuestionSheet(): List<QuestionSheet> {
-        val currentQuestionSet = questionService.getReadyToOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
+        val currentQuestionSet = questionService.getNextOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
         val allMemberRecords = memberService.findAllMember()
         return questionService.createQuestionSheets(currentQuestionSet, allMemberRecords)
     }
 
     override fun getQuestionSheetList(memberId: MemberId): QuestionUseCase.GetQuestionSheetsResult {
+        return TEMP_GET_QUESTION_SHEETS_RESULT
         // 운영중인 questionSet 조회 (todo : scheduler 가 최신 QuestionSet 을 발행 시각 2분전에 publishedYn Y 로 변경 예정)
+        // todo : qSet /
         val operatingQSet =
             questionService.getOperatingQuestionSet()
                 ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_OPERATING_NOT_EXIST)
@@ -168,34 +171,212 @@ class DefaultQuestionUseCase(
             resolverId = memberId,
             questionSetId = operatingQSet.id,
             sheetTotalCount = operatingQSet.questionIds.size,
-            startingQuestionIndex = operatingQSet.questionIds.size - questionSheetResults.size + 1,
+            startingQuestionIndex = operatingQSet.questionIds.size - questionSheetResults.size,
             questionSheetList = questionSheetResults
         )
     }
 
-    private fun QuestionSheet.toQuestionSheetResult(
-        questionOrder: Int,
-        questionContent: String,
-        questionCategory: QuestionCategory,
-        emojiImageUrl: String,
-    ): QuestionUseCase.QuestionSheetResult {
-        return QuestionUseCase.QuestionSheetResult(
-            questionSheetId = questionSheetId,
-            resolverId = resolverId,
-            questionId = questionId,
-            questionOrder = questionOrder,
-            questionContent = questionContent,
-            questionCategory = questionCategory.name,
-            questionEmojiImageUrl = emojiImageUrl,
-            candidates = candidates.map { it.toCandidateResult() }
-        )
-    }
+    companion object {
+        private val TEMP_CANDIDATES_LIST =
+            listOf(
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("1"),
+                    memberName = "낭은영",
+                    platform = MemberPlatform.DESIGN.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("2"),
+                    memberName = "오시연",
+                    platform = MemberPlatform.DESIGN.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("3"),
+                    memberName = "김준형",
+                    platform = MemberPlatform.SPRING.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("4"),
+                    memberName = "오예원",
+                    platform = MemberPlatform.SPRING.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("5"),
+                    memberName = "박세원",
+                    platform = MemberPlatform.SPRING.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("6"),
+                    memberName = "최민석",
+                    platform = MemberPlatform.WEB.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("7"),
+                    memberName = "이현재",
+                    platform = MemberPlatform.WEB.name
+                ),
+                QuestionUseCase.QuestionSheetCandidateResult(
+                    candidateId = MemberId("8"),
+                    memberName = "황태규",
+                    platform = MemberPlatform.WEB.name
+                )
+            )
 
-    private fun Candidate.toCandidateResult(): QuestionUseCase.QuestionSheetCandidateResult {
-        return QuestionUseCase.QuestionSheetCandidateResult(
-            candidateId = memberId,
-            memberName = memberName,
-            platform = platform.name
-        )
+        private val TEMP_QUESTION_SHEET_RESULT =
+            listOf(
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("1"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("1"),
+                    questionOrder = 1,
+                    questionContent = "연애하면 잘해줄 것 같은 사람",
+                    questionCategory = "DATING",
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/love.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("2"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("2"),
+                    questionOrder = 2,
+                    questionContent = "밥 한끼 사주고 싶은 사람",
+                    questionCategory = QuestionCategory.FRIENDSHIP.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/waiting.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("3"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("3"),
+                    questionOrder = 3,
+                    questionContent = "인스타 피드 염탐하고 싶은 사람",
+                    questionCategory = QuestionCategory.OTHER.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/etc.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("4"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("4"),
+                    questionOrder = 4,
+                    questionContent = "헤르미온느 일정 소화할 것 같은 사람",
+                    questionCategory = QuestionCategory.FITNESS.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/health.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("5"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("5"),
+                    questionOrder = 5,
+                    questionContent = "혼자 틱톡 찍어봤을 것 같은 사람",
+                    questionCategory = QuestionCategory.OTHER.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/joke.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("6"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("6"),
+                    questionOrder = 6,
+                    questionContent = "밥 먹을 때 쩝쩝 소리 안낼 것 같은 사람",
+                    questionCategory = QuestionCategory.PERSONALITY.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/personality.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("7"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("7"),
+                    questionOrder = 7,
+                    questionContent = "내가 얘보다는 나을 거 같은 사람",
+                    questionCategory = QuestionCategory.HUMOR.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/intimacy.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("8"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("8"),
+                    questionOrder = 7,
+                    questionContent = "메이플하다가 현피뜨러 서울역 갈 것 같은 사람",
+                    questionCategory = QuestionCategory.FITNESS.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/health.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("9"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("9"),
+                    questionOrder = 9,
+                    questionContent = "아침으로 해독주스 만들어 먹을 것 같은 사람",
+                    questionCategory = QuestionCategory.FITNESS.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/personality.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("10"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("10"),
+                    questionOrder = 10,
+                    questionContent = "핸드폰 앨범에 셀카가 제일 많을 것 같은 사람",
+                    questionCategory = QuestionCategory.APPEARANCE.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/appearence.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("11"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("11"),
+                    questionOrder = 11,
+                    questionContent = "재테크 배워보고 싶은 사람",
+                    questionCategory = QuestionCategory.WORK.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/work.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                ),
+                QuestionUseCase.QuestionSheetResult(
+                    questionSheetId = QuestionSheetId("11"),
+                    resolverId = MemberId("temp"),
+                    questionId = QuestionId("11"),
+                    questionOrder = 11,
+                    questionContent = "엉덩이로 이름 잘 쓸 것 같은 사람",
+                    questionCategory = QuestionCategory.HUMOR.name,
+                    questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/congrat.gif",
+                    candidates = TEMP_CANDIDATES_LIST
+                )
+            )
+        val TEMP_GET_QUESTION_SHEETS_RESULT =
+            QuestionUseCase.GetQuestionSheetsResult(
+                resolverId = MemberId("temp"),
+                questionSetId = QuestionSetId("1"),
+                sheetTotalCount = 12,
+                startingQuestionIndex = 1,
+                questionSheetList = TEMP_QUESTION_SHEET_RESULT
+            )
     }
+}
+
+private fun QuestionSheet.toQuestionSheetResult(
+    questionOrder: Int,
+    questionContent: String,
+    questionCategory: QuestionCategory,
+    emojiImageUrl: String,
+): QuestionUseCase.QuestionSheetResult {
+    return QuestionUseCase.QuestionSheetResult(
+        questionSheetId = questionSheetId,
+        resolverId = resolverId,
+        questionId = questionId,
+        questionOrder = questionOrder,
+        questionContent = questionContent,
+        questionCategory = questionCategory.name,
+        questionEmojiImageUrl = emojiImageUrl,
+        candidates = candidates.map { it.toCandidateResult() }
+    )
+}
+
+private fun Candidate.toCandidateResult(): QuestionUseCase.QuestionSheetCandidateResult {
+    return QuestionUseCase.QuestionSheetCandidateResult(
+        candidateId = memberId,
+        memberName = memberName,
+        platform = platform.name
+    )
 }

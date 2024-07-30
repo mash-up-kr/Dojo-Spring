@@ -47,11 +47,11 @@ data class QuestionSheetsGetResponse(
     val resolverId: MemberId,
     @Schema(description = "질문지 한 묶음의 고유 식별 값")
     val questionSetId: QuestionSetId,
-    @Schema(description = "한 묶음에 해당하는 전체 질문지 수. 1based")
+    @Schema(description = "한 묶음에 해당하는 전체 질문지 수")
     val sheetTotalCount: Int,
     @Schema(description = "유저가 풀어야하는 질문지 순서(1based). 기존에 푼 적이 없다면 1부터 ~ sheetTotalCount 까지")
     val startingQuestionIndex: Int,
-    @Schema(description = "질문지 상세 리스트")
+    @Schema(description = "질문지 상세 리스트. 이미 기존에 다 풀었다면 emptyList로 내려감 ")
     val questionSheetList: List<QuestionSheetResponse>,
 )
 

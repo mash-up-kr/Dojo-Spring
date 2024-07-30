@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 
 interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
     // publishedYn : True && publishedAt > now -> 현재 운영중인 QuestionSet
-    fun findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAtAsc(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
+    fun findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
 
     // publishedYn : True && publishedAt < now -> 발행 직전(예정) QuestionSet
     fun findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
