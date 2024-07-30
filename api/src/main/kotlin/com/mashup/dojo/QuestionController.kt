@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Question", description = "질문지 관련 API 입니다")
 @RequestMapping("/question")
 @RestController
-class
-QuestionController(
+class QuestionController(
     private val questionUseCase: QuestionUseCase,
 ) {
     @GetMapping
