@@ -5,7 +5,6 @@ import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
-import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.service.ImageService
@@ -18,6 +17,7 @@ import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
+import com.mashup.dojo.domain.PickOpenItem
 
 interface PickUseCase {
     data class GetReceivedPickListCommand(
@@ -26,6 +26,7 @@ interface PickUseCase {
     )
 
     data class GetReceivedPick(
+        val pickId: PickId,
         val questionId: QuestionId,
         val questionContent: String,
         val questionEmojiImageUrl: String,
@@ -70,30 +71,36 @@ class DefaultPickUseCase(
 
         if (receivedPickList.isEmpty()) return EMPTY_RECEIVED_PICK
 
+        /*
+        ToDo 지워도 될까욥
         val questionId = receivedPickList.first().questionId
         questionService.getQuestionById(questionId)
+         */
 
         val result =
             receivedPickList.groupBy { it.questionId }
-                .map { (questionId, pickList) ->
+                .flatMap { (questionId, pickList) ->
                     val question =
                         questionService.getQuestionById(questionId)
                             ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [$questionId]")
 
                     val url =
                         imageService.load(question.emojiImageId)?.url
-                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. . EmojiImageId: [${question.emojiImageId}]")
+                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [${question.emojiImageId}]")
 
                     val pickedTotalCount = pickList.size
                     val latestPickedAt = pickList.maxBy { it.createdAt }.createdAt
 
-                    GetReceivedPick(
-                        questionId = question.id,
-                        questionContent = question.content,
-                        questionEmojiImageUrl = url,
-                        totalReceivedPickCount = pickedTotalCount,
-                        latestPickedAt = latestPickedAt
-                    )
+                    pickList.map { pick ->
+                        GetReceivedPick(
+                            pickId = pick.id,
+                            questionId = question.id,
+                            questionContent = question.content,
+                            questionEmojiImageUrl = url,
+                            totalReceivedPickCount = pickedTotalCount,
+                            latestPickedAt = latestPickedAt
+                        )
+                    }
                 }
 
         return when (command.sort) {

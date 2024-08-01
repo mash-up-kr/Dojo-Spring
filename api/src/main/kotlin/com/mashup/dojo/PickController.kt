@@ -48,6 +48,7 @@ class PickController(
         val pickResponseList =
             receivedPickList.map {
                 PickResponse(
+                    pickId = it.pickId,
                     questionId = it.questionId,
                     questionContent = it.questionContent,
                     questionEmojiImageUrl = it.questionEmojiImageUrl,
