@@ -10,9 +10,13 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 interface PickService {
     fun getReceivedPickList(
@@ -31,6 +35,18 @@ interface PickService {
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
     ): String
+
+    fun getPickPaging(
+        id: QuestionId,
+        memberId: MemberId,
+        pageNumber: Int,
+        pageSize: Int,
+    ): Page<Pick>
+
+    fun getPickCount(
+        id: QuestionId,
+        memberId: MemberId,
+    ): Int
 }
 
 @Transactional(readOnly = true)
@@ -45,6 +61,7 @@ class DefaultPickService(
     ): List<Pick> {
         return pickRepository.findAllByPickedId(pickedMemberId.value)
             .map { it.toPick() }
+        // return listOf(DEFAULT_PICK)
     }
 
     @Transactional
@@ -90,6 +107,71 @@ class DefaultPickService(
 
     private fun findPickById(pickId: PickId): Pick? {
         return pickRepository.findByIdOrNull(pickId.value)?.toPick()
+    }
+
+    override fun getPickPaging(
+        id: QuestionId,
+        memberId: MemberId,
+        pageNumber: Int,
+        pageSize: Int,
+    ): Page<Pick> {
+        val pageable = PageRequest.of(pageNumber, pageSize)
+        return PageImpl(SAMPLE_PICK_LIST, pageable, 1L)
+    }
+
+    override fun getPickCount(
+        id: QuestionId,
+        memberId: MemberId,
+    ): Int {
+        // ToDo Pick getCount
+        return 10
+    }
+
+    companion object {
+        val DEFAULT_PICK =
+            Pick(
+                id = PickId("pickmepickme"),
+                questionId = QuestionId("question"),
+                pickerId = MemberId("뽑은놈"),
+                pickedId = MemberId("뽑힌놈"),
+                isGenderOpen = false,
+                isPlatformOpen = false,
+                isMidInitialNameOpen = false,
+                isFullNameOpen = false,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
+//        private fun PickEntity.buildDomain(): Pick {
+//            return Pick(
+//                id = PickId("pickmepickme"),
+//                questionId = QuestionId("question"),
+//                pickerId = MemberId("뽑은놈"),
+//                pickedId = MemberId("뽑힌놈"),
+//                isGenderOpen = false,
+//                isPlatformOpen = false,
+//                isMidInitialNameOpen = false,
+//                isFullNameOpen = false,
+//                createdAt = createdAt,
+//                updatedAt = updatedAt,
+//            )
+//        }
+
+        val SAMPLE_PICK_LIST: List<Pick>
+            get() = listOf(this.SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK)
+
+        private val SAMPLE_PICK =
+            Pick(
+                id = PickId("SAMPLE_PICK_ID"),
+                questionId = QuestionId("SAMPLE_QUESTION_ID"),
+                pickerId = MemberId("SAMPLE_MEMBER_ID"),
+                pickedId = MemberId("SAMPLE_MEMBER_ID"),
+                isGenderOpen = true,
+                isPlatformOpen = true,
+                isMidInitialNameOpen = true,
+                isFullNameOpen = true,
+                createdAt = LocalDateTime.MIN,
+                updatedAt = LocalDateTime.now()
+            )
     }
 }
 

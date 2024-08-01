@@ -94,6 +94,7 @@ data class Member(
 enum class MemberGender {
     MALE,
     FEMALE,
+    UNKNOWN,
     ;
 
     companion object {
@@ -111,6 +112,7 @@ enum class MemberPlatform {
     ANDROID,
     IOS,
     DESIGN,
+    UNKNOWN,
     ;
 
     companion object {
