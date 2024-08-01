@@ -10,6 +10,9 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,6 +35,18 @@ interface PickService {
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
     ): String
+
+    fun getPickPaging(
+        id: QuestionId,
+        memberId: MemberId,
+        pageNumber: Int,
+        pageSize: Int,
+    ): Page<Pick>
+
+    fun getPickCount(
+        id: QuestionId,
+        memberId: MemberId,
+    ): Int
 }
 
 @Transactional(readOnly = true)
@@ -94,6 +109,24 @@ class DefaultPickService(
         return pickRepository.findByIdOrNull(pickId.value)?.toPick()
     }
 
+    override fun getPickPaging(
+        id: QuestionId,
+        memberId: MemberId,
+        pageNumber: Int,
+        pageSize: Int,
+    ): Page<Pick> {
+        val pageable = PageRequest.of(pageNumber, pageSize)
+        return PageImpl(SAMPLE_PICK_LIST, pageable, 1L)
+    }
+
+    override fun getPickCount(
+        id: QuestionId,
+        memberId: MemberId,
+    ): Int {
+        // ToDo Pick getCount
+        return 10
+    }
+
     companion object {
         val DEFAULT_PICK =
             Pick(
@@ -122,6 +155,23 @@ class DefaultPickService(
 //                updatedAt = updatedAt,
 //            )
 //        }
+
+        val SAMPLE_PICK_LIST: List<Pick>
+            get() = listOf(this.SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK)
+
+        private val SAMPLE_PICK =
+            Pick(
+                id = PickId("SAMPLE_PICK_ID"),
+                questionId = QuestionId("SAMPLE_QUESTION_ID"),
+                pickerId = MemberId("SAMPLE_MEMBER_ID"),
+                pickedId = MemberId("SAMPLE_MEMBER_ID"),
+                isGenderOpen = true,
+                isPlatformOpen = true,
+                isMidInitialNameOpen = true,
+                isFullNameOpen = true,
+                createdAt = LocalDateTime.MIN,
+                updatedAt = LocalDateTime.now()
+            )
     }
 }
 
