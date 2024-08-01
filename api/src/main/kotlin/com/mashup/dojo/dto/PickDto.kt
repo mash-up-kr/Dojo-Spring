@@ -1,5 +1,8 @@
 package com.mashup.dojo.dto
 
+import com.mashup.dojo.domain.MemberGender
+import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
@@ -8,7 +11,6 @@ import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
-import com.mashup.dojo.domain.MemberId
 
 @Schema(description = "Pick 생성 요청")
 data class CreatePickRequest(
@@ -30,6 +32,34 @@ data class PickResponse(
     val questionContent: String,
     val questionEmojiImageUrl: String,
     val totalReceivedPickCount: Int,
+    val latestPickedAt: LocalDateTime,
+)
+
+data class PagingPick(
+    val questionId: QuestionId,
+    val questionContent: String,
+    val questionEmojiImageUrl: String,
+    val totalReceivedPickCount: Int,
+    val picks: List<ReceivedPickDetail>,
+    val totalPage: Int,
+    val totalElements: Long,
+    val isFirst: Boolean,
+    val isLast: Boolean,
+)
+
+data class ReceivedPickDetail(
+    val pickId: PickId,
+    val pickerOrdinal: Int,
+    val pickerIdOpen: Boolean,
+    val pickerId: MemberId,
+    val pickerGenderOpen: Boolean,
+    val pickerGender: MemberGender,
+    val pickerPlatformOpen: Boolean,
+    val pickerPlatform: MemberPlatform,
+    val pickerSecondInitialNameOpen: Boolean,
+    val pickerSecondInitialName: String,
+    val pickerFullNameOpen: Boolean,
+    val pickerFullName: String,
     val latestPickedAt: LocalDateTime,
 )
 

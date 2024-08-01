@@ -5,11 +5,10 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
-import com.mashup.dojo.dto.CreatePickRequest
-import com.mashup.dojo.dto.PickOpenItemDto
-import com.mashup.dojo.dto.PickOpenRequest
-import com.mashup.dojo.dto.PickOpenResponse
+import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.dto.PagingPick
 import com.mashup.dojo.dto.PickResponse
+import com.mashup.dojo.dto.ReceivedPickDetail
 import com.mashup.dojo.dto.ReceivedPickListGetResponse
 import com.mashup.dojo.usecase.PickUseCase
 import io.swagger.v3.oas.annotations.Operation
@@ -23,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import com.mashup.dojo.dto.CreatePickRequest
+import com.mashup.dojo.dto.PickOpenItemDto
+import com.mashup.dojo.dto.PickOpenRequest
+import com.mashup.dojo.dto.PickOpenResponse
 
 @Tag(name = "Pick", description = "픽!")
 @RestController
@@ -58,6 +61,49 @@ class PickController(
             }
         return DojoApiResponse.success(ReceivedPickListGetResponse(pickResponseList, sort))
     }
+
+    @GetMapping("/pickDetail")
+    fun getPickDetail(
+        @RequestParam questionId: String,
+        @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
+    ): DojoApiResponse<PagingPick> {
+        val pickPaging: PickUseCase.GetPagingPick =
+            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(MemberId("1"), QuestionId(questionId), pageNumber))
+
+        val pickDetails =
+            pickPaging.picks.map {
+                ReceivedPickDetail(
+                    pickId = it.pickId,
+                    pickerOrdinal = it.pickerOrdinal,
+                    pickerIdOpen = it.pickerIdOpen,
+                    pickerId = it.pickerId,
+                    pickerGenderOpen = it.pickerGenderOpen,
+                    pickerGender = it.pickerGender,
+                    pickerPlatformOpen = it.pickerPlatformOpen,
+                    pickerPlatform = it.pickerPlatform,
+                    pickerSecondInitialNameOpen = it.pickerSecondInitialNameOpen,
+                    pickerSecondInitialName = it.pickerSecondInitialName,
+                    pickerFullNameOpen = it.pickerFullNameOpen,
+                    pickerFullName = it.pickerFullName,
+                    latestPickedAt = it.latestPickedAt
+                )
+            }
+        val pickPagingResponse =
+            PagingPick(
+                questionId = pickPaging.questionId,
+                questionContent = pickPaging.questionContent,
+                questionEmojiImageUrl = pickPaging.questionEmojiImageUrl,
+                totalReceivedPickCount = pickPaging.totalReceivedPickCount,
+                picks = pickDetails,
+                totalPage = pickPaging.totalPage,
+                totalElements = pickPaging.totalElements,
+                isFirst = pickPaging.isFirst,
+                isLast = pickPaging.isLast
+            )
+
+        return DojoApiResponse.success(pickPagingResponse)
+    }
+
 
     @PostMapping
     @Operation(
