@@ -1,5 +1,7 @@
 package com.mashup.dojo.dto
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
@@ -9,8 +11,6 @@ import com.mashup.dojo.domain.QuestionId
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
-import com.mashup.dojo.DojoException
-import com.mashup.dojo.DojoExceptionType
 
 @Schema(description = "Pick 생성 요청")
 data class CreatePickRequest(

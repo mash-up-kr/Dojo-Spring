@@ -41,6 +41,7 @@ interface PickUseCase {
         val memberId: MemberId,
         val questionId: QuestionId,
         val pageNumber: Int,
+        val pageSize: Int,
     )
 
     data class GetPagingPick(
@@ -177,7 +178,7 @@ class DefaultPickUseCase(
         val pickCount: Int = pickService.getPickCount(question.id, command.memberId)
 
         val pickPaging: Page<Pick> =
-            pickService.getPickPaging(question.id, command.memberId, command.pageNumber, PAGE_SIZE)
+            pickService.getPickPaging(question.id, command.memberId, command.pageNumber, command.pageSize)
 
         val pickDetails =
             pickPaging.content.map { pick ->
@@ -279,6 +280,5 @@ class DefaultPickUseCase(
 
     companion object {
         private val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
-        private const val PAGE_SIZE = 10 // 페이지 당 데이터 수
     }
 }

@@ -6,6 +6,10 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.dto.CreatePickRequest
+import com.mashup.dojo.dto.PickOpenItemDto
+import com.mashup.dojo.dto.PickOpenRequest
+import com.mashup.dojo.dto.PickOpenResponse
 import com.mashup.dojo.dto.PickPaging
 import com.mashup.dojo.dto.PickResponse
 import com.mashup.dojo.dto.ReceivedPickDetail
@@ -22,10 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import com.mashup.dojo.dto.CreatePickRequest
-import com.mashup.dojo.dto.PickOpenItemDto
-import com.mashup.dojo.dto.PickOpenRequest
-import com.mashup.dojo.dto.PickOpenResponse
 
 @Tag(name = "Pick", description = "픽!")
 @RestController
@@ -73,9 +73,10 @@ class PickController(
     fun getPickDetail(
         @RequestParam questionId: String,
         @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
+        @RequestParam(required = false, defaultValue = "10") pageSize: Int,
     ): DojoApiResponse<PickPaging> {
         val pickPaging: PickUseCase.GetPagingPick =
-            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(MemberId("1"), QuestionId(questionId), pageNumber))
+            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(MemberId("1"), QuestionId(questionId), pageNumber, pageSize))
 
         val pickDetails =
             pickPaging.picks.map {
@@ -110,7 +111,6 @@ class PickController(
 
         return DojoApiResponse.success(pickPagingResponse)
     }
-
 
     @PostMapping
     @Operation(
