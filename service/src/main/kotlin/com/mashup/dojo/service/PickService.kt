@@ -13,6 +13,7 @@ import com.mashup.dojo.domain.QuestionId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 interface PickService {
     fun getReceivedPickList(
@@ -45,6 +46,7 @@ class DefaultPickService(
     ): List<Pick> {
         return pickRepository.findAllByPickedId(pickedMemberId.value)
             .map { it.toPick() }
+        // return listOf(DEFAULT_PICK)
     }
 
     @Transactional
@@ -90,6 +92,36 @@ class DefaultPickService(
 
     private fun findPickById(pickId: PickId): Pick? {
         return pickRepository.findByIdOrNull(pickId.value)?.toPick()
+    }
+
+    companion object {
+        val DEFAULT_PICK =
+            Pick(
+                id = PickId("pickmepickme"),
+                questionId = QuestionId("question"),
+                pickerId = MemberId("뽑은놈"),
+                pickedId = MemberId("뽑힌놈"),
+                isGenderOpen = false,
+                isPlatformOpen = false,
+                isMidInitialNameOpen = false,
+                isFullNameOpen = false,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
+//        private fun PickEntity.buildDomain(): Pick {
+//            return Pick(
+//                id = PickId("pickmepickme"),
+//                questionId = QuestionId("question"),
+//                pickerId = MemberId("뽑은놈"),
+//                pickedId = MemberId("뽑힌놈"),
+//                isGenderOpen = false,
+//                isPlatformOpen = false,
+//                isMidInitialNameOpen = false,
+//                isFullNameOpen = false,
+//                createdAt = createdAt,
+//                updatedAt = updatedAt,
+//            )
+//        }
     }
 }
 
