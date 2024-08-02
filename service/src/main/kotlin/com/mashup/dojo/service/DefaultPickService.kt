@@ -10,6 +10,7 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.domain.QuestionSetId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -22,6 +23,11 @@ interface PickService {
     fun getReceivedPickList(
         pickedMemberId: MemberId,
         sort: PickSort,
+    ): List<Pick>
+
+    fun getSolvedPickList(
+        pickerMemberId: MemberId,
+        questionSetId: QuestionSetId,
     ): List<Pick>
 
     fun create(
@@ -62,6 +68,13 @@ class DefaultPickService(
         return pickRepository.findAllByPickedId(pickedMemberId.value)
             .map { it.toPick() }
         // return listOf(DEFAULT_PICK)
+    }
+
+    override fun getSolvedPickList(
+        pickerMemberId: MemberId,
+        questionSetId: QuestionSetId,
+    ): List<Pick> {
+        TODO("Not yet implemented")
     }
 
     @Transactional

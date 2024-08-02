@@ -4,11 +4,13 @@ import com.mashup.dojo.QuestionEntity
 import com.mashup.dojo.QuestionRepository
 import com.mashup.dojo.QuestionSetEntity
 import com.mashup.dojo.QuestionSetRepository
+import com.mashup.dojo.QuestionSheetEntity
 import com.mashup.dojo.QuestionSheetRepository
 import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
@@ -17,6 +19,7 @@ import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionSheetId
+import com.mashup.dojo.domain.QuestionSheetWithCandidatesId
 import com.mashup.dojo.domain.QuestionType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -30,14 +33,23 @@ interface QuestionService {
     val questionSetRepository: QuestionSetRepository
     val questionSheetRepository: QuestionSheetRepository
 
+    fun getQuestionById(id: QuestionId): Question?
+
+    fun getOperatingQuestionSet(): QuestionSet?
+
+    fun getNextOperatingQuestionSet(): QuestionSet?
+
+    fun getQuestionSheets(
+        resolverId: MemberId,
+        questionSetId: QuestionSetId,
+    ): List<QuestionSheetWithCandidatesId>
+
     fun createQuestion(
         content: String,
         type: QuestionType,
         category: QuestionCategory,
         emojiImageId: ImageId,
     ): Question
-
-    fun getCurrentQuestionSet(): QuestionSet?
 
     fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet
 
@@ -50,8 +62,6 @@ interface QuestionService {
         questionSet: QuestionSet,
         members: List<Member>,
     ): List<QuestionSheet>
-
-    fun getQuestionById(id: QuestionId): Question?
 }
 
 @Service
@@ -83,12 +93,30 @@ class DefaultQuestionService(
         return question
     }
 
-    override fun getCurrentQuestionSet(): QuestionSet? {
-        return questionSetRepository.findFirstByPublishedYnFalseOrderByPublishedAtAsc()
+    // 현재 운영중인 QuestionSet
+    override fun getOperatingQuestionSet(): QuestionSet? {
+        return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAt()
             ?.toQuestionSet() ?: run {
-            log.warn { "Not Published And Prepared QuestionSet Entity not found" }
+            log.error { "Published And Operating QuestionSet Entity not found" }
             null
         }
+    }
+
+    // 발행 출격 준비 완료 QuestionSet
+    override fun getNextOperatingQuestionSet(): QuestionSet? {
+        return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt()
+            ?.toQuestionSet() ?: run {
+            log.error { "Published And Prepared for sortie QuestionSet Entity not found" }
+            null
+        }
+    }
+
+    override fun getQuestionSheets(
+        resolverId: MemberId,
+        questionSetId: QuestionSetId,
+    ): List<QuestionSheetWithCandidatesId> {
+        return questionSheetRepository.findAllByQuestionSetIdAndResolverId(questionSetId.value, resolverId.value)
+            .map { it.toQuestionSheetWithCandidatesId() }
     }
 
     override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet {
@@ -96,7 +124,7 @@ class DefaultQuestionService(
          * todo :
          * - get Question Set (12s) exclude previousQuestionSet
          * - cache put -> QuestionSet and return
-         *
+         * - questionSet publishedAt by getNextPickTime method
          */
 
         return SAMPLE_QUESTION_SET
@@ -179,10 +207,10 @@ class DefaultQuestionService(
                 resolverId = MemberId("1"),
                 candidates =
                     listOf(
-                        Candidate(MemberId("2"), "임준형", 1),
-                        Candidate(MemberId("3"), "한씨", 1),
-                        Candidate(MemberId("4"), "박씨", 1),
-                        Candidate(MemberId("5"), "오씨", 1)
+                        Candidate(MemberId("2"), "임준형", MemberPlatform.SPRING),
+                        Candidate(MemberId("3"), "한씨", MemberPlatform.SPRING),
+                        Candidate(MemberId("4"), "박씨", MemberPlatform.SPRING),
+                        Candidate(MemberId("5"), "오씨", MemberPlatform.SPRING)
                     )
             )
 
@@ -264,5 +292,15 @@ private fun QuestionSetEntity.toQuestionSet(): QuestionSet {
         id = QuestionSetId(id),
         questionIds = questionOrders,
         publishedAt = publishedAt
+    )
+}
+
+private fun QuestionSheetEntity.toQuestionSheetWithCandidatesId(): QuestionSheetWithCandidatesId {
+    return QuestionSheetWithCandidatesId(
+        questionSheetId = QuestionSheetId(id),
+        questionSetId = QuestionSetId(questionSetId),
+        questionId = QuestionId(questionId),
+        resolverId = MemberId(resolverId),
+        candidates = candidates.map { MemberId(it) }.toList()
     )
 }

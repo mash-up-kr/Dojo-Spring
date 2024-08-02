@@ -79,10 +79,10 @@ class DefaultMemberService(
         val targetMemberId3 = memberRelation3.toId
         val targetMemberId4 = memberRelation4.toId
 
-        val candidate1 = Candidate(targetMemberId1, "한씨", 1)
-        val candidate2 = Candidate(targetMemberId2, "오씨", 2)
-        val candidate3 = Candidate(targetMemberId3, "박씨", 3)
-        val candidate4 = Candidate(targetMemberId4, "김", 4)
+        val candidate1 = Candidate(targetMemberId1, "한씨", MemberPlatform.SPRING)
+        val candidate2 = Candidate(targetMemberId2, "오씨", MemberPlatform.SPRING)
+        val candidate3 = Candidate(targetMemberId3, "박씨", MemberPlatform.SPRING)
+        val candidate4 = Candidate(targetMemberId4, "김", MemberPlatform.SPRING)
 
         return listOf(candidate1, candidate2, candidate3, candidate4)
     }

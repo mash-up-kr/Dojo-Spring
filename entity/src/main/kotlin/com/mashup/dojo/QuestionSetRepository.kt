@@ -11,7 +11,11 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 
 interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
-    fun findFirstByPublishedYnFalseOrderByPublishedAtAsc(): QuestionSetEntity?
+    // publishedYn : True && publishedAt > now -> 현재 운영중인 QuestionSet
+    fun findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
+
+    // publishedYn : True && publishedAt < now -> 발행 직전(예정) QuestionSet
+    fun findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
 }
 
 @Entity

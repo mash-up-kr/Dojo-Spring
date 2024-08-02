@@ -8,11 +8,16 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface QuestionSheetRepository : JpaRepository<QuestionSheet, String>
+interface QuestionSheetRepository : JpaRepository<QuestionSheetEntity, String> {
+    fun findAllByQuestionSetIdAndResolverId(
+        questionSetId: String,
+        resolverId: String,
+    ): List<QuestionSheetEntity>
+}
 
 @Entity
 @Table(name = "question_sheet")
-class QuestionSheet(
+class QuestionSheetEntity(
     @Id
     val id: String,
     @Column(name = "question_set_id", nullable = false)

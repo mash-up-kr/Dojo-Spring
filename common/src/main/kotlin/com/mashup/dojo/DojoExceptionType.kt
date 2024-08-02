@@ -26,7 +26,10 @@ enum class DojoExceptionType(
     INVALID_PICK_OPEN_ITEM("Pick open item does not exist", "CO52_INVALID_PICK_OPEN_ITEM", 400),
 
     // Question
-    QUESTION_SET_NOT_READY("QuestionSet for publish not ready", "Q001_QUESTIO_SET_NOT_EXIST", 500),
+    QUESTION_SET_NOT_READY("QuestionSet for publish not ready", "Q001_QUESTION_SET_NOT_EXIST", 500),
+    QUESTION_SET_OPERATING_NOT_EXIST("QuestionSet for operation not exist", "Q002_QUESTION_SET_NOT_EXIST", 500),
+    QUESTION_NOT_EXIST("Question is not exist", "Q003_QUESTION_NOT_EXIST", 500),
+    QUESTION_SHEET_NOT_EXIST("QuestionSheet is not exist", "Q004_QUESTION_SHEET_NOT_EXIST", 500),
 
     // friend
     FRIEND_NOT_FOUND("Friend not found", "C070_FRIEND_NOT_FOUND", 400),
