@@ -14,7 +14,6 @@ enum class DojoExceptionType(
     METHOD_ARGUMENT_TYPE_MISMATCH_VALUE("Request method argument type mismatch", "C005_TYPE_MISMATCH_VALUE", 400),
     HTTP_REQUEST_METHOD_NOT_SUPPORTED("HTTP request method not supported", "C006_HTTP_METHOD_NOT_SUPPORTED", 400),
     ACCESS_DENIED("Access denied. Check authentication.", "C007_ACCESS_DENIED", 403),
-    AUTHENTICATION_FAILURE("Authentication failed. Check login.", "C008_AUTHENTICATION_FAILURE", 401),
     ARGUMENT_NOT_VALID("Method Argument Not Valid. Check argument validation.", "C009_ARGUMENT_NOT_VALID", 400),
     INVALID_MEMBER_GENDER("The gender does not exist.", "C011_INVALID_MEMBER_GENDER", 400),
     INVALID_MEMBER_PLATFORM("The platform does not exist.", "C010_INVALID_MEMBER_PLATFORM", 400),
@@ -34,4 +33,8 @@ enum class DojoExceptionType(
     // friend
     FRIEND_NOT_FOUND("Friend not found", "C070_FRIEND_NOT_FOUND", 400),
     ALREADY_FRIEND("Already Friend", "C071_ALREADY_FRIEND", 400),
+
+    // auth
+    INVALID_TOKEN("invalid token", "C100_INVALID_TOKEN", 401),
+    AUTHENTICATION_FAILURE("Authentication failed. Check login.", "C101_AUTHENTICATION_FAILURE", 401),
 }

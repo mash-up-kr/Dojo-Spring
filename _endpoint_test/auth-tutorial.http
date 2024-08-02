@@ -1,0 +1,3 @@
+### principal 정보 받기
+GET {{host}}/authentication/test
+Authorization: invalidtokentoken
