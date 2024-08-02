@@ -1,6 +1,7 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
+import com.mashup.dojo.config.security.JwtTokenService
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberUpdateRequest
@@ -9,24 +10,24 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 private val logger = KotlinLogging.logger { }
 
 @Tag(name = "Member", description = "멤버")
 @RestController
-@RequestMapping("/member")
 class MemberController(
     private val memberUseCase: MemberUseCase,
+    private val jwtTokenService: JwtTokenService,
 ) {
-    @PostMapping
+    @PostMapping("/public/member")
     @Operation(
-        summary = "멤버 가입 API",
+        summary = "[PUBLIC] 멤버 가입 API",
         description = "멤버 가입 시 사용하는 API. 현재 ID 제외(auto generation) 별도의 unique 값은 없어요.",
         responses = [
             ApiResponse(responseCode = "200", description = "생성된 멤버의 ID")
@@ -51,7 +52,23 @@ class MemberController(
         return DojoApiResponse.success(MemberCreateResponse(memberId))
     }
 
-    @PatchMapping("/{id}")
+    @GetMapping("/public/member-login")
+    @Operation(
+        summary = "[PUBLIC] 멤버 로그인 API",
+        description = "멤버 로그인 API, ID 값으로만 로그인하며 token을 발급받는 용도",
+        responses = [
+            ApiResponse(responseCode = "200", description = "생성된 멤버의 ID")
+        ]
+    )
+    fun login(memberId: String): DojoApiResponse<MemberLoginResponse> {
+        val id = MemberId(memberId)
+        logger.info { "member-login, id: $id" }
+
+        val authToken = jwtTokenService.createToken(id)
+        return DojoApiResponse.success(MemberLoginResponse(id, authToken.credentials))
+    }
+
+    @PatchMapping("/member/{id}")
     @Operation(
         summary = "멤버 정보 갱신 API",
         description = "멤버 정보 수정 시 사용하는 API. 수정될 요소만 not-null로 받아요. null로 들어온 프로퍼티는 기존 값을 유지해요.",
@@ -82,5 +99,10 @@ class MemberController(
 
     data class MemberUpdateResponse(
         val id: MemberId,
+    )
+
+    data class MemberLoginResponse(
+        val id: MemberId,
+        val authToken: String,
     )
 }
