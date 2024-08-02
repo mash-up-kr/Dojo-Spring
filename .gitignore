@@ -40,3 +40,4 @@ out/
 .kotlin
 
 .env
+_endpoint_test/http-client.private.env.json
