@@ -14,6 +14,7 @@ import com.mashup.dojo.domain.MemberRelation
 import com.mashup.dojo.domain.MemberRelationId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrNull
 
 interface MemberService {
     fun getCandidates(currentMemberId: MemberId): List<Candidate>
@@ -88,8 +89,8 @@ class DefaultMemberService(
     }
 
     override fun findMemberById(memberId: MemberId): Member? {
-        // memberRepository find(MemberId)
-        return mockMember(memberId)
+        val member = memberRepository.findById(memberId.value)
+        return member.getOrNull()?.toMember()
     }
 
     override fun create(command: MemberService.CreateMember): MemberId {
@@ -121,23 +122,7 @@ class DefaultMemberService(
 
     override fun findAllMember(): List<Member> {
         return memberRepository.findAll()
-            .map { m ->
-                val platform = MemberPlatform.findByValue(m.platform)
-                val gender = MemberGender.findByValue(m.gender)
-                val imageId = m.profileImageId?.let { ImageId(it) }
-
-                Member.convertToMember(
-                    id = m.id,
-                    fullName = m.fullName,
-                    secondInitialName = m.secondInitialName,
-                    profileImageId = imageId,
-                    ordinal = m.ordinal,
-                    platform = platform,
-                    gender = gender,
-                    createdAt = m.createdAt,
-                    updatedAt = m.updatedAt
-                )
-            }
+            .map { it.toMember() }
     }
 
     private fun mockMember(memberId: MemberId) =
@@ -155,5 +140,22 @@ private fun Member.toEntity(): MemberEntity {
         platform = platform.name,
         ordinal = ordinal,
         gender = gender.name
+    )
+}
+
+private fun MemberEntity.toMember(): Member {
+    val platform = MemberPlatform.findByValue(platform)
+    val gender = MemberGender.findByValue(gender)
+
+    return Member(
+        id = MemberId(id),
+        fullName = fullName,
+        secondInitialName = secondInitialName,
+        profileImageId = profileImageId?.let { ImageId(it) },
+        ordinal = ordinal,
+        platform = platform,
+        gender = gender,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }

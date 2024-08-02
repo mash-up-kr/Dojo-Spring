@@ -64,30 +64,6 @@ data class Member(
                 updatedAt = LocalDateTime.now()
             )
         }
-
-        internal fun convertToMember(
-            id: String,
-            fullName: String,
-            secondInitialName: String,
-            profileImageId: ImageId?,
-            ordinal: Int,
-            platform: MemberPlatform,
-            gender: MemberGender,
-            createdAt: LocalDateTime,
-            updatedAt: LocalDateTime,
-        ): Member {
-            return Member(
-                id = MemberId(id),
-                fullName = fullName,
-                secondInitialName = secondInitialName,
-                profileImageId = profileImageId,
-                ordinal = ordinal,
-                platform = platform,
-                gender = gender,
-                createdAt = createdAt,
-                updatedAt = updatedAt
-            )
-        }
     }
 }
 
