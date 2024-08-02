@@ -21,7 +21,7 @@ import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.time.LocalTime
+import java.time.ZoneId
 
 interface PickUseCase {
     data class GetReceivedPickListCommand(
@@ -95,7 +95,7 @@ interface PickUseCase {
 
     fun createPick(command: CreatePickCommand): PickId
 
-    fun getNextPickTime(currentTime: LocalDateTime): LocalDateTime
+    fun getNextPickTime(): LocalDateTime
 
     fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
 
@@ -281,11 +281,15 @@ class DefaultPickUseCase(
         }
     }
 
-    override fun getNextPickTime(currentTime: LocalDateTime): LocalDateTime {
-        // fixme: phase1 기준 하루에 2번 투표가 오픈되는데 투표 오픈 시간 값을 어디에 저장해둘지? 하드코딩 or DB 저장
-        val pickTimes = listOf(LocalTime.of(9, 0), LocalTime.of(18, 0))
-
+    override fun getNextPickTime(): LocalDateTime {
+        val currentTime = LocalDateTime.now(ZONE_ID)
         val today = currentTime.toLocalDate()
+
+        val pickTimes = pickService.getPickTimes()
+
+        if (pickTimes.isEmpty()) {
+            throw DojoException.of(DojoExceptionType.ACTIVE_PICK_TIME_NOT_FOUND)
+        }
 
         val nextPickTime =
             pickTimes
@@ -298,5 +302,6 @@ class DefaultPickUseCase(
 
     companion object {
         private val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
+        private val ZONE_ID = ZoneId.of("Asia/Seoul")
     }
 }

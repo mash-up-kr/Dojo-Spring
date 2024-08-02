@@ -37,4 +37,7 @@ enum class DojoExceptionType(
     // auth
     INVALID_TOKEN("invalid token", "C100_INVALID_TOKEN", 401),
     AUTHENTICATION_FAILURE("Authentication failed. Check login.", "C101_AUTHENTICATION_FAILURE", 401),
+
+    // pickTime
+    ACTIVE_PICK_TIME_NOT_FOUND("Active pick time not found", "PT001_ACTIVE_PICK_TIME_NOT_FOUND", 500),
 }
