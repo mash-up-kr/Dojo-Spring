@@ -1,6 +1,6 @@
 ### 멤버 생성하기 (가입하기)
 POST {{host}}/public/member
-
+Content-Type: application/json
 
 {
     "fullName": "오예옹",
@@ -15,5 +15,5 @@ POST {{host}}/public/member-login
 Content-Type: application/json
 
 {
-    "id": "tesrest"
+    "id": "df34d054-4534-4623-8996-9016162c430b"
 }
