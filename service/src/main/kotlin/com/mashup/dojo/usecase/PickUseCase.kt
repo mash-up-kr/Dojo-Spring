@@ -2,7 +2,9 @@ package com.mashup.dojo.usecase
 
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
+import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
@@ -16,6 +18,7 @@ import com.mashup.dojo.usecase.PickUseCase.GetReceivedPick
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickListCommand
 import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -26,10 +29,46 @@ interface PickUseCase {
     )
 
     data class GetReceivedPick(
+        val pickId: PickId,
         val questionId: QuestionId,
         val questionContent: String,
         val questionEmojiImageUrl: String,
         val totalReceivedPickCount: Int,
+        val latestPickedAt: LocalDateTime,
+    )
+
+    data class GetPagingPickCommand(
+        val memberId: MemberId,
+        val questionId: QuestionId,
+        val pageNumber: Int,
+        val pageSize: Int,
+    )
+
+    data class GetPagingPick(
+        val questionId: QuestionId,
+        val questionContent: String,
+        val questionEmojiImageUrl: String,
+        val totalReceivedPickCount: Int,
+        val picks: List<GetReceivedPickDetail>,
+        val totalPage: Int,
+        val totalElements: Long,
+        val isFirst: Boolean,
+        val isLast: Boolean,
+    )
+
+    data class GetReceivedPickDetail(
+        val pickId: PickId,
+        val pickerOrdinal: Int,
+        val pickerIdOpen: Boolean,
+        val pickerId: MemberId,
+        val pickerGenderOpen: Boolean,
+        val pickerGender: MemberGender,
+        val pickerPlatformOpen: Boolean,
+        val pickerPlatform: MemberPlatform,
+        val pickerSecondInitialNameOpen: Boolean,
+        val pickerSecondInitialName: String,
+        val pickerFullNameOpen: Boolean,
+        val pickerFullName: String,
         val latestPickedAt: LocalDateTime,
     )
 
@@ -56,6 +95,8 @@ interface PickUseCase {
     fun createPick(command: CreatePickCommand): PickId
 
     fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
+
+    fun getReceivedPickDetailPaging(command: GetPagingPickCommand): GetPagingPick
 }
 
 @Component
@@ -70,30 +111,30 @@ class DefaultPickUseCase(
 
         if (receivedPickList.isEmpty()) return EMPTY_RECEIVED_PICK
 
-        val questionId = receivedPickList.first().questionId
-        questionService.getQuestionById(questionId)
-
         val result =
             receivedPickList.groupBy { it.questionId }
-                .map { (questionId, pickList) ->
+                .flatMap { (questionId, pickList) ->
                     val question =
                         questionService.getQuestionById(questionId)
                             ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [$questionId]")
 
                     val url =
                         imageService.load(question.emojiImageId)?.url
-                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. . EmojiImageId: [${question.emojiImageId}]")
+                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [${question.emojiImageId}]")
 
                     val pickedTotalCount = pickList.size
                     val latestPickedAt = pickList.maxBy { it.createdAt }.createdAt
 
-                    GetReceivedPick(
-                        questionId = question.id,
-                        questionContent = question.content,
-                        questionEmojiImageUrl = url,
-                        totalReceivedPickCount = pickedTotalCount,
-                        latestPickedAt = latestPickedAt
-                    )
+                    pickList.map { pick ->
+                        GetReceivedPick(
+                            pickId = pick.id,
+                            questionId = question.id,
+                            questionContent = question.content,
+                            questionEmojiImageUrl = url,
+                            totalReceivedPickCount = pickedTotalCount,
+                            latestPickedAt = latestPickedAt
+                        )
+                    }
                 }
 
         return when (command.sort) {
@@ -125,7 +166,119 @@ class DefaultPickUseCase(
         ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it) }
     }
 
+    override fun getReceivedPickDetailPaging(command: PickUseCase.GetPagingPickCommand): PickUseCase.GetPagingPick {
+        val question =
+            questionService.getQuestionById(command.questionId)
+                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [${command.questionId}]")
+
+        val imageUrl =
+            imageService.load(question.emojiImageId)?.url
+                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [${question.emojiImageId}]")
+
+        val pickCount: Int = pickService.getPickCount(question.id, command.memberId)
+
+        val pickPaging: Page<Pick> =
+            pickService.getPickPaging(question.id, command.memberId, command.pageNumber, command.pageSize)
+
+        val pickDetails =
+            pickPaging.content.map { pick ->
+                val findMember =
+                    memberService.findMemberById(pick.pickerId)
+                        ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 회원을 찾을 수 없습니다. MemberId: [${pick.pickerId}]")
+
+                val genderOpen = pick.isGenderOpen
+                val platformOpen = pick.isPlatformOpen
+                val secondInitialNameOpen = pick.isMidInitialNameOpen
+                val fullNameOpen = pick.isFullNameOpen
+                val pickerIdOpen = fullNameOpen && genderOpen && platformOpen && secondInitialNameOpen
+
+                val pickerId = transformPickerId(pickerIdOpen, findMember.id)
+                val pickerGender = transformPickerGender(genderOpen, findMember.gender)
+                val pickerPlatform = transformPickerPlatform(platformOpen, findMember.platform)
+                val pickerSecondInitialName = transformPickerSecondInitialName(secondInitialNameOpen, findMember.secondInitialName)
+                val pickerFullName = transformPickerFullName(fullNameOpen, findMember.fullName)
+
+                PickUseCase.GetReceivedPickDetail(
+                    pickId = pick.id,
+                    pickerOrdinal = findMember.ordinal,
+                    pickerIdOpen = pickerIdOpen,
+                    pickerId = pickerId,
+                    pickerGenderOpen = genderOpen,
+                    pickerGender = pickerGender,
+                    pickerPlatformOpen = platformOpen,
+                    pickerPlatform = pickerPlatform,
+                    pickerSecondInitialNameOpen = secondInitialNameOpen,
+                    pickerSecondInitialName = pickerSecondInitialName,
+                    pickerFullNameOpen = fullNameOpen,
+                    pickerFullName = pickerFullName,
+                    latestPickedAt = pick.createdAt
+                )
+            }
+
+        return PickUseCase.GetPagingPick(
+            questionId = question.id,
+            questionContent = question.content,
+            questionEmojiImageUrl = imageUrl,
+            totalReceivedPickCount = pickCount,
+            picks = pickDetails,
+            totalPage = pickPaging.totalPages,
+            totalElements = pickPaging.totalElements,
+            isFirst = pickPaging.isFirst,
+            isLast = pickPaging.isLast
+        )
+    }
+
+    fun transformPickerId(
+        pickerIdOpen: Boolean,
+        pickerId: MemberId,
+    ): MemberId {
+        return when (pickerIdOpen) {
+            true -> pickerId
+            false -> MemberId("UNKNOWN")
+        }
+    }
+
+    fun transformPickerGender(
+        pickerGenderOpen: Boolean,
+        pickerGender: MemberGender,
+    ): MemberGender {
+        return when (pickerGenderOpen) {
+            true -> pickerGender
+            false -> MemberGender.UNKNOWN
+        }
+    }
+
+    fun transformPickerPlatform(
+        pickerPlatformOpen: Boolean,
+        pickerPlatform: MemberPlatform,
+    ): MemberPlatform {
+        return when (pickerPlatformOpen) {
+            true -> pickerPlatform
+            false -> MemberPlatform.UNKNOWN
+        }
+    }
+
+    fun transformPickerSecondInitialName(
+        pickerSecondInitialNameOpen: Boolean,
+        secondInitialName: String,
+    ): String {
+        return when (pickerSecondInitialNameOpen) {
+            true -> secondInitialName
+            false -> "UNKNOWN"
+        }
+    }
+
+    fun transformPickerFullName(
+        pickerFullNameOpen: Boolean,
+        fullName: String,
+    ): String {
+        return when (pickerFullNameOpen) {
+            true -> fullName
+            false -> "UNKNOWN"
+        }
+    }
+
     companion object {
-        val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
+        private val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
     }
 }

@@ -2,7 +2,10 @@ package com.mashup.dojo.dto
 
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
+import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberPlatform
+import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import io.swagger.v3.oas.annotations.media.Schema
@@ -24,10 +27,39 @@ data class ReceivedPickListGetResponse(
 
 // todo : 질문의 유형(카테고리)도 전달해줘야 하는가
 data class PickResponse(
+    val pickId: PickId,
     val questionId: QuestionId,
     val questionContent: String,
     val questionEmojiImageUrl: String,
     val totalReceivedPickCount: Int,
+    val latestPickedAt: LocalDateTime,
+)
+
+data class PickPaging(
+    val questionId: QuestionId,
+    val questionContent: String,
+    val questionEmojiImageUrl: String,
+    val totalReceivedPickCount: Int,
+    val picks: List<ReceivedPickDetail>,
+    val totalPage: Int,
+    val totalElements: Long,
+    val isFirst: Boolean,
+    val isLast: Boolean,
+)
+
+data class ReceivedPickDetail(
+    val pickId: PickId,
+    val pickerOrdinal: Int,
+    val pickerIdOpen: Boolean,
+    val pickerId: MemberId,
+    val pickerGenderOpen: Boolean,
+    val pickerGender: MemberGender,
+    val pickerPlatformOpen: Boolean,
+    val pickerPlatform: MemberPlatform,
+    val pickerSecondInitialNameOpen: Boolean,
+    val pickerSecondInitialName: String,
+    val pickerFullNameOpen: Boolean,
+    val pickerFullName: String,
     val latestPickedAt: LocalDateTime,
 )
 

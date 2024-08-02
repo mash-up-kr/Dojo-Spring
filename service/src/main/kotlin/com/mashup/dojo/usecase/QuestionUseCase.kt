@@ -1,7 +1,10 @@
 package com.mashup.dojo.usecase
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Question
+import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSheet
@@ -16,6 +19,7 @@ interface QuestionUseCase {
     data class CreateCommand(
         val content: String,
         val type: QuestionType,
+        val category: QuestionCategory,
         val emojiImageId: ImageId,
     )
 
@@ -45,6 +49,7 @@ class DefaultQuestionUseCase(
         return questionService.createQuestion(
             command.content,
             command.type,
+            command.category,
             command.emojiImageId
         )
     }
@@ -52,7 +57,7 @@ class DefaultQuestionUseCase(
     @Transactional
     override fun bulkCreate(commands: List<QuestionUseCase.CreateCommand>): List<Question> {
         return commands.map {
-            questionService.createQuestion(it.content, it.type, it.emojiImageId)
+            questionService.createQuestion(it.content, it.type, it.category, it.emojiImageId)
         }
     }
 
@@ -67,7 +72,7 @@ class DefaultQuestionUseCase(
     }
 
     override fun createQuestionSheet(): List<QuestionSheet> {
-        val currentQuestionSet = questionService.getCurrentQuestionSet()
+        val currentQuestionSet = questionService.getCurrentQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
         val allMemberRecords = memberService.findAllMember()
         return questionService.createQuestionSheets(currentQuestionSet, allMemberRecords)
     }
