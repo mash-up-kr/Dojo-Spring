@@ -22,7 +22,7 @@ class MemberAuthTokenAuthenticationFilter(
         try {
             // Todo Path 분리 밖에서 할 수 있도록 변경하기
             // path가 public 으로 시작하면 패스
-            val isPublicPath = request.servletPath.startsWith("/public")
+            val isPublicPath = request.servletPath.startsWith("/public") || request.servletPath.startsWith("/swagger") || request.servletPath.startsWith("/v3/api-docs")
             if (isPublicPath) {
                 filterChain.doFilter(request, response)
             } else {
