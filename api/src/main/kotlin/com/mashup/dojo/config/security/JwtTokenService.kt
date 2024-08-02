@@ -1,6 +1,9 @@
 package com.mashup.dojo.config.security
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberId
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.SIG
 import io.jsonwebtoken.security.Keys
@@ -39,29 +42,29 @@ class JwtTokenService(
     }
 
     fun isExpired(token: MemberAuthToken): Boolean {
-        val payload =
-            Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(secretKey.toByteArray()))
-                .build()
-                .parseSignedClaims(token.credentials)
-                .payload
+        val claims = getClaims(token)
 
-        return payload.expiration.before(Date())
+        return claims.expiration.before(Date())
     }
 
     fun getMemberId(token: MemberAuthToken): MemberId? {
-        val payload =
+        val claims = getClaims(token)
+
+        return if (claims.containsKey(MEMBER_ID_CLAIM_KEY).not()) {
+            null
+        } else {
+            val memberId = claims.get(MEMBER_ID_CLAIM_KEY, String::class.java)
+            MemberId(memberId)
+        }
+    }
+
+    private fun getClaims(token: MemberAuthToken): Claims {
+        return kotlin.runCatching {
             Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(secretKey.toByteArray()))
                 .build()
                 .parseSignedClaims(token.credentials)
                 .payload
-
-        return if (payload.containsKey(MEMBER_ID_CLAIM_KEY).not()) {
-            null
-        } else {
-            val memberId = payload.get(MEMBER_ID_CLAIM_KEY, String::class.java)
-            MemberId(memberId)
-        }
+        }.getOrElse { throw DojoException.of(DojoExceptionType.INVALID_TOKEN) }
     }
 }
