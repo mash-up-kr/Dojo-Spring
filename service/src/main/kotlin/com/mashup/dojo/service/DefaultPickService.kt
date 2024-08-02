@@ -4,6 +4,7 @@ import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.PickEntity
 import com.mashup.dojo.PickRepository
+import com.mashup.dojo.PickTimeRepository
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
@@ -18,6 +19,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 interface PickService {
     fun getReceivedPickList(
@@ -53,6 +55,8 @@ interface PickService {
         id: QuestionId,
         memberId: MemberId,
     ): Int
+
+    fun getPickTimes(): List<LocalTime>
 }
 
 @Transactional(readOnly = true)
@@ -60,6 +64,7 @@ interface PickService {
 class DefaultPickService(
     private val pickRepository: PickRepository,
     private val memberService: MemberService,
+    private val pickTimeRepository: PickTimeRepository,
 ) : PickService {
     override fun getReceivedPickList(
         pickedMemberId: MemberId,
@@ -138,6 +143,10 @@ class DefaultPickService(
     ): Int {
         // ToDo Pick getCount
         return 10
+    }
+
+    override fun getPickTimes(): List<LocalTime> {
+        return pickTimeRepository.findAllStartTimes()
     }
 
     companion object {

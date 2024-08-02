@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 @Tag(name = "Pick", description = "픽!")
 @RestController
@@ -140,8 +139,7 @@ class PickController(
         ]
     )
     fun getNextPickTime(): DojoApiResponse<LocalDateTime> {
-        val currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
-        val nextPickTime = pickUseCase.getNextPickTime(currentTime)
+        val nextPickTime = pickUseCase.getNextPickTime()
         return DojoApiResponse.success(nextPickTime)
     }
 
