@@ -4,13 +4,14 @@ import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.config.security.JwtTokenService
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.dto.MemberCreateRequest
+import com.mashup.dojo.dto.MemberLoginRequest
 import com.mashup.dojo.dto.MemberUpdateRequest
+import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,6 +24,7 @@ private val logger = KotlinLogging.logger { }
 @RestController
 class MemberController(
     private val memberUseCase: MemberUseCase,
+    private val memberService: MemberService,
     private val jwtTokenService: JwtTokenService,
 ) {
     @PostMapping("/public/member")
@@ -52,7 +54,7 @@ class MemberController(
         return DojoApiResponse.success(MemberCreateResponse(memberId))
     }
 
-    @GetMapping("/public/member-login")
+    @PostMapping("/public/member-login")
     @Operation(
         summary = "[PUBLIC] 멤버 로그인 API",
         description = "멤버 로그인 API, ID 값으로만 로그인하며 token을 발급받는 용도",
@@ -60,10 +62,13 @@ class MemberController(
             ApiResponse(responseCode = "200", description = "생성된 멤버의 ID")
         ]
     )
-    fun login(memberId: String): DojoApiResponse<MemberLoginResponse> {
-        val id = MemberId(memberId)
+    fun login(
+        @RequestBody request: MemberLoginRequest,
+    ): DojoApiResponse<MemberLoginResponse> {
+        val id = MemberId(request.id)
         logger.info { "member-login, id: $id" }
 
+        val member = memberService.findMemberById(id) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
         val authToken = jwtTokenService.createToken(id)
         return DojoApiResponse.success(MemberLoginResponse(id, authToken.credentials))
     }
