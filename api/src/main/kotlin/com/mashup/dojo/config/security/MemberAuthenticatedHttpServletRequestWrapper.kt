@@ -6,7 +6,7 @@ import java.security.Principal
 
 class MemberAuthenticatedHttpServletRequestWrapper(
     private val principal: MemberPrincipal,
-    private val request: ServletWebRequest
-): HttpServletRequestWrapper(request.request) {
+    private val request: ServletWebRequest,
+) : HttpServletRequestWrapper(request.request) {
     override fun getUserPrincipal(): Principal = principal
 }

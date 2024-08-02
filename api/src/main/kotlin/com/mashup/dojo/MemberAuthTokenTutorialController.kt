@@ -9,16 +9,18 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MemberAuthTokenTutorialController(
-    private val jwtTokenService: JwtTokenService
+    private val jwtTokenService: JwtTokenService,
 ) {
     @GetMapping("/public/generate-token/{id}")
-    fun generate(@PathVariable id: String): String {
+    fun generate(
+        @PathVariable id: String,
+    ): String {
         return jwtTokenService.createToken(MemberId(id)).toString()
     }
-    
+
     @GetMapping("/authentication/test")
     fun test(): String {
-       val principal = MemberPrincipalContextHolder.current()
+        val principal = MemberPrincipalContextHolder.current()
         return principal.name
     }
 }

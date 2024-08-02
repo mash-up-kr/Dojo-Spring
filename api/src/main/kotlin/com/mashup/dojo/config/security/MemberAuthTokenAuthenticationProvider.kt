@@ -13,17 +13,18 @@ class MemberAuthTokenAuthenticationProvider(
     private val memberService: MemberService,
 ) {
     fun authenticate(authToken: MemberAuthToken): MemberPrincipal {
-        if(jwtTokenService.isExpired(authToken)) throw DojoException.of(AUTHENTICATION_FAILURE, "토큰 기간이 만료되었어요. 다시 로그인해주세요.")
+        if (jwtTokenService.isExpired(authToken)) throw DojoException.of(AUTHENTICATION_FAILURE, "토큰 기간이 만료되었어요. 다시 로그인해주세요.")
         val memberId = jwtTokenService.getMemberId(authToken) ?: throw DojoException.of(AUTHENTICATION_FAILURE, "유효하지 않은 토큰이에요.")
         val member = memberService.findMemberById(memberId) ?: throw DojoException.of(MEMBER_NOT_FOUND)
-        
+
         return MemberPrincipal(member)
     }
 }
 
 class MemberPrincipal(
     private val member: Member,
-): Principal {
+) : Principal {
     val id: MemberId = member.id
+
     override fun getName(): String = "member(id:${member.id}/full-name:${member.fullName})"
 }
