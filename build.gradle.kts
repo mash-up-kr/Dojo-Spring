@@ -79,6 +79,11 @@ project(":api") {
         implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
         implementation("org.springframework.boot:spring-boot-starter-web")
         implementation("ca.pjer:logback-awslogs-appender:1.6.0")
+
+        // for JWT based token
+        implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+        runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+        runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
     }
 }
 
