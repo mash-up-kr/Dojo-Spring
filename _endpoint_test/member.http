@@ -1,5 +1,5 @@
 ### 멤버 생성하기 (가입하기)
-POST {{host}}/member
+POST {{host}}/public/member
 Content-Type: application/json
 
 {
@@ -9,3 +9,6 @@ Content-Type: application/json
     "ordinal": 14,
     "gender": "FEMALE"
 }
+
+### ID 기반 멤버 로그인하기 (auth token 발급용)
+GET {{host}}/public/member-login?memberId=24e5bdb9-77e7-4f51-840e-78600093e120
