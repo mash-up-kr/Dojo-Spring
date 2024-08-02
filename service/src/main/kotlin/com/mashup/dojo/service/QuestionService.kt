@@ -49,7 +49,7 @@ interface QuestionService {
         type: QuestionType,
         category: QuestionCategory,
         emojiImageId: ImageId,
-    ): Question
+    ): QuestionId
 
     fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet
 
@@ -77,7 +77,7 @@ class DefaultQuestionService(
         type: QuestionType,
         category: QuestionCategory,
         emojiImageId: ImageId,
-    ): Question {
+    ): QuestionId {
         val question =
             Question.create(
                 content = content,
@@ -86,11 +86,9 @@ class DefaultQuestionService(
                 emojiImageId = emojiImageId
             )
 
-        questionRepository.save(question.toEntity())
+        val id = questionRepository.save(question.toEntity()).id
 
-        log.info { "=== Create Question Success : $question ===" }
-
-        return question
+        return QuestionId(id)
     }
 
     // 현재 운영중인 QuestionSet
@@ -145,6 +143,7 @@ class DefaultQuestionService(
         return questionSet
     }
 
+    @Transactional
     override fun createQuestionSheets(
         questionSet: QuestionSet,
         members: List<Member>,

@@ -6,7 +6,6 @@ import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
-import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSet
@@ -66,9 +65,9 @@ interface QuestionUseCase {
         val platform: String,
     )
 
-    fun create(command: CreateCommand): Question
+    fun create(command: CreateCommand): QuestionId
 
-    fun bulkCreate(commands: List<CreateCommand>): List<Question>
+    fun bulkCreate(commands: List<CreateCommand>): List<QuestionId>
 
     fun createQuestionSet(): QuestionSet
 
@@ -87,7 +86,8 @@ class DefaultQuestionUseCase(
     private val pickService: PickService,
     private val imageService: ImageService,
 ) : QuestionUseCase {
-    override fun create(command: QuestionUseCase.CreateCommand): Question {
+    @Transactional
+    override fun create(command: QuestionUseCase.CreateCommand): QuestionId {
         return questionService.createQuestion(
             command.content,
             command.type,
@@ -97,22 +97,25 @@ class DefaultQuestionUseCase(
     }
 
     @Transactional
-    override fun bulkCreate(commands: List<QuestionUseCase.CreateCommand>): List<Question> {
+    override fun bulkCreate(commands: List<QuestionUseCase.CreateCommand>): List<QuestionId> {
         return commands.map {
             questionService.createQuestion(it.content, it.type, it.category, it.emojiImageId)
         }
     }
 
+    @Transactional
     override fun createQuestionSet(): QuestionSet {
         // 직전에 발행된 QuestionSet 확인 및 후보에서 제외 (redis 조회 필요)
         val currentQuestionSet = questionService.getOperatingQuestionSet()
         return questionService.createQuestionSet(currentQuestionSet)
     }
 
+    @Transactional
     override fun createCustomQuestionSet(command: QuestionUseCase.CreateQuestionSetCommand): QuestionSet {
         return questionService.createQuestionSet(command.questionIdList, command.publishedAt)
     }
 
+    @Transactional
     override fun createQuestionSheet(): List<QuestionSheet> {
         val currentQuestionSet = questionService.getNextOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
         val allMemberRecords = memberService.findAllMember()

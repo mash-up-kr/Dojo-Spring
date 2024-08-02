@@ -7,6 +7,7 @@ import com.mashup.dojo.dto.QuestionBulkCreateRequest
 import com.mashup.dojo.dto.QuestionCreateRequest
 import com.mashup.dojo.dto.QuestionSetCustomCreateRequest
 import com.mashup.dojo.usecase.QuestionUseCase
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+
+private val log = KotlinLogging.logger {}
 
 @Tag(name = "Admin", description = "Admin 권한에서 실행할 수 있는 API입니다.")
 @RestController
@@ -34,6 +37,8 @@ class AdminController(
     fun createQuestion(
         @Valid @RequestBody request: QuestionCreateRequest,
     ): DojoApiResponse<QuestionId> {
+        log.info { "create question, request: $request" }
+
         return questionUseCase.create(
             QuestionUseCase.CreateCommand(
                 content = request.content,
@@ -41,7 +46,7 @@ class AdminController(
                 category = request.category,
                 emojiImageId = request.emojiImageId
             )
-        ).let { DojoApiResponse.success(it.id) }
+        ).let { DojoApiResponse.success(it) }
     }
 
     @PostMapping("/question-bulk")
@@ -59,9 +64,7 @@ class AdminController(
             request.questionList.map {
                 QuestionUseCase.CreateCommand(it.content, it.type, it.category, it.emojiImageId)
             }
-        val questionIds =
-            questionUseCase.bulkCreate(createCommands)
-                .map { it.id }
+        val questionIds = questionUseCase.bulkCreate(createCommands)
 
         return DojoApiResponse.success(questionIds)
     }
