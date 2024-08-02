@@ -9,14 +9,14 @@ object MemberPrincipalContextHolder {
     fun current(): MemberPrincipal {
         return when (val attributes = RequestContextHolder.currentRequestAttributes()) {
             is ServletRequestAttributes -> {
-                val principal = attributes.request.userPrincipal ?: throw DojoException.of(AUTHENTICATION_FAILURE, "principal 를 가지고 있지 않아요.")
+                val principal = attributes.request.userPrincipal ?: throw DojoException.of(AUTHENTICATION_FAILURE, "principal not found")
                 if (principal is MemberPrincipal) {
                     principal
                 } else {
-                    throw DojoException.of(AUTHENTICATION_FAILURE, "유효한 principal 이 아니에요.")
+                    throw DojoException.of(AUTHENTICATION_FAILURE, "invalid principal")
                 }
             }
-            else -> throw DojoException.of(AUTHENTICATION_FAILURE, "principal 를 가지고 있지 않아요.")
+            else -> throw DojoException.of(AUTHENTICATION_FAILURE, "principal not found")
         }
     }
 }

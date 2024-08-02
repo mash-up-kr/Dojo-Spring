@@ -1,7 +1,10 @@
 package com.mashup.dojo.config.security
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.mashup.dojo.DojoException
-import com.mashup.dojo.DojoExceptionType
+import com.mashup.dojo.DojoExceptionType.AUTHENTICATION_FAILURE
+import com.mashup.dojo.common.DojoApiErrorResponse
+import com.mashup.dojo.common.DojoApiResponse
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -16,16 +19,20 @@ class MemberAuthTokenAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        // Todo Path 분리 밖에서 할 수 있도록 변경하기
-        // path가 public 으로 시작하면 패스
-        val isPublicPath = request.servletPath.startsWith("/public")
-        if (isPublicPath) {
-            filterChain.doFilter(request, response)
-        } else {
-            val token = resolveMemberAuthToken(request) ?: throw DojoException.of(DojoExceptionType.AUTHENTICATION_FAILURE, "토큰을 찾을 수 없어요")
-            val memberPrincipal = memberAuthTokenAuthenticationProvider.authenticate(token)
+        try {
+            // Todo Path 분리 밖에서 할 수 있도록 변경하기
+            // path가 public 으로 시작하면 패스
+            val isPublicPath = request.servletPath.startsWith("/public")
+            if (isPublicPath) {
+                filterChain.doFilter(request, response)
+            } else {
+                val token = resolveMemberAuthToken(request) ?: throw DojoException.of(AUTHENTICATION_FAILURE, "cannot find token")
+                val memberPrincipal = memberAuthTokenAuthenticationProvider.authenticate(token)
 
-            filterChain.doFilter(MemberAuthenticatedHttpServletRequestWrapper(memberPrincipal, ServletWebRequest(request, response)), response)
+                filterChain.doFilter(MemberAuthenticatedHttpServletRequestWrapper(memberPrincipal, ServletWebRequest(request, response)), response)
+            }
+        } catch (error: DojoException) {
+            handleAuthenticateException(response, error)
         }
     }
 
@@ -34,6 +41,26 @@ class MemberAuthTokenAuthenticationFilter(
             val token = request.getHeader(AUTHORIZATION_HEADER_NAME)
             MemberAuthToken(token)
         }.getOrNull()
+    }
+
+    private fun handleAuthenticateException(
+        response: HttpServletResponse,
+        error: DojoException,
+    ) {
+        response.status = error.httpStatusCode
+        response.contentType = "application/json"
+
+        val dojoResponse =
+            DojoApiResponse(
+                success = false,
+                data = null,
+                error =
+                    DojoApiErrorResponse(
+                        code = error.errorCode,
+                        message = error.message
+                    )
+            )
+        response.writer.write(ObjectMapper().writeValueAsString(dojoResponse))
     }
 
     companion object {
