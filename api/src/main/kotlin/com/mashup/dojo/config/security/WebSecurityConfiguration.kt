@@ -10,15 +10,18 @@ class WebSecurityConfiguration {
     @Bean
     fun jwtTokenService() = JwtTokenService("dojo-secret-dojo-secret-dojo-secret")
 
-    @Bean
-    fun tokenBasedAuthenticationFilter(
-        memberService: MemberService,
-        jwtTokenService: JwtTokenService,
-    ): FilterRegistrationBean<MemberAuthTokenAuthenticationFilter> {
-        val authenticationProvider = MemberAuthTokenAuthenticationProvider(jwtTokenService, memberService)
-
-        val filter = MemberAuthTokenAuthenticationFilter(authenticationProvider)
-
-        return FilterRegistrationBean(filter).apply {}
-    }
+    /**
+     * 임시 제거
+     */
+//    @Bean
+//    fun tokenBasedAuthenticationFilter(
+//        memberService: MemberService,
+//        jwtTokenService: JwtTokenService,
+//    ): FilterRegistrationBean<MemberAuthTokenAuthenticationFilter> {
+//        val authenticationProvider = MemberAuthTokenAuthenticationProvider(jwtTokenService, memberService)
+//
+//        val filter = MemberAuthTokenAuthenticationFilter(authenticationProvider)
+//
+//        return FilterRegistrationBean(filter).apply {}
+//    }
 }
