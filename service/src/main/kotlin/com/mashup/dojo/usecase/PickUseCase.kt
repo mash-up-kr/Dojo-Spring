@@ -10,6 +10,8 @@ import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.domain.QuestionSetId
+import com.mashup.dojo.domain.QuestionSheetId
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
@@ -154,8 +156,15 @@ class DefaultPickUseCase(
             memberService.findMemberById(command.pickedId)
                 ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID ${command.pickedId}")
 
+        // ToDo
+        // 현재 사용자의 ID로 redis에서 questionSheetId, questionSetId를 가져옴
+        val questionSetId = QuestionSetId("questionSetId")
+        val questionSheetId = QuestionSheetId("questionSheetId")
+
         return pickService.create(
             questionId = question.id,
+            questionSetId = questionSetId,
+            questionSheetId = questionSheetId,
             pickerMemberId = command.pickerId,
             pickedMemberId = pickedMember.id
         )

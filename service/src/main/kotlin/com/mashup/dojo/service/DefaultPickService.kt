@@ -12,6 +12,7 @@ import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
+import com.mashup.dojo.domain.QuestionSheetId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -34,6 +35,8 @@ interface PickService {
 
     fun create(
         questionId: QuestionId,
+        questionSetId: QuestionSetId,
+        questionSheetId: QuestionSheetId,
         pickerMemberId: MemberId,
         pickedMemberId: MemberId,
     ): PickId
@@ -85,12 +88,16 @@ class DefaultPickService(
     @Transactional
     override fun create(
         questionId: QuestionId,
+        questionSetId: QuestionSetId,
+        questionSheetId: QuestionSheetId,
         pickerMemberId: MemberId,
         pickedMemberId: MemberId,
     ): PickId {
         val pick =
             Pick.create(
                 questionId = questionId,
+                questionSetId = questionSetId,
+                questionSheetId = questionSheetId,
                 pickerId = pickerMemberId,
                 pickedId = pickedMemberId
             )
@@ -154,6 +161,8 @@ class DefaultPickService(
             Pick(
                 id = PickId("pickmepickme"),
                 questionId = QuestionId("question"),
+                questionSetId = QuestionSetId("questionSetId"),
+                questionSheetId = QuestionSheetId("questionSheetId"),
                 pickerId = MemberId("뽑은놈"),
                 pickedId = MemberId("뽑힌놈"),
                 isGenderOpen = false,
@@ -185,6 +194,8 @@ class DefaultPickService(
             Pick(
                 id = PickId("SAMPLE_PICK_ID"),
                 questionId = QuestionId("SAMPLE_QUESTION_ID"),
+                questionSetId = QuestionSetId("questionSetId"),
+                questionSheetId = QuestionSheetId("questionSheetId"),
                 pickerId = MemberId("SAMPLE_MEMBER_ID"),
                 pickedId = MemberId("SAMPLE_MEMBER_ID"),
                 isGenderOpen = true,
@@ -201,6 +212,8 @@ private fun Pick.toEntity(): PickEntity {
     return PickEntity(
         id = id.value,
         questionId = questionId.value,
+        questionSetId = questionSetId.value,
+        questionSheetId = questionSheetId.value,
         pickerId = pickerId.value,
         pickedId = pickedId.value,
         isGenderOpen = isGenderOpen,
@@ -214,6 +227,8 @@ private fun PickEntity.toPick(): Pick {
     return Pick(
         id = PickId(id),
         questionId = QuestionId(questionId),
+        questionSetId = QuestionSetId(questionSetId),
+        questionSheetId = QuestionSheetId(questionSheetId),
         pickerId = MemberId(pickerId),
         pickedId = MemberId(pickedId),
         isGenderOpen = isGenderOpen,

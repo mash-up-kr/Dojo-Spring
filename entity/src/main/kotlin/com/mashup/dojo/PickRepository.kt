@@ -16,18 +16,22 @@ interface PickRepository : JpaRepository<PickEntity, String> {
 class PickEntity(
     @Id
     val id: String,
-    @Column(name = "questionId")
+    @Column(name = "question_id")
     val questionId: String,
-    @Column(name = "pickerId")
+    @Column(name = "question_set_id")
+    val questionSetId: String,
+    @Column(name = "question_sheet_id")
+    val questionSheetId: String,
+    @Column(name = "picker_id")
     val pickerId: String,
-    @Column(name = "pickedId")
+    @Column(name = "picked_id")
     val pickedId: String,
-    @Column(name = "isGenderOpen")
+    @Column(name = "is_gender_open")
     val isGenderOpen: Boolean = false,
-    @Column(name = "isPlatformOpen")
+    @Column(name = "is_platform_open")
     val isPlatformOpen: Boolean = false,
-    @Column(name = "isMidInitialNameOpen")
+    @Column(name = "is_mid_initial_name_open")
     val isMidInitialNameOpen: Boolean = false,
-    @Column(name = "isFullNameOpen")
+    @Column(name = "is_full_name_open")
     val isFullNameOpen: Boolean = false,
 ) : BaseTimeEntity()

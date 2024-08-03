@@ -11,6 +11,8 @@ value class PickId(val value: String)
 data class Pick(
     val id: PickId,
     val questionId: QuestionId,
+    val questionSetId: QuestionSetId,
+    val questionSheetId: QuestionSheetId,
     // 고른 멤버
     val pickerId: MemberId,
     // 골라진 멤버
@@ -29,6 +31,8 @@ data class Pick(
     companion object {
         internal fun create(
             questionId: QuestionId,
+            questionSetId: QuestionSetId,
+            questionSheetId: QuestionSheetId,
             pickerId: MemberId,
             pickedId: MemberId,
         ): Pick {
@@ -37,6 +41,8 @@ data class Pick(
             return Pick(
                 id = PickId(uuid),
                 questionId = questionId,
+                questionSetId = questionSetId,
+                questionSheetId = questionSheetId,
                 pickerId = pickerId,
                 pickedId = pickedId,
                 createdAt = LocalDateTime.now(),
