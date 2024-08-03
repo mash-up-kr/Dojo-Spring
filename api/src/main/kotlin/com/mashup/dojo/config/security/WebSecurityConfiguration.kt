@@ -8,9 +8,7 @@ class WebSecurityConfiguration {
     @Bean
     fun jwtTokenService() = JwtTokenService("dojo-secret-dojo-secret-dojo-secret")
 
-    /**
-     * 임시 제거
-     */
+    // 임시 제거
 //    @Bean
 //    fun tokenBasedAuthenticationFilter(
 //        memberService: MemberService,
