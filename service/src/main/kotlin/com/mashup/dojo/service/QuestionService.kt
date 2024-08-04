@@ -124,7 +124,7 @@ class DefaultQuestionService(
     }
 
     override fun getLatestPublishedQuestionSet(): QuestionSet? {
-        TODO("Not yet implemented")
+        return questionSetRepository.findTopByOrderByPublishedAtDesc()?.toQuestionSet()
     }
 
     override fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet? {
