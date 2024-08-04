@@ -55,7 +55,7 @@ data class Member(
             if (fullName.length < 2) throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
             val secondInitialName = InitialParser.parse(fullName.substring(1, 2)[0]) ?: throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
 
-            return if (profileImageId == null) { 
+            return if (profileImageId == null) {
                 Member(
                     id = MemberId(uuid),
                     fullName = fullName,

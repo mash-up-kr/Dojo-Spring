@@ -62,6 +62,7 @@ interface QuestionUseCase {
     data class QuestionSheetCandidateResult(
         val candidateId: MemberId,
         val memberName: String,
+        val memberImageId: ImageId,
         val platform: String,
     )
 
@@ -158,6 +159,7 @@ class DefaultQuestionUseCase(
                                 Candidate(
                                     memberId = member.id,
                                     memberName = member.fullName,
+                                    memberImageId = member.profileImageId,
                                     platform = member.platform
                                 )
                             } ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
@@ -187,41 +189,49 @@ class DefaultQuestionUseCase(
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("1"),
                     memberName = "낭은영",
+                    memberImageId = ImageId("member-image-1"),
                     platform = MemberPlatform.DESIGN.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("2"),
                     memberName = "오시연",
+                    memberImageId = ImageId("member-image-2"),
                     platform = MemberPlatform.DESIGN.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("3"),
                     memberName = "김준형",
+                    memberImageId = ImageId("member-image-3"),
                     platform = MemberPlatform.SPRING.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("4"),
                     memberName = "오예원",
+                    memberImageId = ImageId("member-image-4"),
                     platform = MemberPlatform.SPRING.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("5"),
                     memberName = "박세원",
+                    memberImageId = ImageId("member-image-5"),
                     platform = MemberPlatform.SPRING.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("6"),
                     memberName = "최민석",
+                    memberImageId = ImageId("member-image-6"),
                     platform = MemberPlatform.WEB.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("7"),
                     memberName = "이현재",
+                    memberImageId = ImageId("member-image-7"),
                     platform = MemberPlatform.WEB.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("8"),
                     memberName = "황태규",
+                    memberImageId = ImageId("member-image-8"),
                     platform = MemberPlatform.WEB.name
                 )
             )
@@ -302,7 +312,7 @@ class DefaultQuestionUseCase(
                     questionSheetId = QuestionSheetId("8"),
                     resolverId = MemberId("temp"),
                     questionId = QuestionId("8"),
-                    questionOrder = 7,
+                    questionOrder = 8,
                     questionContent = "메이플하다가 현피뜨러 서울역 갈 것 같은 사람",
                     questionCategory = QuestionCategory.FITNESS.name,
                     questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/health.gif",
@@ -339,10 +349,10 @@ class DefaultQuestionUseCase(
                     candidates = TEMP_CANDIDATES_LIST
                 ),
                 QuestionUseCase.QuestionSheetResult(
-                    questionSheetId = QuestionSheetId("11"),
+                    questionSheetId = QuestionSheetId("12"),
                     resolverId = MemberId("temp"),
-                    questionId = QuestionId("11"),
-                    questionOrder = 11,
+                    questionId = QuestionId("12"),
+                    questionOrder = 12,
                     questionContent = "엉덩이로 이름 잘 쓸 것 같은 사람",
                     questionCategory = QuestionCategory.HUMOR.name,
                     questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/congrat.gif",
@@ -382,6 +392,7 @@ private fun Candidate.toCandidateResult(): QuestionUseCase.QuestionSheetCandidat
     return QuestionUseCase.QuestionSheetCandidateResult(
         candidateId = memberId,
         memberName = memberName,
+        memberImageId = memberImageId,
         platform = platform.name
     )
 }

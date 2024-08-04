@@ -267,10 +267,10 @@ class DefaultQuestionService(
                 resolverId = MemberId("1"),
                 candidates =
                     listOf(
-                        Candidate(MemberId("2"), "임준형", MemberPlatform.SPRING),
-                        Candidate(MemberId("3"), "한씨", MemberPlatform.SPRING),
-                        Candidate(MemberId("4"), "박씨", MemberPlatform.SPRING),
-                        Candidate(MemberId("5"), "오씨", MemberPlatform.SPRING)
+                        Candidate(MemberId("2"), "임준형", ImageId("member-image-id-1"), MemberPlatform.SPRING),
+                        Candidate(MemberId("3"), "한씨", ImageId("member-image-id-2"), MemberPlatform.SPRING),
+                        Candidate(MemberId("4"), "박씨", ImageId("member-image-id-3"), MemberPlatform.SPRING),
+                        Candidate(MemberId("5"), "오씨", ImageId("member-image-id-4"), MemberPlatform.SPRING)
                     )
             )
 
