@@ -125,7 +125,16 @@ class PickController(
         @RequestBody request: CreatePickRequest,
     ): DojoApiResponse<PickId> {
         // todo : update memberId to AuthInfo
-        val pickId = pickUseCase.createPick(PickUseCase.CreatePickCommand(request.questionId, MemberId("1"), request.pickedId))
+        val pickId =
+            pickUseCase.createPick(
+                PickUseCase.CreatePickCommand(
+                    questionSheetId = request.questionSheetId,
+                    questionSetId = request.questionSetId,
+                    questionId = request.questionId,
+                    pickerId = MemberId("1"),
+                    pickedId = request.pickedId
+                )
+            )
 
         return DojoApiResponse.success(pickId)
     }

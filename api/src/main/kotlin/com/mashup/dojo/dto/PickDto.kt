@@ -8,12 +8,18 @@ import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
+import com.mashup.dojo.domain.QuestionSetId
+import com.mashup.dojo.domain.QuestionSheetId
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
 @Schema(description = "Pick 생성 요청")
 data class CreatePickRequest(
+    @Schema(description = "질문지 id")
+    val questionSheetId: QuestionSheetId,
+    @Schema(description = "질문 세트 id")
+    val questionSetId: QuestionSetId,
     @Schema(description = "질문 id")
     val questionId: QuestionId,
     @Schema(description = "후보자 중 선택한 대상 멤버 id")
