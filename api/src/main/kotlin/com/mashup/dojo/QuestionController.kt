@@ -45,7 +45,7 @@ fun QuestionUseCase.GetQuestionSheetsResult.toResponse(): QuestionSheetsGetRespo
                     QuestionSheetCandidate(
                         memberId = candidate.candidateId,
                         memberName = candidate.memberName,
-                        memberImageId = candidate.memberImageId,
+                        memberImageUrl = candidate.memberImageUrl,
                         platform = candidate.platform
                     )
                 }.toList()
