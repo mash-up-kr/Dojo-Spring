@@ -7,9 +7,20 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
-interface QuestionRepository : JpaRepository<QuestionEntity, String>
+interface QuestionRepository : JpaRepository<QuestionEntity, String> {
+
+    @Query("SELECT q FROM QuestionEntity q WHERE q.type = :type AND q.id NOT IN :excludeIds ORDER BY function('RAND')")
+    fun findRandomQuestions(
+        @Param("type") type: QuestionType,
+        @Param("excludeIds") excludeIds: List<String>,
+        pageable: Pageable
+    ): List<QuestionEntity>
+}
 
 @Entity
 @Table(name = "question")

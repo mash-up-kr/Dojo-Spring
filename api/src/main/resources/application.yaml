@@ -4,6 +4,11 @@ spring:
   profiles:
     include: entity, common
 
+dojo:
+  questionSet:
+    size: 12
+    friend-ratio: 0.6 # percent 
+
 scheduler:
   cron: "0 0 9,21 * * *"
   sheet-cron: "0 5 9,21 * * *"

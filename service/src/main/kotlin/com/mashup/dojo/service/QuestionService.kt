@@ -1,5 +1,7 @@
 package com.mashup.dojo.service
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.QuestionEntity
 import com.mashup.dojo.QuestionRepository
 import com.mashup.dojo.QuestionSetEntity
@@ -22,10 +24,13 @@ import com.mashup.dojo.domain.QuestionSheetId
 import com.mashup.dojo.domain.QuestionSheetWithCandidatesId
 import com.mashup.dojo.domain.QuestionType
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import kotlin.math.floor
 
 private val log = KotlinLogging.logger {}
 
@@ -39,6 +44,8 @@ interface QuestionService {
     fun getOperatingQuestionSet(): QuestionSet?
 
     fun getNextOperatingQuestionSet(): QuestionSet?
+
+    fun getLatestPublishedQuestionSet(): QuestionSet?
 
     fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet?
 
@@ -54,7 +61,7 @@ interface QuestionService {
         emojiImageId: ImageId,
     ): QuestionId
 
-    fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet
+    fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId
 
     fun createQuestionSet(
         questionIds: List<QuestionId>,
@@ -70,6 +77,10 @@ interface QuestionService {
 @Service
 @Transactional(readOnly = true)
 class DefaultQuestionService(
+    @Value("\${dojo.questionSet.size}")
+    private val questionSetSize: Int,
+    @Value("\${dojo.questionSet.friend-ratio}")
+    private val friendQuestionRatio: Float,
     override val questionRepository: QuestionRepository,
     override val questionSetRepository: QuestionSetRepository,
     override val questionSheetRepository: QuestionSheetRepository,
@@ -112,6 +123,10 @@ class DefaultQuestionService(
         }
     }
 
+    override fun getLatestPublishedQuestionSet(): QuestionSet? {
+        TODO("Not yet implemented")
+    }
+
     override fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet? {
         return questionSetRepository.findByIdOrNull(questionSetId.value)?.toQuestionSet()
     }
@@ -124,15 +139,43 @@ class DefaultQuestionService(
             .map { it.toQuestionSheetWithCandidatesId() }
     }
 
-    override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSet {
-        /**
-         * todo :
-         * - get Question Set (12s) exclude previousQuestionSet
-         * - cache put -> QuestionSet and return
-         * - questionSet publishedAt by getNextPickTime method
-         */
+    @Transactional
+    override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId {
+        // 비율에 따라 questionType 선정 
+        val friendQuestionSize = floor(questionSetSize * friendQuestionRatio).toInt()
+        val excludedQuestionIds: List<String> = excludedQuestionSet?.questionIds?.map { it.questionId.value } ?: emptyList()
 
-        return SAMPLE_QUESTION_SET
+        val friendQuestions = questionRepository.findRandomQuestions(com.mashup.dojo.QuestionType.FRIEND, excludedQuestionIds, Pageable.ofSize(friendQuestionSize))
+            .map { it.toQuestion() }
+        val accompanyQuestions = questionRepository.findRandomQuestions(com.mashup.dojo.QuestionType.ACCOMPANY, excludedQuestionIds, Pageable.ofSize(questionSetSize - friendQuestions.size))
+            .map { it.toQuestion() }
+
+        val questionList = (friendQuestions + accompanyQuestions).shuffled()
+
+        if (questionList.size != questionSetSize) {
+            log.error {
+                "QSet 을 만들기 위한 남은 Question 들이 부족합니다. " +
+                        "조회한 QuestionSize : ${questionList.size}, 친구용 질문 size : $friendQuestionSize, 전체용 질문 size : ${accompanyQuestions.size}, " +
+                        "이전 QSetId : ${excludedQuestionSet?.id}, 제외한 QuestionIds : $excludedQuestionIds"
+            }
+
+            throw DojoException.of(DojoExceptionType.QUESTION_LACK_FOR_CREATE_QUESTION_SET)
+        }
+
+        val questionOrders = questionList.mapIndexed { index, question ->
+            QuestionOrder(questionId = question.id, order = index)
+        }
+
+        // 다음 발행 시간은 어디서 가져오지? 
+        // todo: QSet에서 publishedAt 이 가장 큰 녀석 가져온 후 해당 publishedAt 보다 큰 startTime 을 가진 PickTime 정보 가져옴  (fix publishedAt)
+        val questionSetEntity = QuestionSet.create(
+            questionOrders = questionOrders,
+            publishedAt = LocalDateTime.of(2099, 1, 1, 1, 1, 0)
+        ).toEntity()
+
+        val id = questionSetRepository.save(questionSetEntity).id
+
+        return QuestionSetId(id)
     }
 
     @Transactional
@@ -140,7 +183,7 @@ class DefaultQuestionService(
         questionIds: List<QuestionId>,
         publishedAt: LocalDateTime,
     ): QuestionSet {
-        require(questionIds.size == DEFAULT_QUESTION_SIZE) { "questions size for QuestionSet must be 12" }
+        require(questionIds.size == questionSetSize) { "questions size for QuestionSet must be $questionSetSize" }
         require(publishedAt >= LocalDateTime.now()) { "publishedAt must be in the future" }
 
         val questionOrders = questionIds.mapIndexed { idx, qId -> QuestionOrder(qId, idx + 1) }
@@ -188,20 +231,20 @@ class DefaultQuestionService(
             QuestionSet(
                 id = QuestionSetId("1"),
                 questionIds =
-                    listOf(
-                        QuestionOrder(QuestionId("1"), 1),
-                        QuestionOrder(QuestionId("2"), 2),
-                        QuestionOrder(QuestionId("3"), 3),
-                        QuestionOrder(QuestionId("4"), 4),
-                        QuestionOrder(QuestionId("5"), 5),
-                        QuestionOrder(QuestionId("6"), 6),
-                        QuestionOrder(QuestionId("7"), 7),
-                        QuestionOrder(QuestionId("8"), 8),
-                        QuestionOrder(QuestionId("9"), 9),
-                        QuestionOrder(QuestionId("10"), 10),
-                        QuestionOrder(QuestionId("11"), 11),
-                        QuestionOrder(QuestionId("12"), 12)
-                    ),
+                listOf(
+                    QuestionOrder(QuestionId("1"), 1),
+                    QuestionOrder(QuestionId("2"), 2),
+                    QuestionOrder(QuestionId("3"), 3),
+                    QuestionOrder(QuestionId("4"), 4),
+                    QuestionOrder(QuestionId("5"), 5),
+                    QuestionOrder(QuestionId("6"), 6),
+                    QuestionOrder(QuestionId("7"), 7),
+                    QuestionOrder(QuestionId("8"), 8),
+                    QuestionOrder(QuestionId("9"), 9),
+                    QuestionOrder(QuestionId("10"), 10),
+                    QuestionOrder(QuestionId("11"), 11),
+                    QuestionOrder(QuestionId("12"), 12)
+                ),
                 publishedAt = LocalDateTime.now()
             )
 
@@ -212,12 +255,12 @@ class DefaultQuestionService(
                 questionId = QuestionId("1"),
                 resolverId = MemberId("1"),
                 candidates =
-                    listOf(
-                        Candidate(MemberId("2"), "임준형", MemberPlatform.SPRING),
-                        Candidate(MemberId("3"), "한씨", MemberPlatform.SPRING),
-                        Candidate(MemberId("4"), "박씨", MemberPlatform.SPRING),
-                        Candidate(MemberId("5"), "오씨", MemberPlatform.SPRING)
-                    )
+                listOf(
+                    Candidate(MemberId("2"), "임준형", MemberPlatform.SPRING),
+                    Candidate(MemberId("3"), "한씨", MemberPlatform.SPRING),
+                    Candidate(MemberId("4"), "박씨", MemberPlatform.SPRING),
+                    Candidate(MemberId("5"), "오씨", MemberPlatform.SPRING)
+                )
             )
 
         // TODO: Set to 3 sheets initially. Need to modify for all users later.
@@ -231,22 +274,22 @@ private fun Question.toEntity(): QuestionEntity {
         id = id.value,
         content = content,
         type =
-            when (type) {
-                QuestionType.FRIEND -> com.mashup.dojo.QuestionType.FRIEND
-                QuestionType.ACCOMPANY -> com.mashup.dojo.QuestionType.ACCOMPANY
-            },
+        when (type) {
+            QuestionType.FRIEND -> com.mashup.dojo.QuestionType.FRIEND
+            QuestionType.ACCOMPANY -> com.mashup.dojo.QuestionType.ACCOMPANY
+        },
         category =
-            when (category) {
-                QuestionCategory.DATING -> com.mashup.dojo.QuestionCategory.DATING
-                QuestionCategory.FRIENDSHIP -> com.mashup.dojo.QuestionCategory.FRIENDSHIP
-                QuestionCategory.PERSONALITY -> com.mashup.dojo.QuestionCategory.PERSONALITY
-                QuestionCategory.ENTERTAINMENT -> com.mashup.dojo.QuestionCategory.ENTERTAINMENT
-                QuestionCategory.FITNESS -> com.mashup.dojo.QuestionCategory.FITNESS
-                QuestionCategory.APPEARANCE -> com.mashup.dojo.QuestionCategory.APPEARANCE
-                QuestionCategory.WORK -> com.mashup.dojo.QuestionCategory.WORK
-                QuestionCategory.HUMOR -> com.mashup.dojo.QuestionCategory.HUMOR
-                QuestionCategory.OTHER -> com.mashup.dojo.QuestionCategory.OTHER
-            },
+        when (category) {
+            QuestionCategory.DATING -> com.mashup.dojo.QuestionCategory.DATING
+            QuestionCategory.FRIENDSHIP -> com.mashup.dojo.QuestionCategory.FRIENDSHIP
+            QuestionCategory.PERSONALITY -> com.mashup.dojo.QuestionCategory.PERSONALITY
+            QuestionCategory.ENTERTAINMENT -> com.mashup.dojo.QuestionCategory.ENTERTAINMENT
+            QuestionCategory.FITNESS -> com.mashup.dojo.QuestionCategory.FITNESS
+            QuestionCategory.APPEARANCE -> com.mashup.dojo.QuestionCategory.APPEARANCE
+            QuestionCategory.WORK -> com.mashup.dojo.QuestionCategory.WORK
+            QuestionCategory.HUMOR -> com.mashup.dojo.QuestionCategory.HUMOR
+            QuestionCategory.OTHER -> com.mashup.dojo.QuestionCategory.OTHER
+        },
         emojiImageId = emojiImageId.value
     )
 }
@@ -256,22 +299,22 @@ private fun QuestionEntity.toQuestion(): Question {
         id = QuestionId(id),
         content = content,
         type =
-            when (type) {
-                com.mashup.dojo.QuestionType.FRIEND -> QuestionType.FRIEND
-                com.mashup.dojo.QuestionType.ACCOMPANY -> QuestionType.ACCOMPANY
-            },
+        when (type) {
+            com.mashup.dojo.QuestionType.FRIEND -> QuestionType.FRIEND
+            com.mashup.dojo.QuestionType.ACCOMPANY -> QuestionType.ACCOMPANY
+        },
         category =
-            when (category) {
-                com.mashup.dojo.QuestionCategory.DATING -> QuestionCategory.DATING
-                com.mashup.dojo.QuestionCategory.FRIENDSHIP -> QuestionCategory.FRIENDSHIP
-                com.mashup.dojo.QuestionCategory.PERSONALITY -> QuestionCategory.PERSONALITY
-                com.mashup.dojo.QuestionCategory.ENTERTAINMENT -> QuestionCategory.ENTERTAINMENT
-                com.mashup.dojo.QuestionCategory.FITNESS -> QuestionCategory.FITNESS
-                com.mashup.dojo.QuestionCategory.APPEARANCE -> QuestionCategory.APPEARANCE
-                com.mashup.dojo.QuestionCategory.WORK -> QuestionCategory.WORK
-                com.mashup.dojo.QuestionCategory.HUMOR -> QuestionCategory.HUMOR
-                com.mashup.dojo.QuestionCategory.OTHER -> QuestionCategory.OTHER
-            },
+        when (category) {
+            com.mashup.dojo.QuestionCategory.DATING -> QuestionCategory.DATING
+            com.mashup.dojo.QuestionCategory.FRIENDSHIP -> QuestionCategory.FRIENDSHIP
+            com.mashup.dojo.QuestionCategory.PERSONALITY -> QuestionCategory.PERSONALITY
+            com.mashup.dojo.QuestionCategory.ENTERTAINMENT -> QuestionCategory.ENTERTAINMENT
+            com.mashup.dojo.QuestionCategory.FITNESS -> QuestionCategory.FITNESS
+            com.mashup.dojo.QuestionCategory.APPEARANCE -> QuestionCategory.APPEARANCE
+            com.mashup.dojo.QuestionCategory.WORK -> QuestionCategory.WORK
+            com.mashup.dojo.QuestionCategory.HUMOR -> QuestionCategory.HUMOR
+            com.mashup.dojo.QuestionCategory.OTHER -> QuestionCategory.OTHER
+        },
         emojiImageId = ImageId(emojiImageId)
     )
 }
