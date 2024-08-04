@@ -2,7 +2,6 @@ package com.mashup.dojo.usecase
 
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
-import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
@@ -12,7 +11,6 @@ import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionSheetId
-import com.mashup.dojo.domain.QuestionSheetWithCandidatesId
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
@@ -126,7 +124,7 @@ class DefaultQuestionUseCase(
     }
 
     override fun getQuestionSheetList(memberId: MemberId): QuestionUseCase.GetQuestionSheetsResult {
-//        return TEMP_GET_QUESTION_SHEETS_RESULT
+        return TEMP_GET_QUESTION_SHEETS_RESULT
         // 운영중인 questionSet 조회 (todo : scheduler 가 최신 QuestionSet 을 발행 시각 2분전에 publishedYn Y 로 변경 예정)
         // todo : qSet /
         val operatingQSet =
@@ -152,36 +150,26 @@ class DefaultQuestionUseCase(
         val questionSheetResults =
             questionSheets
                 .filterNot { it.questionId in solvedQuestionIds }
-                .map { qSheet: QuestionSheetWithCandidatesId ->
-                    // QuestionSheetWithCandidatesId to QuestionSheet
-                    val candidates: List<Candidate> =
-                        qSheet.candidates.map { memberId ->
-                            memberService.findMemberById(memberId)?.let { member ->
-                                Candidate(
-                                    memberId = member.id,
-                                    memberName = member.fullName,
-                                    memberImageId = member.profileImageId,
-                                    platform = member.platform
-                                )
-                            } ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
-                        }
-
-                    val questionSheet: QuestionSheet = qSheet.toQuestionSheet(candidates)
-
+                .map { qSheet: QuestionSheet ->
                     // QSheet to QSheetResult
                     val candidateResults: List<QuestionUseCase.QuestionSheetCandidateResult> =
-                        questionSheet.candidates.map { candidate ->
-                            val profileImageUrl =
-                                imageService.load(candidate.memberImageId)?.url ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "image id ${candidate.memberImageId} not exist")
+                        qSheet.candidates.map { memberId ->
+                            val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+                            val profileImageUrl = imageService.load(member.profileImageId)?.url ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "image id ${member.profileImageId} not exist")
 
-                            candidate.toCandidateResult(profileImageUrl)
+                            QuestionUseCase.QuestionSheetCandidateResult(
+                                candidateId = memberId,
+                                memberImageUrl = profileImageUrl,
+                                memberName = member.fullName,
+                                platform = member.platform.name
+                            )
                         }
 
-                    val question = questionService.getQuestionById(questionSheet.questionId) ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
+                    val question = questionService.getQuestionById(qSheet.questionId) ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
                     val imageUrl = imageService.load(question.emojiImageId)?.url ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "image id ${question.emojiImageId} not exist")
-                    val questionOrder = questionIds.indexOf(questionSheet.questionId)
+                    val questionOrder = questionIds.indexOf(qSheet.questionId)
 
-                    questionSheet.toQuestionSheetResult(questionOrder, question.content, question.category, imageUrl, candidateResults)
+                    qSheet.toQuestionSheetResult(questionOrder, question.content, question.category, imageUrl, candidateResults)
                 }
 
         return QuestionUseCase.GetQuestionSheetsResult(
@@ -210,7 +198,7 @@ class DefaultQuestionUseCase(
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("3"),
-                    memberName = "김준형",
+                    memberName = "임준형",
                     memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.SPRING.name
                 ),
@@ -396,14 +384,5 @@ private fun QuestionSheet.toQuestionSheetResult(
         questionCategory = questionCategory.name,
         questionEmojiImageUrl = emojiImageUrl,
         candidates = candidates
-    )
-}
-
-private fun Candidate.toCandidateResult(profileImageUrl: String): QuestionUseCase.QuestionSheetCandidateResult {
-    return QuestionUseCase.QuestionSheetCandidateResult(
-        candidateId = memberId,
-        memberName = memberName,
-        memberImageUrl = profileImageUrl,
-        platform = platform.name
     )
 }

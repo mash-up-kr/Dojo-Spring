@@ -52,16 +52,6 @@ enum class QuestionCategory(
 @JvmInline
 value class QuestionSheetId(val value: String)
 
-data class QuestionSheet(
-    val questionSheetId: QuestionSheetId,
-    // 문제지 조회를 위해 필요 !
-    val questionSetId: QuestionSetId,
-    val questionId: QuestionId,
-    val resolverId: MemberId,
-    // Todo Json String으로 저장하자
-    val candidates: List<Candidate>,
-)
-
 data class Candidate(
     val memberId: MemberId,
     val memberName: String,
@@ -69,21 +59,11 @@ data class Candidate(
     val platform: MemberPlatform,
 )
 
-data class QuestionSheetWithCandidatesId(
+data class QuestionSheet(
     val questionSheetId: QuestionSheetId,
     // 문제지 조회를 위해 필요 !
     val questionSetId: QuestionSetId,
     val questionId: QuestionId,
     val resolverId: MemberId,
     val candidates: List<MemberId>,
-) {
-    fun toQuestionSheet(candidates: List<Candidate>): QuestionSheet {
-        return QuestionSheet(
-            questionSheetId = questionSheetId,
-            questionSetId = questionSetId,
-            questionId = questionId,
-            resolverId = resolverId,
-            candidates = candidates
-        )
-    }
-}
+)
