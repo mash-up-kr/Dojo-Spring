@@ -13,12 +13,11 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface QuestionRepository : JpaRepository<QuestionEntity, String> {
-
     @Query("SELECT q FROM QuestionEntity q WHERE q.type = :type AND q.id NOT IN :excludeIds ORDER BY function('RAND')")
     fun findRandomQuestions(
         @Param("type") type: QuestionType,
         @Param("excludeIds") excludeIds: List<String>,
-        pageable: Pageable
+        pageable: Pageable,
     ): List<QuestionEntity>
 }
 
