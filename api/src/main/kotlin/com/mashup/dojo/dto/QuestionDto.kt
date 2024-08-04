@@ -57,7 +57,7 @@ data class QuestionSheetsGetResponse(
 
 @Schema(description = "질문지 상세")
 data class QuestionSheetResponse(
-    @Schema(description = "질문지에 대한 고유 식별 값")
+    @Schema(description = "질문지 id")
     val questionSheetId: QuestionSheetId,
     @Schema(description = "질문지에 해당하는 응답자 id")
     val resolverId: MemberId,

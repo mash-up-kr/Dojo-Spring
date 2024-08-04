@@ -76,6 +76,8 @@ interface PickUseCase {
     )
 
     data class CreatePickCommand(
+        val questionSheetId: QuestionSheetId,
+        val questionSetId: QuestionSetId,
         val questionId: QuestionId,
         val pickerId: MemberId,
         val pickedId: MemberId,
@@ -156,15 +158,12 @@ class DefaultPickUseCase(
             memberService.findMemberById(command.pickedId)
                 ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID ${command.pickedId}")
 
-        // ToDo
-        // 현재 사용자의 ID로 redis에서 questionSheetId, questionSetId를 가져옴
-        val questionSetId = QuestionSetId("questionSetId")
-        val questionSheetId = QuestionSheetId("questionSheetId")
+        val questionSet = questionService.getQuestionSetById(command.questionSetId) ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_EXIST)
 
         return pickService.create(
             questionId = question.id,
-            questionSetId = questionSetId,
-            questionSheetId = questionSheetId,
+            questionSetId = questionSet.id,
+            questionSheetId = command.questionSheetId,
             pickerMemberId = command.pickerId,
             pickedMemberId = pickedMember.id
         )

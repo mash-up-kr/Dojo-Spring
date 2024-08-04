@@ -22,6 +22,7 @@ import com.mashup.dojo.domain.QuestionSheetId
 import com.mashup.dojo.domain.QuestionSheetWithCandidatesId
 import com.mashup.dojo.domain.QuestionType
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -38,6 +39,8 @@ interface QuestionService {
     fun getOperatingQuestionSet(): QuestionSet?
 
     fun getNextOperatingQuestionSet(): QuestionSet?
+
+    fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet?
 
     fun getQuestionSheets(
         resolverId: MemberId,
@@ -107,6 +110,10 @@ class DefaultQuestionService(
             log.error { "Published And Prepared for sortie QuestionSet Entity not found" }
             null
         }
+    }
+
+    override fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet? {
+        return questionSetRepository.findByIdOrNull(questionSetId.value)?.toQuestionSet()
     }
 
     override fun getQuestionSheets(
