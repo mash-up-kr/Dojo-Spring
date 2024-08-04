@@ -80,10 +80,10 @@ class DefaultMemberService(
         val targetMemberId3 = memberRelation3.toId
         val targetMemberId4 = memberRelation4.toId
 
-        val candidate1 = Candidate(targetMemberId1, "한씨", MemberPlatform.SPRING)
-        val candidate2 = Candidate(targetMemberId2, "오씨", MemberPlatform.SPRING)
-        val candidate3 = Candidate(targetMemberId3, "박씨", MemberPlatform.SPRING)
-        val candidate4 = Candidate(targetMemberId4, "김", MemberPlatform.SPRING)
+        val candidate1 = Candidate(targetMemberId1, "한씨", ImageId("member-image-id-1"), MemberPlatform.SPRING)
+        val candidate2 = Candidate(targetMemberId2, "오씨", ImageId("member-image-id-2"), MemberPlatform.SPRING)
+        val candidate3 = Candidate(targetMemberId3, "박씨", ImageId("member-image-id-3"), MemberPlatform.SPRING)
+        val candidate4 = Candidate(targetMemberId4, "김", ImageId("member-image-id-4"), MemberPlatform.SPRING)
 
         return listOf(candidate1, candidate2, candidate3, candidate4)
     }
@@ -136,7 +136,7 @@ private fun Member.toEntity(): MemberEntity {
         id = id.value,
         fullName = fullName,
         secondInitialName = secondInitialName,
-        profileImageId = profileImageId?.value,
+        profileImageId = profileImageId.value,
         platform = platform.name,
         ordinal = ordinal,
         gender = gender.name
@@ -151,7 +151,7 @@ private fun MemberEntity.toMember(): Member {
         id = MemberId(id),
         fullName = fullName,
         secondInitialName = secondInitialName,
-        profileImageId = profileImageId?.let { ImageId(it) },
+        profileImageId = ImageId(profileImageId),
         ordinal = ordinal,
         platform = platform,
         gender = gender,

@@ -13,7 +13,7 @@ class MemberEntity(
     val id: String,
     val fullName: String,
     val secondInitialName: String,
-    val profileImageId: String?,
+    val profileImageId: String,
     val platform: String,
     val ordinal: Int,
     val gender: String,
