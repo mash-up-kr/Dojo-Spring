@@ -40,7 +40,7 @@ data class Member(
 
     companion object {
         // todo: profile 사진 미 변경 시, default 이미지 id 값
-        const val DEFAULT_PROFILE_IMAGE_ID = "profile-default-image-id-1"
+        const val DEFAULT_PROFILE_IMAGE_ID = "profile_default_image_1"
 
         internal fun create(
             fullName: String,
