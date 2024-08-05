@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface PickRepository : JpaRepository<PickEntity, String> {
+interface PickRepository : JpaRepository<PickEntity, String>, PickRepositoryCustom {
     fun findAllByPickedId(pickedId: String): List<PickEntity>
 }
 
@@ -48,12 +48,6 @@ interface PickRepositoryCustom {
         pageable: Pageable,
     ): Page<PickEntity>
 
-    fun findPickDetailContent(
-        memberId: String,
-        questionId: String,
-        pageable: Pageable,
-    ): List<PickEntity>
-
     fun findPickDetailCount(
         memberId: String,
         questionId: String,
@@ -74,7 +68,7 @@ class PickRepositoryImpl(
         return PageImpl(picks, pageable, count)
     }
 
-    override fun findPickDetailContent(
+    private fun findPickDetailContent(
         memberId: String,
         questionId: String,
         pageable: Pageable,
@@ -99,6 +93,10 @@ class PickRepositoryImpl(
         return jpaQueryFactory
             .select(Wildcard.count)
             .from(pickEntity)
+            .where(
+                pickEntity.pickedId.eq(memberId),
+                pickEntity.questionId.eq(questionId)
+            )
             .fetchOne() ?: 0
     }
 }
