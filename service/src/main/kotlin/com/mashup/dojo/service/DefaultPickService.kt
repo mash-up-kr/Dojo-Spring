@@ -169,9 +169,6 @@ class DefaultPickService(
 
         val receivedPickDetails =
             pagingPick.content.map { pickEntity ->
-                val findMember =
-                    memberService.findMemberById(MemberId(pickEntity.pickerId))
-                        ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 회원을 찾을 수 없습니다. MemberId: [${pickEntity.pickerId}]")
 
                 val genderOpen = pickEntity.isGenderOpen
                 val platformOpen = pickEntity.isPlatformOpen
@@ -179,15 +176,15 @@ class DefaultPickService(
                 val fullNameOpen = pickEntity.isFullNameOpen
                 val pickerIdOpen = fullNameOpen && genderOpen && platformOpen && secondInitialNameOpen
 
-                val pickerId = transformPickerId(pickerIdOpen, findMember.id)
-                val pickerGender = transformPickerGender(genderOpen, findMember.gender)
-                val pickerPlatform = transformPickerPlatform(platformOpen, findMember.platform)
-                val pickerSecondInitialName = transformPickerSecondInitialName(secondInitialNameOpen, findMember.secondInitialName)
-                val pickerFullName = transformPickerFullName(fullNameOpen, findMember.fullName)
+                val pickerId = transformPickerId(isOpen = pickerIdOpen, pickerId = MemberId(pickEntity.pickerId))
+                val pickerGender = transformPickerGender(isOpen = genderOpen, pickerGender = MemberGender.findByValue(pickEntity.pickerGender))
+                val pickerPlatform = transformPickerPlatform(isOpen = platformOpen, pickerPlatform = MemberPlatform.findByValue(pickEntity.pickerPlatform))
+                val pickerSecondInitialName = transformPickerSecondInitialName(isOpen = secondInitialNameOpen, secondInitialName = pickEntity.pickerSecondInitialName)
+                val pickerFullName = transformPickerFullName(isOpen = fullNameOpen, fullName = pickEntity.pickerFullName)
 
                 PickService.GetReceivedPickDetail(
-                    pickId = PickId(pickEntity.id),
-                    pickerOrdinal = findMember.ordinal,
+                    pickId = PickId(pickEntity.pickId),
+                    pickerOrdinal = pickEntity.pickerOrdinal,
                     pickerIdOpen = pickerIdOpen,
                     pickerId = pickerId,
                     pickerGenderOpen = genderOpen,
@@ -212,50 +209,50 @@ class DefaultPickService(
     }
 
     fun transformPickerId(
-        pickerIdOpen: Boolean,
+        isOpen: Boolean,
         pickerId: MemberId,
     ): MemberId {
-        return when (pickerIdOpen) {
+        return when (isOpen) {
             true -> pickerId
             false -> MemberId("UNKNOWN")
         }
     }
 
     fun transformPickerGender(
-        pickerGenderOpen: Boolean,
+        isOpen: Boolean,
         pickerGender: MemberGender,
     ): MemberGender {
-        return when (pickerGenderOpen) {
+        return when (isOpen) {
             true -> pickerGender
             false -> MemberGender.UNKNOWN
         }
     }
 
     fun transformPickerPlatform(
-        pickerPlatformOpen: Boolean,
+        isOpen: Boolean,
         pickerPlatform: MemberPlatform,
     ): MemberPlatform {
-        return when (pickerPlatformOpen) {
+        return when (isOpen) {
             true -> pickerPlatform
             false -> MemberPlatform.UNKNOWN
         }
     }
 
     fun transformPickerSecondInitialName(
-        pickerSecondInitialNameOpen: Boolean,
+        isOpen: Boolean,
         secondInitialName: String,
     ): String {
-        return when (pickerSecondInitialNameOpen) {
+        return when (isOpen) {
             true -> secondInitialName
             false -> "UNKNOWN"
         }
     }
 
     fun transformPickerFullName(
-        pickerFullNameOpen: Boolean,
+        isOpen: Boolean,
         fullName: String,
     ): String {
-        return when (pickerFullNameOpen) {
+        return when (isOpen) {
             true -> fullName
             false -> "UNKNOWN"
         }
