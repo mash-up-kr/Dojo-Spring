@@ -214,7 +214,7 @@ class DefaultPickService(
     ): MemberId {
         return when (isOpen) {
             true -> pickerId
-            false -> MemberId("UNKNOWN")
+            false -> MemberId(UNKNOWN)
         }
     }
 
@@ -244,7 +244,7 @@ class DefaultPickService(
     ): String {
         return when (isOpen) {
             true -> secondInitialName
-            false -> "UNKNOWN"
+            false -> UNKNOWN
         }
     }
 
@@ -254,7 +254,7 @@ class DefaultPickService(
     ): String {
         return when (isOpen) {
             true -> fullName
-            false -> "UNKNOWN"
+            false -> UNKNOWN
         }
     }
 
@@ -302,39 +302,8 @@ class DefaultPickService(
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
             )
-//        private fun PickEntity.buildDomain(): Pick {
-//            return Pick(
-//                id = PickId("pickmepickme"),
-//                questionId = QuestionId("question"),
-//                pickerId = MemberId("뽑은놈"),
-//                pickedId = MemberId("뽑힌놈"),
-//                isGenderOpen = false,
-//                isPlatformOpen = false,
-//                isMidInitialNameOpen = false,
-//                isFullNameOpen = false,
-//                createdAt = createdAt,
-//                updatedAt = updatedAt,
-//            )
-//        }
 
-        val SAMPLE_PICK_LIST: List<Pick>
-            get() = listOf(this.SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK)
-
-        private val SAMPLE_PICK =
-            Pick(
-                id = PickId("SAMPLE_PICK_ID"),
-                questionId = QuestionId("SAMPLE_QUESTION_ID"),
-                questionSetId = QuestionSetId("questionSetId"),
-                questionSheetId = QuestionSheetId("questionSheetId"),
-                pickerId = MemberId("SAMPLE_MEMBER_ID"),
-                pickedId = MemberId("SAMPLE_MEMBER_ID"),
-                isGenderOpen = true,
-                isPlatformOpen = true,
-                isMidInitialNameOpen = true,
-                isFullNameOpen = true,
-                createdAt = LocalDateTime.MIN,
-                updatedAt = LocalDateTime.now()
-            )
+        private const val UNKNOWN = "UNKNOWN"
     }
 }
 
