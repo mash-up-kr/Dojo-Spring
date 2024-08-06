@@ -19,7 +19,7 @@ data class Member(
     val id: MemberId,
     val fullName: String,
     val secondInitialName: String,
-    val profileImageId: ImageId?,
+    val profileImageId: ImageId = ImageId(DEFAULT_PROFILE_IMAGE_ID),
     val platform: MemberPlatform,
     // 기수
     val ordinal: Int,
@@ -39,6 +39,8 @@ data class Member(
     }
 
     companion object {
+        const val DEFAULT_PROFILE_IMAGE_ID = "profile_default_image_1"
+
         internal fun create(
             fullName: String,
             profileImageId: ImageId?,
@@ -52,17 +54,30 @@ data class Member(
             if (fullName.length < 2) throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
             val secondInitialName = InitialParser.parse(fullName.substring(1, 2)[0]) ?: throw IllegalArgumentException("이름은 2글자 이상이어야해요.")
 
-            return Member(
-                id = MemberId(uuid),
-                fullName = fullName,
-                secondInitialName = secondInitialName,
-                profileImageId = profileImageId,
-                platform = platform,
-                gender = gender,
-                ordinal = ordinal,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
-            )
+            return if (profileImageId == null) {
+                Member(
+                    id = MemberId(uuid),
+                    fullName = fullName,
+                    secondInitialName = secondInitialName,
+                    platform = platform,
+                    gender = gender,
+                    ordinal = ordinal,
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
+                )
+            } else {
+                Member(
+                    id = MemberId(uuid),
+                    fullName = fullName,
+                    secondInitialName = secondInitialName,
+                    profileImageId = profileImageId,
+                    platform = platform,
+                    gender = gender,
+                    ordinal = ordinal,
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
+                )
+            }
         }
     }
 }

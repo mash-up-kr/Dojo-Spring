@@ -2,7 +2,6 @@ package com.mashup.dojo.usecase
 
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
-import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
@@ -12,7 +11,6 @@ import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionSheetId
-import com.mashup.dojo.domain.QuestionSheetWithCandidatesId
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
@@ -62,6 +60,7 @@ interface QuestionUseCase {
     data class QuestionSheetCandidateResult(
         val candidateId: MemberId,
         val memberName: String,
+        val memberImageUrl: String,
         val platform: String,
     )
 
@@ -151,25 +150,26 @@ class DefaultQuestionUseCase(
         val questionSheetResults =
             questionSheets
                 .filterNot { it.questionId in solvedQuestionIds }
-                .map { qSheet: QuestionSheetWithCandidatesId ->
-                    val candidates =
+                .map { qSheet: QuestionSheet ->
+                    // QSheet to QSheetResult
+                    val candidateResults: List<QuestionUseCase.QuestionSheetCandidateResult> =
                         qSheet.candidates.map { memberId ->
-                            memberService.findMemberById(memberId)?.let { member ->
-                                Candidate(
-                                    memberId = member.id,
-                                    memberName = member.fullName,
-                                    platform = member.platform
-                                )
-                            } ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+                            val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+                            val profileImageUrl = imageService.load(member.profileImageId)?.url ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "image id ${member.profileImageId} not exist")
+
+                            QuestionUseCase.QuestionSheetCandidateResult(
+                                candidateId = memberId,
+                                memberImageUrl = profileImageUrl,
+                                memberName = member.fullName,
+                                platform = member.platform.name
+                            )
                         }
 
-                    val questionSheet: QuestionSheet = qSheet.toQuestionSheet(candidates)
-
-                    val question = questionService.getQuestionById(questionSheet.questionId) ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
+                    val question = questionService.getQuestionById(qSheet.questionId) ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
                     val imageUrl = imageService.load(question.emojiImageId)?.url ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "image id ${question.emojiImageId} not exist")
-                    val questionOrder = questionIds.indexOf(questionSheet.questionId)
+                    val questionOrder = questionIds.indexOf(qSheet.questionId)
 
-                    questionSheet.toQuestionSheetResult(questionOrder, question.content, question.category, imageUrl)
+                    qSheet.toQuestionSheetResult(questionOrder, question.content, question.category, imageUrl, candidateResults)
                 }
 
         return QuestionUseCase.GetQuestionSheetsResult(
@@ -187,41 +187,49 @@ class DefaultQuestionUseCase(
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("1"),
                     memberName = "낭은영",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.DESIGN.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("2"),
                     memberName = "오시연",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.DESIGN.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("3"),
-                    memberName = "김준형",
+                    memberName = "임준형",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.SPRING.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("4"),
                     memberName = "오예원",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.SPRING.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("5"),
                     memberName = "박세원",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.SPRING.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("6"),
                     memberName = "최민석",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.WEB.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("7"),
                     memberName = "이현재",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.WEB.name
                 ),
                 QuestionUseCase.QuestionSheetCandidateResult(
                     candidateId = MemberId("8"),
                     memberName = "황태규",
+                    memberImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/profile-default-image.png",
                     platform = MemberPlatform.WEB.name
                 )
             )
@@ -302,7 +310,7 @@ class DefaultQuestionUseCase(
                     questionSheetId = QuestionSheetId("8"),
                     resolverId = MemberId("temp"),
                     questionId = QuestionId("8"),
-                    questionOrder = 7,
+                    questionOrder = 8,
                     questionContent = "메이플하다가 현피뜨러 서울역 갈 것 같은 사람",
                     questionCategory = QuestionCategory.FITNESS.name,
                     questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/health.gif",
@@ -339,10 +347,10 @@ class DefaultQuestionUseCase(
                     candidates = TEMP_CANDIDATES_LIST
                 ),
                 QuestionUseCase.QuestionSheetResult(
-                    questionSheetId = QuestionSheetId("11"),
+                    questionSheetId = QuestionSheetId("12"),
                     resolverId = MemberId("temp"),
-                    questionId = QuestionId("11"),
-                    questionOrder = 11,
+                    questionId = QuestionId("12"),
+                    questionOrder = 12,
                     questionContent = "엉덩이로 이름 잘 쓸 것 같은 사람",
                     questionCategory = QuestionCategory.HUMOR.name,
                     questionEmojiImageUrl = "https://dojo-backend-source-bundle.s3.ap-northeast-2.amazonaws.com/congrat.gif",
@@ -365,6 +373,7 @@ private fun QuestionSheet.toQuestionSheetResult(
     questionContent: String,
     questionCategory: QuestionCategory,
     emojiImageUrl: String,
+    candidates: List<QuestionUseCase.QuestionSheetCandidateResult>,
 ): QuestionUseCase.QuestionSheetResult {
     return QuestionUseCase.QuestionSheetResult(
         questionSheetId = questionSheetId,
@@ -374,14 +383,6 @@ private fun QuestionSheet.toQuestionSheetResult(
         questionContent = questionContent,
         questionCategory = questionCategory.name,
         questionEmojiImageUrl = emojiImageUrl,
-        candidates = candidates.map { it.toCandidateResult() }
-    )
-}
-
-private fun Candidate.toCandidateResult(): QuestionUseCase.QuestionSheetCandidateResult {
-    return QuestionUseCase.QuestionSheetCandidateResult(
-        candidateId = memberId,
-        memberName = memberName,
-        platform = platform.name
+        candidates = candidates
     )
 }

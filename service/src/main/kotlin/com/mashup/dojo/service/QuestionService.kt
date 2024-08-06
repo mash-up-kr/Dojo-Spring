@@ -8,11 +8,9 @@ import com.mashup.dojo.QuestionSetEntity
 import com.mashup.dojo.QuestionSetRepository
 import com.mashup.dojo.QuestionSheetEntity
 import com.mashup.dojo.QuestionSheetRepository
-import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberId
-import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
@@ -21,7 +19,6 @@ import com.mashup.dojo.domain.QuestionSet
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionSheetId
-import com.mashup.dojo.domain.QuestionSheetWithCandidatesId
 import com.mashup.dojo.domain.QuestionType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
@@ -52,7 +49,7 @@ interface QuestionService {
     fun getQuestionSheets(
         resolverId: MemberId,
         questionSetId: QuestionSetId,
-    ): List<QuestionSheetWithCandidatesId>
+    ): List<QuestionSheet>
 
     fun createQuestion(
         content: String,
@@ -137,7 +134,7 @@ class DefaultQuestionService(
     override fun getQuestionSheets(
         resolverId: MemberId,
         questionSetId: QuestionSetId,
-    ): List<QuestionSheetWithCandidatesId> {
+    ): List<QuestionSheet> {
         return questionSheetRepository.findAllByQuestionSetIdAndResolverId(questionSetId.value, resolverId.value)
             .map { it.toQuestionSheetWithCandidatesId() }
     }
@@ -267,10 +264,10 @@ class DefaultQuestionService(
                 resolverId = MemberId("1"),
                 candidates =
                     listOf(
-                        Candidate(MemberId("2"), "임준형", MemberPlatform.SPRING),
-                        Candidate(MemberId("3"), "한씨", MemberPlatform.SPRING),
-                        Candidate(MemberId("4"), "박씨", MemberPlatform.SPRING),
-                        Candidate(MemberId("5"), "오씨", MemberPlatform.SPRING)
+                        MemberId("2"),
+                        MemberId("3"),
+                        MemberId("4"),
+                        MemberId("5")
                     )
             )
 
@@ -355,8 +352,8 @@ private fun QuestionSetEntity.toQuestionSet(): QuestionSet {
     )
 }
 
-private fun QuestionSheetEntity.toQuestionSheetWithCandidatesId(): QuestionSheetWithCandidatesId {
-    return QuestionSheetWithCandidatesId(
+private fun QuestionSheetEntity.toQuestionSheetWithCandidatesId(): QuestionSheet {
+    return QuestionSheet(
         questionSheetId = QuestionSheetId(id),
         questionSetId = QuestionSetId(questionSetId),
         questionId = QuestionId(questionId),

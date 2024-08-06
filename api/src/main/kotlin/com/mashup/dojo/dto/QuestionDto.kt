@@ -81,6 +81,8 @@ data class QuestionSheetCandidate(
     val memberId: MemberId,
     @Schema(description = "후보자 이름")
     val memberName: String,
+    @Schema(description = "후보자 image url")
+    val memberImageUrl: String,
     @Schema(description = "후보자 플랫폼")
     val platform: String,
 )
