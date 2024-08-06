@@ -9,12 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class WebConfiguration : WebMvcConfigurer {
-    // override fun addCorsMappings(registry: CorsRegistry) {
-    //     registry.addMapping("/**")
-    //         .allowedOrigins("http://localhost:5173")
-    //         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-    // }
-
     @Bean
     fun corsFilter(): CorsFilter {
         val source = UrlBasedCorsConfigurationSource()
