@@ -262,7 +262,7 @@ class DefaultPickService(
         questionId: QuestionId,
         memberId: MemberId,
     ): Int {
-        return pickRepository.findPickDetailCount(questionId.value, memberId.value).toInt()
+        return pickRepository.findPickDetailCount(memberId = memberId.value, questionId = questionId.value).toInt()
     }
 
     override fun getNextPickTime(): LocalDateTime {
