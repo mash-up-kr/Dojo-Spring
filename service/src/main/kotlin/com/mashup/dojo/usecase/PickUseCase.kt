@@ -23,7 +23,6 @@ import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 interface PickUseCase {
     data class GetReceivedPickListCommand(
@@ -290,26 +289,10 @@ class DefaultPickUseCase(
     }
 
     override fun getNextPickTime(): LocalDateTime {
-        val currentTime = LocalDateTime.now(ZONE_ID)
-        val today = currentTime.toLocalDate()
-
-        val pickTimes = pickService.getPickTimes()
-
-        if (pickTimes.isEmpty()) {
-            throw DojoException.of(DojoExceptionType.ACTIVE_PICK_TIME_NOT_FOUND)
-        }
-
-        val nextPickTime =
-            pickTimes
-                .map { today.atTime(it) }
-                .firstOrNull { it.isAfter(currentTime) }
-
-        // 다음 투표 시간이 오늘 안에 있다면 반환, 아니면 내일 첫 투표 시간 반환
-        return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
+        return pickService.getNextPickTime()
     }
 
     companion object {
         private val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
-        private val ZONE_ID = ZoneId.of("Asia/Seoul")
     }
 }

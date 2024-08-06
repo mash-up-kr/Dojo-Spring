@@ -20,7 +20,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.time.LocalTime
+import java.time.ZoneId
 
 interface PickService {
     fun getReceivedPickList(
@@ -59,7 +59,7 @@ interface PickService {
         memberId: MemberId,
     ): Int
 
-    fun getPickTimes(): List<LocalTime>
+    fun getNextPickTime(): LocalDateTime
 }
 
 @Transactional(readOnly = true)
@@ -152,11 +152,28 @@ class DefaultPickService(
         return 10
     }
 
-    override fun getPickTimes(): List<LocalTime> {
-        return pickTimeRepository.findAllStartTimes()
+    override fun getNextPickTime(): LocalDateTime {
+        val currentTime = LocalDateTime.now(ZONE_ID)
+        val today = currentTime.toLocalDate()
+
+        val pickTimes = pickTimeRepository.findAllStartTimes()
+
+        if (pickTimes.isEmpty()) {
+            throw DojoException.of(DojoExceptionType.ACTIVE_PICK_TIME_NOT_FOUND)
+        }
+
+        val nextPickTime =
+            pickTimes
+                .map { today.atTime(it) }
+                .firstOrNull { it.isAfter(currentTime) }
+
+        // 다음 투표 시간이 오늘 안에 있다면 반환, 아니면 내일 첫 투표 시간 반환
+        return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
     }
 
     companion object {
+        private val ZONE_ID = ZoneId.of("Asia/Seoul")
+
         val DEFAULT_PICK =
             Pick(
                 id = PickId("pickmepickme"),

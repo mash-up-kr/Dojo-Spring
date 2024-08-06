@@ -69,7 +69,7 @@ interface QuestionUseCase {
 
     fun bulkCreate(commands: List<CreateCommand>): List<QuestionId>
 
-    fun createQuestionSet(): QuestionSet
+    fun createQuestionSet(): QuestionSetId
 
     fun createCustomQuestionSet(command: CreateQuestionSetCommand): QuestionSet
 
@@ -104,10 +104,12 @@ class DefaultQuestionUseCase(
     }
 
     @Transactional
-    override fun createQuestionSet(): QuestionSet {
-        // 직전에 발행된 QuestionSet 확인 및 후보에서 제외 (redis 조회 필요)
-        val currentQuestionSet = questionService.getOperatingQuestionSet()
-        return questionService.createQuestionSet(currentQuestionSet)
+    override fun createQuestionSet(): QuestionSetId {
+        // 가장 마지막에 만들어진 QSet 정보는 제외
+        val currentQuestionSet = questionService.getLatestPublishedQuestionSet()
+        val nextPickTime = pickService.getNextPickTime()
+
+        return questionService.createQuestionSet(excludedQuestionSet = currentQuestionSet, nextPickTime)
     }
 
     @Transactional

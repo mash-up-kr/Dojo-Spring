@@ -16,6 +16,8 @@ interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
 
     // publishedYn : True && publishedAt < now -> 발행 직전(예정) QuestionSet
     fun findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
+
+    fun findTopByOrderByPublishedAtDesc(): QuestionSetEntity?
 }
 
 @Entity

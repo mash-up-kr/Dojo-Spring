@@ -30,6 +30,7 @@ enum class DojoExceptionType(
     QUESTION_SET_NOT_EXIST("QuestionSet is not exist", "Q003_QUESTION_SET_NOT_READY", 400),
     QUESTION_NOT_EXIST("Question is not exist", "Q004_QUESTION_NOT_EXIST", 500),
     QUESTION_SHEET_NOT_EXIST("QuestionSheet is not exist", "Q005_QUESTION_SHEET_NOT_EXIST", 500),
+    QUESTION_LACK_FOR_CREATE_QUESTION_SET("Question is lack for creation QSet", "Q006_QUESTION_LACK", 500),
 
     // friend
     FRIEND_NOT_FOUND("Friend not found", "C070_FRIEND_NOT_FOUND", 400),
