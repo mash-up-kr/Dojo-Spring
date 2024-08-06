@@ -106,6 +106,7 @@ class PickRepositoryImpl(
                 pickEntity.pickedId.eq(memberId),
                 pickEntity.questionId.eq(questionId)
             )
+            .orderBy(pickEntity.createdAt.desc())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
