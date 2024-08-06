@@ -107,7 +107,9 @@ class DefaultQuestionUseCase(
     override fun createQuestionSet(): QuestionSetId {
         // 가장 마지막에 만들어진 QSet 정보는 제외
         val currentQuestionSet = questionService.getLatestPublishedQuestionSet()
-        return questionService.createQuestionSet(excludedQuestionSet = currentQuestionSet)
+        val nextPickTime = pickService.getNextPickTime()
+
+        return questionService.createQuestionSet(excludedQuestionSet = currentQuestionSet, nextPickTime)
     }
 
     @Transactional

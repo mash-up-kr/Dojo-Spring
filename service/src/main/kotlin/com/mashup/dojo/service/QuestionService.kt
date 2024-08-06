@@ -61,7 +61,10 @@ interface QuestionService {
         emojiImageId: ImageId,
     ): QuestionId
 
-    fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId
+    fun createQuestionSet(
+        excludedQuestionSet: QuestionSet?,
+        publishedAt: LocalDateTime,
+    ): QuestionSetId
 
     fun createQuestionSet(
         questionIds: List<QuestionId>,
@@ -140,7 +143,10 @@ class DefaultQuestionService(
     }
 
     @Transactional
-    override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId {
+    override fun createQuestionSet(
+        excludedQuestionSet: QuestionSet?,
+        publishedAt: LocalDateTime,
+    ): QuestionSetId {
         // 비율에 따라 questionType 선정
         val friendQuestionSize = floor(questionSetSize * friendQuestionRatio).toInt()
         val excludedQuestionIds: List<String> = excludedQuestionSet?.questionIds?.map { it.questionId.value } ?: emptyList()
@@ -169,12 +175,13 @@ class DefaultQuestionService(
                 QuestionOrder(questionId = question.id, order = index)
             }
 
-        // 다음 발행 시간은 어디서 가져오지?
-        // todo: QSet에서 publishedAt 이 가장 큰 녀석 가져온 후 해당 publishedAt 보다 큰 startTime 을 가진 PickTime 정보 가져옴  (fix publishedAt)
+        // 우선 만들어지는 시점이 다음 투표 이전에 만들어질 QSet 을 만든다고 가정, 따라서 해당 QSet 은 바로 다음 발행될 QSet
+        // todo: QSet에서 publishedAt 이 가장 큰 녀석 가져온 후 해당 publishedAt 보다 큰 startTime 을 가진 PickTime 정보 가져옴
+        //  (fix publishedAt) 현재 PickTime Entity 는 LocalTime 으로 저장되고 있음. LocalDateTime 이어야 위 가정이 유효
         val questionSetEntity =
             QuestionSet.create(
                 questionOrders = questionOrders,
-                publishedAt = LocalDateTime.of(2099, 1, 1, 1, 1, 0)
+                publishedAt = publishedAt
             ).toEntity()
 
         val id = questionSetRepository.save(questionSetEntity).id
