@@ -1,7 +1,5 @@
 package com.mashup.dojo.usecase
 
-import com.mashup.dojo.DojoException
-import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
