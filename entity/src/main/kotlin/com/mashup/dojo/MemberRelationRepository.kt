@@ -43,6 +43,11 @@ interface MemberRelationQueryRepository {
     fun findFriendsByFromId(fromId: String): List<String>
 
     fun findAccompanyByFromId(fromId: String): List<String>
+
+    fun isFriend(
+        fromId: String,
+        toId: String,
+    ): Boolean
 }
 
 class MemberRelationQueryRepositoryImpl(
@@ -66,6 +71,25 @@ class MemberRelationQueryRepositoryImpl(
 
     override fun findAccompanyByFromId(fromId: String): List<String> {
         return findByFromIdAndRelationType(fromId, RelationType.ACCOMPANY)
+    }
+
+    override fun isFriend(
+        fromId: String,
+        toId: String,
+    ): Boolean {
+        val memberRelationEntity = QMemberRelationEntity.memberRelationEntity
+
+        val findMemberRelation =
+            jpaQueryFactory
+                .selectFrom(memberRelationEntity)
+                .where(
+                    memberRelationEntity.fromId.eq(fromId),
+                    memberRelationEntity.toId.eq(toId),
+                    memberRelationEntity.relationType.eq(RelationType.FRIEND)
+                )
+                .fetchOne()
+
+        return findMemberRelation != null
     }
 
     private fun findByFromIdAndRelationType(
