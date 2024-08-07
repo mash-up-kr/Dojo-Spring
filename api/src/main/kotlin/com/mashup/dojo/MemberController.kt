@@ -79,7 +79,7 @@ class MemberController(
     @GetMapping("/member")
     @Operation(
         summary = "타인 멤버 프로필 조회 API",
-        description = "멤버의 프로필을 조회하는 API.",
+        description = "멤버의 프로필을 조회하는 API."
     )
     fun getProfile(
         @RequestParam memberId: String,
