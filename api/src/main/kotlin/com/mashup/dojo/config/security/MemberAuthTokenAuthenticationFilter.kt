@@ -53,6 +53,9 @@ class MemberAuthTokenAuthenticationFilter(
     ) {
         response.status = error.httpStatusCode
         response.contentType = "application/json"
+        response.setHeader("Access-Control-Allow-Origin", "*")
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type")
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
         val dojoResponse =
             DojoApiResponse(
