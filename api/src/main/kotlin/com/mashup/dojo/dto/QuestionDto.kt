@@ -39,6 +39,8 @@ data class QuestionSetCustomCreateRequest(
     val questionIds: List<QuestionId>,
     @Schema(description = "질문지 세트를 발행할 시각")
     val publishedAt: LocalDateTime,
+    @Schema(description = "질문지 세트를 종료할 시각")
+    val endAt: LocalDateTime,
 )
 
 @Schema(description = "질문지 (투표 용지) 한 다스 조회 응답")

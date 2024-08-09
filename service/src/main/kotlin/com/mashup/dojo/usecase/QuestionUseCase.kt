@@ -34,6 +34,7 @@ interface QuestionUseCase {
     data class CreateQuestionSetCommand(
         val questionIdList: List<QuestionId>,
         val publishedAt: LocalDateTime,
+        val endAt: LocalDateTime,
     )
 
     data class GetQuestionSheetsResult(
@@ -105,15 +106,14 @@ class DefaultQuestionUseCase(
     @Transactional
     override fun createQuestionSet(): QuestionSetId {
         // 가장 마지막에 만들어진 QSet 정보는 제외
-        val currentQuestionSet = questionService.getLatestPublishedQuestionSet()
-        val nextPickTime = pickService.getNextPickTime()
+        val latestQSet = questionService.getLatestPublishedQuestionSet()
 
-        return questionService.createQuestionSet(excludedQuestionSet = currentQuestionSet, nextPickTime)
+        return questionService.createQuestionSet(excludedQuestionSet = latestQSet)
     }
 
     @Transactional
     override fun createCustomQuestionSet(command: QuestionUseCase.CreateQuestionSetCommand): QuestionSet {
-        return questionService.createQuestionSet(command.questionIdList, command.publishedAt)
+        return questionService.createQuestionSet(command.questionIdList, command.publishedAt, command.endAt)
     }
 
     @Transactional

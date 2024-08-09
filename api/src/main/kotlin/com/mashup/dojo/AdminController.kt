@@ -77,7 +77,7 @@ class AdminController(
         request.questionIds
         val customQuestionSet =
             questionUseCase.createCustomQuestionSet(
-                QuestionUseCase.CreateQuestionSetCommand(request.questionIds, request.publishedAt)
+                QuestionUseCase.CreateQuestionSetCommand(request.questionIds, request.publishedAt, request.endAt)
             )
 
         return DojoApiResponse.success(customQuestionSet.id)

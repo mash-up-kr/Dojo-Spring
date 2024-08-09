@@ -5,6 +5,8 @@ import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
@@ -29,10 +31,19 @@ class QuestionSetEntity(
     @Column(name = "question_ids", nullable = false)
     val questionIds: List<String>,
     @Column(name = "published_yn", nullable = false)
-    val publishedYn: Boolean = false,
+    @Enumerated(EnumType.STRING)
+    val status: Status,
     @Column(name = "published_at", nullable = false)
     val publishedAt: LocalDateTime,
+    @Column(name = "end_at", nullable = false)
+    val endAt: LocalDateTime,
 ) : BaseEntity()
+
+enum class Status {
+    TERMINATED, // 종료
+    ACTIVE, // 운영중
+    UPCOMING, // 예정
+}
 
 class QuestionIdConverter : AttributeConverter<List<String>, String> {
     override fun convertToDatabaseColumn(attribute: List<String>): String {
