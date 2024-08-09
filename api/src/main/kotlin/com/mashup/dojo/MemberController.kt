@@ -5,6 +5,7 @@ import com.mashup.dojo.config.security.JwtTokenService
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberLoginRequest
+import com.mashup.dojo.dto.MemberProfileResponse
 import com.mashup.dojo.dto.MemberUpdateRequest
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.usecase.MemberUseCase
@@ -12,6 +13,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -71,6 +73,30 @@ class MemberController(
         val member = memberService.findMemberById(id) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
         val authToken = jwtTokenService.createToken(id)
         return DojoApiResponse.success(MemberLoginResponse(id, authToken.credentials))
+    }
+
+    @GetMapping("/member/{memberId}")
+    @Operation(
+        summary = "타인 멤버 프로필 조회 API",
+        description = "멤버의 프로필을 조회하는 API."
+    )
+    fun getProfile(
+        @PathVariable memberId: String,
+    ): DojoApiResponse<MemberProfileResponse> {
+        val profileResponse = memberUseCase.findMemberById(MemberId(memberId))
+
+        return DojoApiResponse.success(
+            MemberProfileResponse(
+                memberId = profileResponse.memberId.value,
+                profileImageUrl = profileResponse.profileImageUrl,
+                memberName = profileResponse.memberName,
+                platform = profileResponse.platform,
+                ordinal = profileResponse.ordinal,
+                isFriend = profileResponse.isFriend,
+                pickCount = profileResponse.pickCount,
+                friendCount = profileResponse.friendCount
+            )
+        )
     }
 
     @PatchMapping("/member/{id}")

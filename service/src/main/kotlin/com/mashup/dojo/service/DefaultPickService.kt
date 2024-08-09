@@ -59,6 +59,8 @@ interface PickService {
         memberId: MemberId,
     ): Int
 
+    fun findPickCountByMemberId(memberId: MemberId): Int
+
     fun getNextPickTime(): LocalDateTime
 
     fun getAnyOpenPickerCount(
@@ -268,6 +270,10 @@ class DefaultPickService(
         memberId: MemberId,
     ): Int {
         return pickRepository.findPickDetailCount(memberId = memberId.value, questionId = questionId.value).toInt()
+    }
+
+    override fun findPickCountByMemberId(memberId: MemberId): Int {
+        return pickRepository.findPickCountByMemberId(memberId = memberId.value).toInt()
     }
 
     override fun getNextPickTime(): LocalDateTime {

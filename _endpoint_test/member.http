@@ -17,3 +17,6 @@ Content-Type: application/json
 {
     "id": "df34d054-4534-4623-8996-9016162c430b"
 }
+
+### 타인 프로필 조회 API
+GET {{host}}/member/{{memberId}}}
