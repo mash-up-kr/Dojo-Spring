@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface MemberRelationService {
-    fun getAllRelationShip(fromId: String): List<MemberId>
+    fun getAllRelationShip(fromId: MemberId): List<MemberId>
 
-    fun getFriendRelationIds(fromId: String): List<MemberId>
+    fun getFriendRelationIds(fromId: MemberId): List<MemberId>
 
-    fun getAccompanyRelationIds(fromId: String): List<MemberId>
+    fun getAccompanyRelationIds(fromId: MemberId): List<MemberId>
 
     fun createRelation(
         fromId: MemberId,
@@ -27,6 +27,11 @@ interface MemberRelationService {
         fromId: String,
         toId: String,
     )
+
+    fun isFriend(
+        fromId: MemberId,
+        toId: MemberId,
+    ): Boolean
 }
 
 @Service
@@ -34,16 +39,16 @@ interface MemberRelationService {
 class DefaultMemberRelationService(
     private val memberRelationRepository: MemberRelationRepository,
 ) : MemberRelationService {
-    override fun getAllRelationShip(fromId: String): List<MemberId> {
-        return memberRelationRepository.findByFromId(fromId).map { MemberId(it) }
+    override fun getAllRelationShip(fromId: MemberId): List<MemberId> {
+        return memberRelationRepository.findByFromId(fromId.value).map { MemberId(it) }
     }
 
-    override fun getFriendRelationIds(fromId: String): List<MemberId> {
-        return memberRelationRepository.findFriendsByFromId(fromId).map { MemberId(it) }
+    override fun getFriendRelationIds(fromId: MemberId): List<MemberId> {
+        return memberRelationRepository.findFriendsByFromId(fromId.value).map { MemberId(it) }
     }
 
-    override fun getAccompanyRelationIds(fromId: String): List<MemberId> {
-        return memberRelationRepository.findAccompanyByFromId(fromId).map { MemberId(it) }
+    override fun getAccompanyRelationIds(fromId: MemberId): List<MemberId> {
+        return memberRelationRepository.findAccompanyByFromId(fromId.value).map { MemberId(it) }
     }
 
     @Transactional
@@ -66,6 +71,13 @@ class DefaultMemberRelationService(
         }
         val updatedRelation = toDomain.updateToFriend()
         memberRelationRepository.save(updatedRelation.toEntity())
+    }
+
+    override fun isFriend(
+        fromId: MemberId,
+        toId: MemberId,
+    ): Boolean {
+        return memberRelationRepository.isFriend(fromId = fromId.value, toId = toId.value)
     }
 }
 
