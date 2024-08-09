@@ -171,23 +171,23 @@ class PickRepositoryImpl(
 }
 
 data class PickEntityMapper
-@QueryProjection
-constructor(
-    val pickId: String,
-    val questionId: String,
-    val questionSetId: String,
-    val questionSheetId: String,
-    val pickerId: String,
-    val pickedId: String,
-    val isGenderOpen: Boolean,
-    val isPlatformOpen: Boolean,
-    val isMidInitialNameOpen: Boolean,
-    val isFullNameOpen: Boolean,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
-    val pickerOrdinal: Int,
-    val pickerGender: String,
-    val pickerPlatform: String,
-    val pickerSecondInitialName: String,
-    val pickerFullName: String,
-)
+    @QueryProjection
+    constructor(
+        val pickId: String,
+        val questionId: String,
+        val questionSetId: String,
+        val questionSheetId: String,
+        val pickerId: String,
+        val pickedId: String,
+        val isGenderOpen: Boolean,
+        val isPlatformOpen: Boolean,
+        val isMidInitialNameOpen: Boolean,
+        val isFullNameOpen: Boolean,
+        val createdAt: LocalDateTime,
+        val updatedAt: LocalDateTime,
+        val pickerOrdinal: Int,
+        val pickerGender: String,
+        val pickerPlatform: String,
+        val pickerSecondInitialName: String,
+        val pickerFullName: String,
+    )
