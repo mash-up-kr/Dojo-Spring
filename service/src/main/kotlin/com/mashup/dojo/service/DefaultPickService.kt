@@ -275,7 +275,7 @@ class DefaultPickService(
     override fun findPickCountByMemberId(memberId: MemberId): Int {
         return pickRepository.findPickCountByMemberId(memberId = memberId.value).toInt()
     }
-    
+
     override fun getNextPickTime(): LocalDateTime {
         val currentTime = LocalDateTime.now(ZONE_ID)
         val today = currentTime.toLocalDate()
