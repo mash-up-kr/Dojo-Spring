@@ -76,8 +76,10 @@ class PickController(
         @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
         @RequestParam(required = false, defaultValue = "10") pageSize: Int,
     ): DojoApiResponse<PickPaging> {
+        // ToDo 추후 실제 사용자로 변경
+        val currentMember = MemberId("1")
         val pickPaging: PickUseCase.GetPagingPick =
-            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(MemberId("1"), QuestionId(questionId), pageNumber, pageSize))
+            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(currentMember, QuestionId(questionId), pageNumber, pageSize))
 
         val pickDetails =
             pickPaging.picks.map {
@@ -103,6 +105,7 @@ class PickController(
                 questionContent = pickPaging.questionContent,
                 questionEmojiImageUrl = pickPaging.questionEmojiImageUrl,
                 totalReceivedPickCount = pickPaging.totalReceivedPickCount,
+                anyOpenPickerCount = pickPaging.anyOpenPickerCount,
                 picks = pickDetails,
                 totalPage = pickPaging.totalPage,
                 totalElements = pickPaging.totalElements,

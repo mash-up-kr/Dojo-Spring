@@ -2,6 +2,7 @@ package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseTimeEntity
 import com.querydsl.core.annotations.QueryProjection
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Wildcard
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
@@ -53,6 +54,11 @@ interface PickRepositoryCustom {
     fun findPickDetailCount(
         memberId: String,
         questionId: String,
+    ): Long
+
+    fun getOpenPickerCount(
+        questionId: String,
+        memberId: String,
     ): Long
 }
 
@@ -125,6 +131,29 @@ class PickRepositoryImpl(
                 pickEntity.questionId.eq(questionId)
             )
             .fetchOne() ?: 0
+    }
+
+    override fun getOpenPickerCount(
+        questionId: String,
+        memberId: String,
+    ): Long {
+        val pickEntity = QPickEntity.pickEntity
+        return jpaQueryFactory
+            .select(Wildcard.count)
+            .from(pickEntity)
+            .where(
+                pickEntity.questionId.eq(questionId),
+                pickEntity.pickedId.eq(memberId),
+                isAnyOpen(pickEntity)
+            )
+            .fetchOne() ?: 0
+    }
+
+    private fun isAnyOpen(pickEntity: QPickEntity): BooleanExpression? {
+        return pickEntity.isGenderOpen
+            .or(pickEntity.isPlatformOpen)
+            .or(pickEntity.isMidInitialNameOpen)
+            .or(pickEntity.isFullNameOpen)
     }
 }
 

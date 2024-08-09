@@ -61,6 +61,11 @@ interface PickService {
 
     fun getNextPickTime(): LocalDateTime
 
+    fun getAnyOpenPickerCount(
+        questionId: QuestionId,
+        memberId: MemberId,
+    ): Int
+
     data class GetPagingPick(
         val picks: List<GetReceivedPickDetail>,
         val totalPage: Int,
@@ -282,6 +287,13 @@ class DefaultPickService(
 
         // 다음 투표 시간이 오늘 안에 있다면 반환, 아니면 내일 첫 투표 시간 반환
         return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
+    }
+
+    override fun getAnyOpenPickerCount(
+        questionId: QuestionId,
+        memberId: MemberId,
+    ): Int {
+        return pickRepository.getOpenPickerCount(questionId.value, memberId.value).toInt()
     }
 
     companion object {

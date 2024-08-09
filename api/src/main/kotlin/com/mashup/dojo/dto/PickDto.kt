@@ -46,6 +46,7 @@ data class PickPaging(
     val questionContent: String,
     val questionEmojiImageUrl: String,
     val totalReceivedPickCount: Int,
+    val anyOpenPickerCount: Int,
     val picks: List<ReceivedPickDetail>,
     val totalPage: Int,
     val totalElements: Long,
