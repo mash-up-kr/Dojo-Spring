@@ -5,7 +5,9 @@ import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.PickEntity
 import com.mashup.dojo.PickRepository
 import com.mashup.dojo.PickTimeRepository
+import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
@@ -13,8 +15,6 @@ import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -48,18 +48,47 @@ interface PickService {
     ): String
 
     fun getPickPaging(
-        id: QuestionId,
+        questionId: QuestionId,
         memberId: MemberId,
         pageNumber: Int,
         pageSize: Int,
-    ): Page<Pick>
+    ): GetPagingPick
 
     fun getPickCount(
-        id: QuestionId,
+        questionId: QuestionId,
         memberId: MemberId,
     ): Int
 
     fun getNextPickTime(): LocalDateTime
+
+    fun getAnyOpenPickerCount(
+        questionId: QuestionId,
+        memberId: MemberId,
+    ): Int
+
+    data class GetPagingPick(
+        val picks: List<GetReceivedPickDetail>,
+        val totalPage: Int,
+        val totalElements: Long,
+        val isFirst: Boolean,
+        val isLast: Boolean,
+    )
+
+    data class GetReceivedPickDetail(
+        val pickId: PickId,
+        val pickerOrdinal: Int,
+        val pickerIdOpen: Boolean,
+        val pickerId: MemberId,
+        val pickerGenderOpen: Boolean,
+        val pickerGender: MemberGender,
+        val pickerPlatformOpen: Boolean,
+        val pickerPlatform: MemberPlatform,
+        val pickerSecondInitialNameOpen: Boolean,
+        val pickerSecondInitialName: String,
+        val pickerFullNameOpen: Boolean,
+        val pickerFullName: String,
+        val latestPickedAt: LocalDateTime,
+    )
 }
 
 @Transactional(readOnly = true)
@@ -135,21 +164,110 @@ class DefaultPickService(
     }
 
     override fun getPickPaging(
-        id: QuestionId,
+        questionId: QuestionId,
         memberId: MemberId,
         pageNumber: Int,
         pageSize: Int,
-    ): Page<Pick> {
+    ): PickService.GetPagingPick {
         val pageable = PageRequest.of(pageNumber, pageSize)
-        return PageImpl(SAMPLE_PICK_LIST, pageable, 1L)
+        val pagingPick = pickRepository.findPickDetailPaging(memberId = memberId.value, questionId = questionId.value, pageable = pageable)
+
+        val receivedPickDetails =
+            pagingPick.content.map { pickEntity ->
+
+                val genderOpen = pickEntity.isGenderOpen
+                val platformOpen = pickEntity.isPlatformOpen
+                val secondInitialNameOpen = pickEntity.isMidInitialNameOpen
+                val fullNameOpen = pickEntity.isFullNameOpen
+                val pickerIdOpen = fullNameOpen && genderOpen && platformOpen && secondInitialNameOpen
+
+                val pickerId = transformPickerId(isOpen = pickerIdOpen, pickerId = MemberId(pickEntity.pickerId))
+                val pickerGender = transformPickerGender(isOpen = genderOpen, pickerGender = MemberGender.findByValue(pickEntity.pickerGender))
+                val pickerPlatform = transformPickerPlatform(isOpen = platformOpen, pickerPlatform = MemberPlatform.findByValue(pickEntity.pickerPlatform))
+                val pickerSecondInitialName = transformPickerSecondInitialName(isOpen = secondInitialNameOpen, secondInitialName = pickEntity.pickerSecondInitialName)
+                val pickerFullName = transformPickerFullName(isOpen = fullNameOpen, fullName = pickEntity.pickerFullName)
+
+                PickService.GetReceivedPickDetail(
+                    pickId = PickId(pickEntity.pickId),
+                    pickerOrdinal = pickEntity.pickerOrdinal,
+                    pickerIdOpen = pickerIdOpen,
+                    pickerId = pickerId,
+                    pickerGenderOpen = genderOpen,
+                    pickerGender = pickerGender,
+                    pickerPlatformOpen = platformOpen,
+                    pickerPlatform = pickerPlatform,
+                    pickerSecondInitialNameOpen = secondInitialNameOpen,
+                    pickerSecondInitialName = pickerSecondInitialName,
+                    pickerFullNameOpen = fullNameOpen,
+                    pickerFullName = pickerFullName,
+                    latestPickedAt = pickEntity.createdAt
+                )
+            }
+
+        return PickService.GetPagingPick(
+            picks = receivedPickDetails,
+            totalPage = pagingPick.totalPages,
+            totalElements = pagingPick.totalElements,
+            isFirst = pagingPick.isFirst,
+            isLast = pagingPick.isLast
+        )
+    }
+
+    fun transformPickerId(
+        isOpen: Boolean,
+        pickerId: MemberId,
+    ): MemberId {
+        if (isOpen) {
+            return pickerId
+        }
+        return MemberId(UNKNOWN)
+    }
+
+    fun transformPickerGender(
+        isOpen: Boolean,
+        pickerGender: MemberGender,
+    ): MemberGender {
+        if (isOpen) {
+            return pickerGender
+        }
+        return MemberGender.UNKNOWN
+    }
+
+    fun transformPickerPlatform(
+        isOpen: Boolean,
+        pickerPlatform: MemberPlatform,
+    ): MemberPlatform {
+        if (isOpen) {
+            return pickerPlatform
+        }
+        return MemberPlatform.UNKNOWN
+    }
+
+    fun transformPickerSecondInitialName(
+        isOpen: Boolean,
+        secondInitialName: String,
+    ): String {
+        if (isOpen) {
+            return secondInitialName
+        }
+        return UNKNOWN
+    }
+
+    fun transformPickerFullName(
+        isOpen: Boolean,
+        fullName: String,
+    ): String {
+        if (isOpen) {
+            return fullName
+        }
+        return UNKNOWN
     }
 
     override fun getPickCount(
-        id: QuestionId,
+        questionId: QuestionId,
         memberId: MemberId,
     ): Int {
-        // ToDo Pick getCount
-        return 10
+        return pickRepository.findPickDetailCount(memberId = memberId.value, questionId = questionId.value).toInt()
     }
 
     override fun getNextPickTime(): LocalDateTime {
@@ -171,6 +289,13 @@ class DefaultPickService(
         return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
     }
 
+    override fun getAnyOpenPickerCount(
+        questionId: QuestionId,
+        memberId: MemberId,
+    ): Int {
+        return pickRepository.getOpenPickerCount(questionId.value, memberId.value).toInt()
+    }
+
     companion object {
         private val ZONE_ID = ZoneId.of("Asia/Seoul")
 
@@ -189,39 +314,8 @@ class DefaultPickService(
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
             )
-//        private fun PickEntity.buildDomain(): Pick {
-//            return Pick(
-//                id = PickId("pickmepickme"),
-//                questionId = QuestionId("question"),
-//                pickerId = MemberId("뽑은놈"),
-//                pickedId = MemberId("뽑힌놈"),
-//                isGenderOpen = false,
-//                isPlatformOpen = false,
-//                isMidInitialNameOpen = false,
-//                isFullNameOpen = false,
-//                createdAt = createdAt,
-//                updatedAt = updatedAt,
-//            )
-//        }
 
-        val SAMPLE_PICK_LIST: List<Pick>
-            get() = listOf(this.SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK, SAMPLE_PICK)
-
-        private val SAMPLE_PICK =
-            Pick(
-                id = PickId("SAMPLE_PICK_ID"),
-                questionId = QuestionId("SAMPLE_QUESTION_ID"),
-                questionSetId = QuestionSetId("questionSetId"),
-                questionSheetId = QuestionSheetId("questionSheetId"),
-                pickerId = MemberId("SAMPLE_MEMBER_ID"),
-                pickedId = MemberId("SAMPLE_MEMBER_ID"),
-                isGenderOpen = true,
-                isPlatformOpen = true,
-                isMidInitialNameOpen = true,
-                isFullNameOpen = true,
-                createdAt = LocalDateTime.MIN,
-                updatedAt = LocalDateTime.now()
-            )
+        private const val UNKNOWN = "UNKNOWN"
     }
 }
 

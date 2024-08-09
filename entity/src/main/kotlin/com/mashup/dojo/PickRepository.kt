@@ -1,13 +1,21 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseTimeEntity
+import com.querydsl.core.annotations.QueryProjection
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.Wildcard
+import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 
-interface PickRepository : JpaRepository<PickEntity, String> {
+interface PickRepository : JpaRepository<PickEntity, String>, PickRepositoryCustom {
     fun findAllByPickedId(pickedId: String): List<PickEntity>
 }
 
@@ -35,3 +43,138 @@ class PickEntity(
     @Column(name = "is_full_name_open")
     val isFullNameOpen: Boolean = false,
 ) : BaseTimeEntity()
+
+interface PickRepositoryCustom {
+    fun findPickDetailPaging(
+        memberId: String,
+        questionId: String,
+        pageable: Pageable,
+    ): Page<PickEntityMapper>
+
+    fun findPickDetailCount(
+        memberId: String,
+        questionId: String,
+    ): Long
+
+    fun getOpenPickerCount(
+        questionId: String,
+        memberId: String,
+    ): Long
+}
+
+class PickRepositoryImpl(
+    private val jpaQueryFactory: JPAQueryFactory,
+) : PickRepositoryCustom {
+    override fun findPickDetailPaging(
+        memberId: String,
+        questionId: String,
+        pageable: Pageable,
+    ): Page<PickEntityMapper> {
+        val picks = findPickDetailContent(memberId = memberId, questionId = questionId, pageable = pageable)
+        val count = findPickDetailCount(memberId = memberId, questionId = questionId)
+
+        return PageImpl(picks, pageable, count)
+    }
+
+    private fun findPickDetailContent(
+        memberId: String,
+        questionId: String,
+        pageable: Pageable,
+    ): List<PickEntityMapper> {
+        val pickEntity = QPickEntity.pickEntity
+        val memberEntity = QMemberEntity.memberEntity
+
+        return jpaQueryFactory
+            .select(
+                QPickEntityMapper(
+                    pickEntity.id,
+                    pickEntity.questionId,
+                    pickEntity.questionSetId,
+                    pickEntity.questionSheetId,
+                    pickEntity.pickerId,
+                    pickEntity.pickedId,
+                    pickEntity.isGenderOpen,
+                    pickEntity.isPlatformOpen,
+                    pickEntity.isMidInitialNameOpen,
+                    pickEntity.isFullNameOpen,
+                    pickEntity.createdAt,
+                    pickEntity.updatedAt,
+                    memberEntity.ordinal,
+                    memberEntity.gender,
+                    memberEntity.platform,
+                    memberEntity.secondInitialName,
+                    memberEntity.fullName
+                )
+            )
+            .from(pickEntity)
+            .join(memberEntity).on(pickEntity.pickerId.eq(memberEntity.id))
+            .where(
+                pickEntity.pickedId.eq(memberId),
+                pickEntity.questionId.eq(questionId)
+            )
+            .orderBy(pickEntity.createdAt.desc())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+    }
+
+    override fun findPickDetailCount(
+        memberId: String,
+        questionId: String,
+    ): Long {
+        val pickEntity = QPickEntity.pickEntity
+        return jpaQueryFactory
+            .select(Wildcard.count)
+            .from(pickEntity)
+            .where(
+                pickEntity.pickedId.eq(memberId),
+                pickEntity.questionId.eq(questionId)
+            )
+            .fetchOne() ?: 0
+    }
+
+    override fun getOpenPickerCount(
+        questionId: String,
+        memberId: String,
+    ): Long {
+        val pickEntity = QPickEntity.pickEntity
+        return jpaQueryFactory
+            .select(Wildcard.count)
+            .from(pickEntity)
+            .where(
+                pickEntity.questionId.eq(questionId),
+                pickEntity.pickedId.eq(memberId),
+                isAnyOpen(pickEntity)
+            )
+            .fetchOne() ?: 0
+    }
+
+    private fun isAnyOpen(pickEntity: QPickEntity): BooleanExpression? {
+        return pickEntity.isGenderOpen
+            .or(pickEntity.isPlatformOpen)
+            .or(pickEntity.isMidInitialNameOpen)
+            .or(pickEntity.isFullNameOpen)
+    }
+}
+
+data class PickEntityMapper
+    @QueryProjection
+    constructor(
+        val pickId: String,
+        val questionId: String,
+        val questionSetId: String,
+        val questionSheetId: String,
+        val pickerId: String,
+        val pickedId: String,
+        val isGenderOpen: Boolean,
+        val isPlatformOpen: Boolean,
+        val isMidInitialNameOpen: Boolean,
+        val isFullNameOpen: Boolean,
+        val createdAt: LocalDateTime,
+        val updatedAt: LocalDateTime,
+        val pickerOrdinal: Int,
+        val pickerGender: String,
+        val pickerPlatform: String,
+        val pickerSecondInitialName: String,
+        val pickerFullName: String,
+    )
