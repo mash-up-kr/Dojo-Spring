@@ -14,10 +14,16 @@ import java.time.LocalDateTime
 
 interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
     // publishedYn : True && publishedAt > now -> 현재 운영중인 QuestionSet
-    fun findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
+    fun findByPublishedAtAfterAndEndAtBefore(
+        publishedCompareTime: LocalDateTime = LocalDateTime.now(),
+        endTimeCompareTime: LocalDateTime = LocalDateTime.now(),
+    ): QuestionSetEntity?
 
     // publishedYn : True && publishedAt < now -> 발행 직전(예정) QuestionSet
-    fun findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
+    fun findByStatusAndPublishedAtAfter(
+        status: Status,
+        compareTime: LocalDateTime = LocalDateTime.now(),
+    ): QuestionSetEntity?
 
     fun findTopByOrderByPublishedAtDesc(): QuestionSetEntity?
 }
