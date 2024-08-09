@@ -30,9 +30,9 @@ class WebConfiguration : WebMvcConfigurer {
         config.addAllowedMethod("OPTIONS")
         config.addExposedHeader("Authorization")
         source.registerCorsConfiguration("/**", config)
-        
+
         // CORS 필터 우선순위 최상단 설정
-        return FilterRegistrationBean(CorsFilter(source)).apply { 
+        return FilterRegistrationBean(CorsFilter(source)).apply {
             order = Int.MIN_VALUE
         }
     }
