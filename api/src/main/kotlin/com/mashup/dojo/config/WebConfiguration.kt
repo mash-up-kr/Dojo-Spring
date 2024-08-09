@@ -1,5 +1,6 @@
 package com.mashup.dojo.config
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.cors.CorsConfiguration
@@ -10,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebConfiguration : WebMvcConfigurer {
     @Bean
-    fun corsFilter(): CorsFilter {
+    fun corsFilter(): FilterRegistrationBean<CorsFilter> {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
@@ -29,6 +30,10 @@ class WebConfiguration : WebMvcConfigurer {
         config.addAllowedMethod("OPTIONS")
         config.addExposedHeader("Authorization")
         source.registerCorsConfiguration("/**", config)
-        return CorsFilter(source)
+        
+        // CORS 필터 우선순위 최상단 설정
+        return FilterRegistrationBean(CorsFilter(source)).apply { 
+            order = Int.MIN_VALUE
+        }
     }
 }
