@@ -212,50 +212,50 @@ class DefaultPickService(
         isOpen: Boolean,
         pickerId: MemberId,
     ): MemberId {
-        return when (isOpen) {
-            true -> pickerId
-            false -> MemberId(UNKNOWN)
+        if (isOpen) {
+            return pickerId
         }
+        return MemberId(UNKNOWN)
     }
 
     fun transformPickerGender(
         isOpen: Boolean,
         pickerGender: MemberGender,
     ): MemberGender {
-        return when (isOpen) {
-            true -> pickerGender
-            false -> MemberGender.UNKNOWN
+        if (isOpen) {
+            return pickerGender
         }
+        return MemberGender.UNKNOWN
     }
 
     fun transformPickerPlatform(
         isOpen: Boolean,
         pickerPlatform: MemberPlatform,
     ): MemberPlatform {
-        return when (isOpen) {
-            true -> pickerPlatform
-            false -> MemberPlatform.UNKNOWN
+        if (isOpen) {
+            return pickerPlatform
         }
+        return MemberPlatform.UNKNOWN
     }
 
     fun transformPickerSecondInitialName(
         isOpen: Boolean,
         secondInitialName: String,
     ): String {
-        return when (isOpen) {
-            true -> secondInitialName
-            false -> UNKNOWN
+        if (isOpen) {
+            return secondInitialName
         }
+        return UNKNOWN
     }
 
     fun transformPickerFullName(
         isOpen: Boolean,
         fullName: String,
     ): String {
-        return when (isOpen) {
-            true -> fullName
-            false -> UNKNOWN
+        if (isOpen) {
+            return fullName
         }
+        return UNKNOWN
     }
 
     override fun getPickCount(
