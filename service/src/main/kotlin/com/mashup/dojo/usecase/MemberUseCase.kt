@@ -1,5 +1,7 @@
 package com.mashup.dojo.usecase
 
+import com.mashup.dojo.DojoException
+import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
@@ -83,46 +85,34 @@ class DefaultMemberUseCase(
 
     override fun findMemberById(targetMemberId: MemberId): MemberUseCase.ProfileResponse {
         // ToDo 현재 프로필 조회시 query 5번 호출되는데 나중에 수정할 것인지
-        // ToDo 추후에 데이터 넣은 후 주석 해제, 현재 MockData 반환
 
-        // val findMember =
-        //     memberService.findMemberById(targetMemberId)
-        //         ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID $targetMemberId")
-        //
-        // val profileImageId = findMember.profileImageId ?: ImageId("defaultImageUrl")
-        // val profileImageUrl = (
-        //     imageService.load(profileImageId)?.url
-        //         ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [$profileImageId}]")
-        // )
-        //
-        // val pickCountByMemberId = pickService.findPickCountByMemberId(findMember.id)
-        //
-        // // ToDo 실제 사용자 가져와야함
-        // val currentMemberId = "currentMemberId"
-        //
-        // val isFriend = memberRelationService.isFriend(MemberId(currentMemberId), targetMemberId)
-        // val friendCount = memberRelationService.getFriendRelationIds(targetMemberId).size
+        val findMember =
+            memberService.findMemberById(targetMemberId)
+                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID $targetMemberId")
 
-        return MemberUseCase.ProfileResponse(
-            memberId = MemberId("targetMemberId"),
-            profileImageUrl = "targetMemberProfileImageUrl",
-            memberName = "김아무개",
-            platform = MemberPlatform.SPRING.name,
-            ordinal = 14,
-            isFriend = false,
-            pickCount = 0,
-            friendCount = 0
+        val profileImageId = findMember.profileImageId ?: ImageId("defaultImageUrl")
+        val profileImageUrl = (
+            imageService.load(profileImageId)?.url
+                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [$profileImageId}]")
         )
 
-        // return MemberUseCase.ProfileResponse(
-        //     memberId = findMember.id,
-        //     profileImageUrl = profileImageUrl,
-        //     memberName = findMember.fullName,
-        //     platform = findMember.platform.name,
-        //     ordinal = findMember.ordinal,
-        //     isFriend = isFriend,
-        //     pickCount = pickCountByMemberId,
-        //     friendCount = friendCount
-        // )
+        val pickCountByMemberId = pickService.findPickCountByMemberId(findMember.id)
+
+        // ToDo 실제 사용자 가져와야함
+        val currentMemberId = "currentMemberId"
+
+        val isFriend = memberRelationService.isFriend(MemberId(currentMemberId), targetMemberId)
+        val friendCount = memberRelationService.getFriendRelationIds(targetMemberId).size
+
+        return MemberUseCase.ProfileResponse(
+            memberId = findMember.id,
+            profileImageUrl = profileImageUrl,
+            memberName = findMember.fullName,
+            platform = findMember.platform.name,
+            ordinal = findMember.ordinal,
+            isFriend = isFriend,
+            pickCount = pickCountByMemberId,
+            friendCount = friendCount
+        )
     }
 }
