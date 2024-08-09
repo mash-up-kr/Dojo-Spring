@@ -19,4 +19,4 @@ Content-Type: application/json
 }
 
 ### 타인 프로필 조회 API
-GET {{host}}/member/memberId=memberId
+GET {{host}}/member/{{memberId}}}
