@@ -20,3 +20,7 @@ Content-Type: application/json
 
 ### 타인 프로필 조회 API
 GET {{host}}/member/{{memberId}}}
+
+
+### 타인 프로필 조회 Mock API
+GET {{host}}/member/mock/{{memberId}}}

@@ -44,6 +44,9 @@ interface MemberUseCase {
     fun update(command: UpdateCommand): MemberId
 
     fun findMemberById(targetMemberId: MemberId): ProfileResponse
+
+    // ToDo 로직 연결 후 추후 제거
+    fun findMemberByIdMock(targetMemberId: MemberId): ProfileResponse
 }
 
 @Component
@@ -113,6 +116,20 @@ class DefaultMemberUseCase(
             isFriend = isFriend,
             pickCount = pickCountByMemberId,
             friendCount = friendCount
+        )
+    }
+
+    // ToDo 로직 연결 후 추후 제거
+    override fun findMemberByIdMock(targetMemberId: MemberId): MemberUseCase.ProfileResponse {
+        return MemberUseCase.ProfileResponse(
+            memberId = targetMemberId,
+            profileImageUrl = "targetMemberProfileImageUrl",
+            memberName = "김아무개",
+            platform = MemberPlatform.SPRING.name,
+            ordinal = 14,
+            isFriend = false,
+            pickCount = 0,
+            friendCount = 0
         )
     }
 }
