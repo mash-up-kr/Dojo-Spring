@@ -99,6 +99,31 @@ class MemberController(
         )
     }
 
+    // ToDo 로직 연결 후 추후 제거
+    @GetMapping("/member/mock/{memberId}")
+    @Operation(
+        summary = "타인 멤버 프로필 조회 API",
+        description = "멤버의 프로필을 조회하는 API."
+    )
+    fun getProfileMock(
+        @PathVariable memberId: String,
+    ): DojoApiResponse<MemberProfileResponse> {
+        val profileResponse = memberUseCase.findMemberByIdMock(MemberId(memberId))
+
+        return DojoApiResponse.success(
+            MemberProfileResponse(
+                memberId = profileResponse.memberId.value,
+                profileImageUrl = profileResponse.profileImageUrl,
+                memberName = profileResponse.memberName,
+                platform = profileResponse.platform,
+                ordinal = profileResponse.ordinal,
+                isFriend = profileResponse.isFriend,
+                pickCount = profileResponse.pickCount,
+                friendCount = profileResponse.friendCount
+            )
+        )
+    }
+
     @PatchMapping("/member/{id}")
     @Operation(
         summary = "멤버 정보 갱신 API",
