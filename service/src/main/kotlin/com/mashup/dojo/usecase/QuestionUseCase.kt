@@ -126,7 +126,6 @@ class DefaultQuestionUseCase(
     override fun getQuestionSheetList(memberId: MemberId): QuestionUseCase.GetQuestionSheetsResult {
         return TEMP_GET_QUESTION_SHEETS_RESULT
         // 운영중인 questionSet 조회 (todo : scheduler 가 최신 QuestionSet 을 발행 시각 2분전에 publishedYn Y 로 변경 예정)
-        // todo : qSet /
         val operatingQSet =
             questionService.getOperatingQuestionSet()
                 ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_OPERATING_NOT_EXIST)
@@ -134,7 +133,6 @@ class DefaultQuestionUseCase(
         val questionIds = operatingQSet.questionIds.map { it.questionId }
 
         // QuestionSetId & solverId 를 통해 현재 운영중인 QuestionSet 에서 푼 문제가 어디까지 인지 확인
-        // todo : Pick 정보에 QuestionSetId 필요함 (QuestionSet 이 없는 경우, 동일 질문 다른 후보자에 대한 정보와 분간 X)
         val solvedQuestionIds =
             pickService.getSolvedPickList(memberId, operatingQSet.id)
                 .map { it.questionId }
