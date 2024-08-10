@@ -2,11 +2,13 @@ package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.config.security.JwtTokenService
+import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberLoginRequest
 import com.mashup.dojo.dto.MemberProfileResponse
 import com.mashup.dojo.dto.MemberUpdateRequest
+import com.mashup.dojo.dto.MyProfileResponse
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -97,6 +99,20 @@ class MemberController(
                 friendCount = profileResponse.friendCount
             )
         )
+    }
+
+    @GetMapping("/member/me")
+    @Operation(
+        summary = "본인 프로필 조회 API",
+        description = "본인 프로필 조회 API, header 토큰에 의해 본인을 식별해요"
+    )
+    fun me(): DojoApiResponse<MyProfileResponse> {
+        val memberId = MemberPrincipalContextHolder.current().id
+
+        logger.info { "read my profile, $memberId" }
+
+        // TODO 로직 연결
+        return DojoApiResponse.success(MyProfileResponse.mock())
     }
 
     // ToDo 로직 연결 후 추후 제거
