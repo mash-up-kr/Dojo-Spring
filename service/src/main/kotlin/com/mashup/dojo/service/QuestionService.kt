@@ -8,9 +8,12 @@ import com.mashup.dojo.QuestionSetEntity
 import com.mashup.dojo.QuestionSetRepository
 import com.mashup.dojo.QuestionSheetEntity
 import com.mashup.dojo.QuestionSheetRepository
+import com.mashup.dojo.Status
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.PublishStatus
+import com.mashup.dojo.domain.PublishedTime
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
@@ -26,7 +29,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import kotlin.math.floor
 
 private val log = KotlinLogging.logger {}
@@ -58,14 +63,12 @@ interface QuestionService {
         emojiImageId: ImageId,
     ): QuestionId
 
-    fun createQuestionSet(
-        excludedQuestionSet: QuestionSet?,
-        publishedAt: LocalDateTime,
-    ): QuestionSetId
+    fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId
 
     fun createQuestionSet(
         questionIds: List<QuestionId>,
         publishedAt: LocalDateTime,
+        endAt: LocalDateTime,
     ): QuestionSet
 
     fun createQuestionSheets(
@@ -107,7 +110,7 @@ class DefaultQuestionService(
 
     // 현재 운영중인 QuestionSet
     override fun getOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtAfterOrderByPublishedAt()
+        return questionSetRepository.findByPublishedAtAfterAndEndAtBefore(LocalDateTime.now(), LocalDateTime.now())
             ?.toQuestionSet() ?: run {
             log.error { "Published And Operating QuestionSet Entity not found" }
             null
@@ -116,7 +119,7 @@ class DefaultQuestionService(
 
     // 발행 출격 준비 완료 QuestionSet
     override fun getNextOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findFirstByPublishedYnTrueAndPublishedAtBeforeOrderByPublishedAt()
+        return questionSetRepository.findByStatusAndPublishedAtAfter(Status.UPCOMING, LocalDateTime.now())
             ?.toQuestionSet() ?: run {
             log.error { "Published And Prepared for sortie QuestionSet Entity not found" }
             null
@@ -140,10 +143,7 @@ class DefaultQuestionService(
     }
 
     @Transactional
-    override fun createQuestionSet(
-        excludedQuestionSet: QuestionSet?,
-        publishedAt: LocalDateTime,
-    ): QuestionSetId {
+    override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId {
         // 비율에 따라 questionType 선정
         val friendQuestionSize = floor(questionSetSize * friendQuestionRatio).toInt()
         val excludedQuestionIds: List<String> = excludedQuestionSet?.questionIds?.map { it.questionId.value } ?: emptyList()
@@ -172,13 +172,34 @@ class DefaultQuestionService(
                 QuestionOrder(questionId = question.id, order = index)
             }
 
+        // 마지막 QSet 의 발행 시각 가져오기
+        val latestQSet = getLatestPublishedQuestionSet()
+
+        val publishedTime =
+            latestQSet?.endAt ?: run {
+                val now = LocalTime.now()
+                val today = LocalDate.now()
+
+                when {
+                    now.isBefore(PublishedTime.OPEN_TIME_1) -> today.atTime(PublishedTime.OPEN_TIME_1)
+                    now.isBefore(PublishedTime.OPEN_TIME_2) -> today.atTime(PublishedTime.OPEN_TIME_2)
+                    else -> today.plusDays(1).atTime(PublishedTime.OPEN_TIME_1)
+                }
+            }
+
+        val endTime =
+            if (publishedTime.toLocalTime() == PublishedTime.OPEN_TIME_1) {
+                publishedTime.toLocalDate().atTime(PublishedTime.OPEN_TIME_2)
+            } else { //  publishedTime.toLocalTime() == PublishedTime.OPEN_TIME_2
+                publishedTime.toLocalDate().plusDays(1).atTime(PublishedTime.OPEN_TIME_1)
+            }
+
         // 우선 만들어지는 시점이 다음 투표 이전에 만들어질 QSet 을 만든다고 가정, 따라서 해당 QSet 은 바로 다음 발행될 QSet
-        // todo: QSet에서 publishedAt 이 가장 큰 녀석 가져온 후 해당 publishedAt 보다 큰 startTime 을 가진 PickTime 정보 가져옴
-        //  (fix publishedAt) 현재 PickTime Entity 는 LocalTime 으로 저장되고 있음. LocalDateTime 이어야 위 가정이 유효
         val questionSetEntity =
             QuestionSet.create(
                 questionOrders = questionOrders,
-                publishedAt = publishedAt
+                publishedAt = publishedTime,
+                endAt = endTime
             ).toEntity()
 
         val id = questionSetRepository.save(questionSetEntity).id
@@ -190,12 +211,13 @@ class DefaultQuestionService(
     override fun createQuestionSet(
         questionIds: List<QuestionId>,
         publishedAt: LocalDateTime,
+        endAt: LocalDateTime,
     ): QuestionSet {
         require(questionIds.size == questionSetSize) { "questions size for QuestionSet must be $questionSetSize" }
         require(publishedAt >= LocalDateTime.now()) { "publishedAt must be in the future" }
 
         val questionOrders = questionIds.mapIndexed { idx, qId -> QuestionOrder(qId, idx + 1) }
-        val questionSet = QuestionSet.create(questionOrders, publishedAt)
+        val questionSet = QuestionSet.create(questionOrders, publishedAt, endAt)
 
         questionSetRepository.save(questionSet.toEntity())
         return questionSet
@@ -235,7 +257,7 @@ class DefaultQuestionService(
                 emojiImageId = ImageId("345678")
             )
 
-        val SAMPLE_QUESTION_SET =
+        private val SAMPLE_QUESTION_SET =
             QuestionSet(
                 id = QuestionSetId("1"),
                 questionIds =
@@ -253,7 +275,8 @@ class DefaultQuestionService(
                         QuestionOrder(QuestionId("11"), 11),
                         QuestionOrder(QuestionId("12"), 12)
                     ),
-                publishedAt = LocalDateTime.now()
+                publishedAt = LocalDateTime.now(),
+                endAt = LocalDateTime.now().plusHours(12)
             )
 
         private val SAMPLE_QUESTION_SHEET =
@@ -332,7 +355,9 @@ private fun QuestionSet.toEntity(): QuestionSetEntity {
     return QuestionSetEntity(
         id = id.value,
         questionIds = questionIds,
-        publishedAt = publishedAt
+        status = status.toDomainPublishStatus(),
+        publishedAt = publishedAt,
+        endAt = endAt
     )
 }
 
@@ -348,7 +373,9 @@ private fun QuestionSetEntity.toQuestionSet(): QuestionSet {
     return QuestionSet(
         id = QuestionSetId(id),
         questionIds = questionOrders,
-        publishedAt = publishedAt
+        status = status.toDomainPublishStatus(),
+        publishedAt = publishedAt,
+        endAt = endAt
     )
 }
 
@@ -360,4 +387,20 @@ private fun QuestionSheetEntity.toQuestionSheetWithCandidatesId(): QuestionSheet
         resolverId = MemberId(resolverId),
         candidates = candidates.map { MemberId(it) }.toList()
     )
+}
+
+private fun Status.toDomainPublishStatus(): PublishStatus {
+    return when (this) {
+        Status.TERMINATED -> PublishStatus.TERMINATED
+        Status.ACTIVE -> PublishStatus.ACTIVE
+        Status.UPCOMING -> PublishStatus.UPCOMING
+    }
+}
+
+private fun PublishStatus.toDomainPublishStatus(): Status {
+    return when (this) {
+        PublishStatus.TERMINATED -> Status.TERMINATED
+        PublishStatus.ACTIVE -> Status.ACTIVE
+        PublishStatus.UPCOMING -> Status.UPCOMING
+    }
 }

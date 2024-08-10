@@ -106,7 +106,6 @@ class DefaultPickService(
     ): List<Pick> {
         return pickRepository.findAllByPickedId(pickedMemberId.value)
             .map { it.toPick() }
-        // return listOf(DEFAULT_PICK)
     }
 
     override fun getSolvedPickList(
