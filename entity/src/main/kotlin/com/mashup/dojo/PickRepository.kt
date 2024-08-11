@@ -62,6 +62,11 @@ interface PickRepositoryCustom {
     ): Long
 
     fun findPickCountByMemberId(memberId: String): Long
+
+    fun findSolvedPick(
+        memberId: String,
+        questionSetId: String,
+    ): List<PickEntity>
 }
 
 class PickRepositoryImpl(
@@ -167,6 +172,21 @@ class PickRepositoryImpl(
                 pickEntity.pickedId.eq(memberId)
             )
             .fetchOne() ?: 0
+    }
+
+    override fun findSolvedPick(
+        memberId: String,
+        questionSetId: String,
+    ): List<PickEntity> {
+        val pickEntity = QPickEntity.pickEntity
+
+        return jpaQueryFactory
+            .selectFrom(pickEntity)
+            .where(
+                pickEntity.questionSetId.eq(questionSetId),
+                pickEntity.pickerId.eq(memberId)
+            )
+            .fetch()
     }
 }
 

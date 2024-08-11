@@ -112,7 +112,8 @@ class DefaultPickService(
         pickerMemberId: MemberId,
         questionSetId: QuestionSetId,
     ): List<Pick> {
-        TODO("Not yet implemented")
+        return pickRepository.findSolvedPick(pickerMemberId.value, questionSetId.value)
+            .map { it.toPick() }
     }
 
     @Transactional
