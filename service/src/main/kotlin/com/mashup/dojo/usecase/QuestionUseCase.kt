@@ -378,9 +378,6 @@ class DefaultQuestionUseCase(
                 startingQuestionIndex = 1,
                 questionSheetList = TEMP_QUESTION_SHEET_RESULT
             )
-
-        private const val DEFAULT_CANDIDATE_SIZE = 4L
-        private const val DEFAULT_FRIEND_QUESTION_SIZE = 9L
     }
 }
 
