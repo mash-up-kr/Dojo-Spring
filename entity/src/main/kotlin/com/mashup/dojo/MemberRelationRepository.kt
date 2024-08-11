@@ -1,6 +1,7 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseTimeEntity
+import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -48,6 +49,16 @@ interface MemberRelationQueryRepository {
         fromId: String,
         toId: String,
     ): Boolean
+
+    fun findRandomOfFriend(
+        memberId: String,
+        limit: Long,
+    ): List<String>
+
+    fun findRandomOfAccompany(
+        memberId: String,
+        limit: Long,
+    ): List<String>
 }
 
 class MemberRelationQueryRepositoryImpl(
@@ -90,6 +101,42 @@ class MemberRelationQueryRepositoryImpl(
                 .fetchOne()
 
         return findMemberRelation != null
+    }
+
+    override fun findRandomOfFriend(
+        memberId: String,
+        limit: Long,
+    ): List<String> {
+        val memberRelation = QMemberRelationEntity.memberRelationEntity
+
+        return jpaQueryFactory
+            .select(memberRelation.toId)
+            .from(memberRelation)
+            .where(
+                memberRelation.fromId.eq(memberId),
+                memberRelation.relationType.eq(RelationType.FRIEND)
+            )
+            .orderBy(Expressions.numberTemplate(Double::class.java, "function('RAND')").asc())
+            .limit(limit)
+            .fetch()
+    }
+
+    override fun findRandomOfAccompany(
+        memberId: String,
+        limit: Long,
+    ): List<String> {
+        val memberRelation = QMemberRelationEntity.memberRelationEntity
+
+        return jpaQueryFactory
+            .select(memberRelation.toId)
+            .from(memberRelation)
+            .where(
+                memberRelation.fromId.eq(memberId),
+                memberRelation.relationType.eq(RelationType.ACCOMPANY)
+            )
+            .orderBy(Expressions.numberTemplate(Double::class.java, "function('RAND')").asc())
+            .limit(8)
+            .fetch()
     }
 
     private fun findByFromIdAndRelationType(

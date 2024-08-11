@@ -32,6 +32,10 @@ interface MemberRelationService {
         fromId: MemberId,
         toId: MemberId,
     ): Boolean
+
+    fun findCandidateOfFriend(memberId: MemberId): List<MemberId>
+
+    fun findCandidateOfAccompany(memberId: MemberId): List<MemberId>
 }
 
 @Service
@@ -78,6 +82,28 @@ class DefaultMemberRelationService(
         toId: MemberId,
     ): Boolean {
         return memberRelationRepository.isFriend(fromId = fromId.value, toId = toId.value)
+    }
+
+    override fun findCandidateOfFriend(memberId: MemberId): List<MemberId> {
+        return memberRelationRepository.findRandomOfFriend(
+            memberId = memberId.value,
+            limit = DEFAULT_CANDIDATE_SIZE
+        ).map {
+            MemberId(it)
+        }
+    }
+
+    override fun findCandidateOfAccompany(memberId: MemberId): List<MemberId> {
+        return memberRelationRepository.findRandomOfAccompany(
+            memberId = memberId.value,
+            limit = DEFAULT_CANDIDATE_SIZE
+        ).map {
+            MemberId(it)
+        }
+    }
+
+    companion object {
+        private const val DEFAULT_CANDIDATE_SIZE: Long = 8
     }
 }
 
