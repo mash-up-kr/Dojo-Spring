@@ -250,33 +250,33 @@ class DefaultQuestionService(
         val friendQuestionIds = questionRepository.findFriendQuestionsByIds(questionIds)
         val accompanyQuestionIds = questionRepository.findAccompanyQuestionsByIds(questionIds)
 
-        val friendQuestionSheetEntities =
+        val friendQuestionSheets =
             friendQuestionIds.map { friendQuestionId ->
                 QuestionSheet.create(
                     questionSetId = questionSet.id,
                     questionId = QuestionId(friendQuestionId),
                     resolverId = resolver,
                     candidates = candidatesOfFriend
-                ).toEntity()
+                )
             }
 
-        val accompanyQuestionSheetEntities =
+        val accompanyQuestionSheets =
             accompanyQuestionIds.map { friendQuestionId ->
                 QuestionSheet.create(
                     questionSetId = questionSet.id,
                     questionId = QuestionId(friendQuestionId),
                     resolverId = resolver,
                     candidates = candidatesOfAccompany
-                ).toEntity()
+                )
             }
 
-        val questionSheetEntities = friendQuestionSheetEntities + accompanyQuestionSheetEntities
-        return questionSheetEntities.map { it.toQuestionSheetWithCandidatesId() }
+        return friendQuestionSheets + accompanyQuestionSheets
     }
 
     override fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet> {
-        val questionSheetEntities = questionSheetRepository.saveAll(allMemberQuestionSheets.map { it.toEntity() })
-        return questionSheetEntities.map { it.toQuestionSheetWithCandidatesId() }
+        val questionSheetEntities = allMemberQuestionSheets.map { it.toEntity() }
+        val saveQuestionSheetEntities = questionSheetRepository.saveAll(questionSheetEntities)
+        return saveQuestionSheetEntities.map { it.toQuestionSheetWithCandidatesId() }
     }
 
     override fun getQuestionById(id: QuestionId): Question? {
