@@ -234,13 +234,6 @@ class DefaultQuestionService(
         resolver: MemberId,
     ): List<QuestionSheet> {
         /**
-         * TODO: 여기 있는 애들은 해결된 것일까요?
-         * target : members
-         * question : QuestionSet
-         * candidate : member.candidate()
-         *
-         * - make friend logic, get Candidate logic
-         *
          * ToDo 아래는 추후 캐시에 넣는 작업을 해야합니다.
          * - cache put -> QuestionSet and return
          * - Temporarily set to create for all members, discuss details later

@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: api
+  profiles:
+    include: entity, common
+
+dojo:
+  candidate:
+    size: 8
+  
