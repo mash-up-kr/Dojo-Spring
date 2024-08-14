@@ -55,6 +55,9 @@ class MemberController(
                 )
             )
 
+        // 가입된 멤버에 대해서 기본 관계 생성
+        memberUseCase.createDefaultMemberRelation(memberId)
+
         return DojoApiResponse.success(MemberCreateResponse(memberId))
     }
 

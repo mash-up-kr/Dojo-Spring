@@ -18,7 +18,7 @@ data class MemberRelation(
     val lastUpdatedAt: LocalDateTime,
 ) {
     companion object {
-        fun create(
+        fun createAccompanyRelation(
             fromId: MemberId,
             toId: MemberId,
         ): MemberRelation {
