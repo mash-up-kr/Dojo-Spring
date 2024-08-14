@@ -4,6 +4,7 @@ import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.config.security.JwtTokenService
 import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberRelationId
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberLoginRequest
 import com.mashup.dojo.dto.MemberProfileResponse
@@ -166,6 +167,14 @@ class MemberController(
             )
 
         return DojoApiResponse.success(MemberUpdateResponse(memberId))
+    }
+
+    // todo : temp api for insert relationship data
+    @PostMapping("/public/member/relation")
+    fun createRelationShip(
+        @RequestBody id: MemberId,
+    ): DojoApiResponse<List<MemberRelationId>> {
+        return DojoApiResponse.success(memberUseCase.createDefaultMemberRelation(id))
     }
 
     data class MemberCreateResponse(
