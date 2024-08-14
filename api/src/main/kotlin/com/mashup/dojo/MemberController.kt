@@ -170,10 +170,8 @@ class MemberController(
     }
 
     // todo : temp api for insert relationship data
-    @PostMapping("/public/member/relation")
-    fun createRelationShip(
-        @RequestBody id: MemberId,
-    ): DojoApiResponse<List<MemberRelationId>> {
+    @PostMapping("/public/member/relation/{id}")
+    fun createRelationShip(@PathVariable id: MemberId): DojoApiResponse<List<MemberRelationId>> {
         return DojoApiResponse.success(memberUseCase.createDefaultMemberRelation(id))
     }
 
