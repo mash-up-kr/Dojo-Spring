@@ -40,6 +40,11 @@ interface MemberUseCase {
         val friendCount: Int,
     )
 
+    data class CreateFollowCommand(
+        val fromId: MemberId,
+        val toId: MemberId,
+    )
+
     fun create(command: CreateCommand): MemberId
 
     fun update(command: UpdateCommand): MemberId
@@ -50,6 +55,8 @@ interface MemberUseCase {
     fun findMemberByIdMock(targetMemberId: MemberId): ProfileResponse
 
     fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId>
+
+    fun updateToFollowRelation(command: CreateFollowCommand): MemberRelationId
 }
 
 @Component
@@ -144,5 +151,10 @@ class DefaultMemberUseCase(
                 .map { it.id }
 
         return memberRelationService.bulkCreateRelation(newMemberId, allMemberIds)
+    }
+
+    @Transactional
+    override fun updateToFollowRelation(command: MemberUseCase.CreateFollowCommand): MemberRelationId {
+        return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
     }
 }
