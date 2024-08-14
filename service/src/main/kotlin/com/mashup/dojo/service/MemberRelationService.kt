@@ -8,6 +8,7 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberRelation
 import com.mashup.dojo.domain.MemberRelationId
 import com.mashup.dojo.domain.RelationType
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -32,12 +33,18 @@ interface MemberRelationService {
         fromId: MemberId,
         toId: MemberId,
     ): Boolean
+
+    fun findCandidateOfFriend(memberId: MemberId): List<MemberId>
+
+    fun findCandidateOfAccompany(memberId: MemberId): List<MemberId>
 }
 
 @Service
 @Transactional(readOnly = true)
 class DefaultMemberRelationService(
     private val memberRelationRepository: MemberRelationRepository,
+    @Value("\${dojo.candidate.size}")
+    private val defaultCandidateSize: Long,
 ) : MemberRelationService {
     override fun getAllRelationShip(fromId: MemberId): List<MemberId> {
         return memberRelationRepository.findByFromId(fromId.value).map { MemberId(it) }
@@ -78,6 +85,24 @@ class DefaultMemberRelationService(
         toId: MemberId,
     ): Boolean {
         return memberRelationRepository.isFriend(fromId = fromId.value, toId = toId.value)
+    }
+
+    override fun findCandidateOfFriend(memberId: MemberId): List<MemberId> {
+        return memberRelationRepository.findRandomOfFriend(
+            memberId = memberId.value,
+            limit = defaultCandidateSize
+        ).map {
+            MemberId(it)
+        }
+    }
+
+    override fun findCandidateOfAccompany(memberId: MemberId): List<MemberId> {
+        return memberRelationRepository.findRandomOfAccompany(
+            memberId = memberId.value,
+            limit = defaultCandidateSize
+        ).map {
+            MemberId(it)
+        }
     }
 }
 

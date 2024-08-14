@@ -10,7 +10,6 @@ import com.mashup.dojo.QuestionSheetEntity
 import com.mashup.dojo.QuestionSheetRepository
 import com.mashup.dojo.Status
 import com.mashup.dojo.domain.ImageId
-import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PublishStatus
 import com.mashup.dojo.domain.PublishedTime
@@ -71,10 +70,14 @@ interface QuestionService {
         endAt: LocalDateTime,
     ): QuestionSet
 
-    fun createQuestionSheets(
+    fun createQuestionSheetsForMember(
         questionSet: QuestionSet,
-        members: List<Member>,
+        candidatesOfFriend: List<MemberId>,
+        candidatesOfAccompany: List<MemberId>,
+        resolver: MemberId,
     ): List<QuestionSheet>
+
+    fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet>
 }
 
 @Service
@@ -224,21 +227,49 @@ class DefaultQuestionService(
     }
 
     @Transactional
-    override fun createQuestionSheets(
+    override fun createQuestionSheetsForMember(
         questionSet: QuestionSet,
-        members: List<Member>,
+        candidatesOfFriend: List<MemberId>,
+        candidatesOfAccompany: List<MemberId>,
+        resolver: MemberId,
     ): List<QuestionSheet> {
         /**
-         * TODO:
-         * target : members
-         * question : QuestionSet
-         * candidate : member.candidate()
-         *
-         * - make friend logic, get Candidate logic
+         * ToDo 아래는 추후 캐시에 넣는 작업을 해야합니다.
          * - cache put -> QuestionSet and return
          * - Temporarily set to create for all members, discuss details later
          */
-        return LIST_SAMPLE_QUESTION_SHEET
+
+        val questionIds = questionSet.questionIds.map { questionOrder -> questionOrder.questionId.value }
+        val friendQuestionIds = questionRepository.findFriendQuestionsByIds(questionIds)
+        val accompanyQuestionIds = questionRepository.findAccompanyQuestionsByIds(questionIds)
+
+        val friendQuestionSheets =
+            friendQuestionIds.map { friendQuestionId ->
+                QuestionSheet.create(
+                    questionSetId = questionSet.id,
+                    questionId = QuestionId(friendQuestionId),
+                    resolverId = resolver,
+                    candidates = candidatesOfFriend
+                )
+            }
+
+        val accompanyQuestionSheets =
+            accompanyQuestionIds.map { friendQuestionId ->
+                QuestionSheet.create(
+                    questionSetId = questionSet.id,
+                    questionId = QuestionId(friendQuestionId),
+                    resolverId = resolver,
+                    candidates = candidatesOfAccompany
+                )
+            }
+
+        return friendQuestionSheets + accompanyQuestionSheets
+    }
+
+    override fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet> {
+        val questionSheetEntities = allMemberQuestionSheets.map { it.toEntity() }
+        val saveQuestionSheetEntities = questionSheetRepository.saveAll(questionSheetEntities)
+        return saveQuestionSheetEntities.map { it.toQuestionSheetWithCandidatesId() }
     }
 
     override fun getQuestionById(id: QuestionId): Question? {
@@ -376,6 +407,16 @@ private fun QuestionSetEntity.toQuestionSet(): QuestionSet {
         status = status.toDomainPublishStatus(),
         publishedAt = publishedAt,
         endAt = endAt
+    )
+}
+
+private fun QuestionSheet.toEntity(): QuestionSheetEntity {
+    return QuestionSheetEntity(
+        id = questionSheetId.value,
+        questionSetId = questionSetId.value,
+        questionId = questionId.value,
+        resolverId = resolverId.value,
+        candidates = candidates.map { it.value }.toList()
     )
 }
 

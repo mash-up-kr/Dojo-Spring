@@ -66,4 +66,21 @@ data class QuestionSheet(
     val questionId: QuestionId,
     val resolverId: MemberId,
     val candidates: List<MemberId>,
-)
+) {
+    companion object {
+        fun create(
+            questionSetId: QuestionSetId,
+            questionId: QuestionId,
+            resolverId: MemberId,
+            candidates: List<MemberId>,
+        ): QuestionSheet {
+            return QuestionSheet(
+                questionSheetId = QuestionSheetId(UUIDGenerator.generate()),
+                questionSetId = questionSetId,
+                questionId = questionId,
+                resolverId = resolverId,
+                candidates = candidates
+            )
+        }
+    }
+}

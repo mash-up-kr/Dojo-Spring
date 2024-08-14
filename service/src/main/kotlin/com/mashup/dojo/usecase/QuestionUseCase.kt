@@ -13,6 +13,7 @@ import com.mashup.dojo.domain.QuestionSheet
 import com.mashup.dojo.domain.QuestionSheetId
 import com.mashup.dojo.domain.QuestionType
 import com.mashup.dojo.service.ImageService
+import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
@@ -85,6 +86,7 @@ class DefaultQuestionUseCase(
     private val memberService: MemberService,
     private val pickService: PickService,
     private val imageService: ImageService,
+    private val memberRelationService: MemberRelationService,
 ) : QuestionUseCase {
     @Transactional
     override fun create(command: QuestionUseCase.CreateCommand): QuestionId {
@@ -120,7 +122,21 @@ class DefaultQuestionUseCase(
     override fun createQuestionSheet(): List<QuestionSheet> {
         val currentQuestionSet = questionService.getNextOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
         val allMemberRecords = memberService.findAllMember()
-        return questionService.createQuestionSheets(currentQuestionSet, allMemberRecords)
+        // ToDo Default 친구 수가 8명 이하일 경우 오류 발생하므로, 친구가 8명이 아니면 회원가입 불가능
+
+        val allMemberQuestionSheets =
+            allMemberRecords.flatMap { member ->
+                val candidateOfFriend = memberRelationService.findCandidateOfFriend(member.id)
+                val candidateOfAccompany = memberRelationService.findCandidateOfAccompany(member.id)
+                questionService.createQuestionSheetsForMember(
+                    questionSet = currentQuestionSet,
+                    candidatesOfFriend = candidateOfFriend,
+                    candidatesOfAccompany = candidateOfAccompany,
+                    resolver = member.id
+                )
+            }
+
+        return questionService.saveQuestionSheets(allMemberQuestionSheets)
     }
 
     override fun getQuestionSheetList(memberId: MemberId): QuestionUseCase.GetQuestionSheetsResult {
