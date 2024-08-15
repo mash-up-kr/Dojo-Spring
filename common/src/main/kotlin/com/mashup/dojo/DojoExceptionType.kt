@@ -42,4 +42,7 @@ enum class DojoExceptionType(
 
     // pickTime
     ACTIVE_PICK_TIME_NOT_FOUND("Active pick time not found", "PT001_ACTIVE_PICK_TIME_NOT_FOUND", 500),
+
+    // MemberRelation
+    RELATION_NOT_FOUND("Relation not found", "MR001_RELATION_NOT_FOUND", 500),
 }

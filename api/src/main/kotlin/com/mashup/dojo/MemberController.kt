@@ -9,6 +9,7 @@ import com.mashup.dojo.dto.MemberCreateFriendRelationRequest
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberLoginRequest
 import com.mashup.dojo.dto.MemberProfileResponse
+import com.mashup.dojo.dto.MemberSearchResponse
 import com.mashup.dojo.dto.MemberUpdateRequest
 import com.mashup.dojo.dto.MyProfileResponse
 import com.mashup.dojo.service.MemberService
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
@@ -230,6 +232,30 @@ class MemberController(
 
         return DojoApiResponse.success(
             MySpacePickResponse(response)
+        )
+    }
+
+    @GetMapping("/member/search")
+    @Operation(
+        summary = "멤버 검색 API",
+        description = "친구, 친구 아닌 사람 모두 검색 가능한 통합 검색 기능입니다."
+    )
+    fun searchMember(
+        @RequestParam keyword: String,
+    ): DojoApiResponse<List<MemberSearchResponse>> {
+        val memberId = MemberPrincipalContextHolder.current().id
+        val result = memberUseCase.searchMember(memberId, keyword)
+        return DojoApiResponse.success(
+            result.map {
+                MemberSearchResponse(
+                    memberId = it.memberId,
+                    profileImageUrl = it.profileImageUrl,
+                    memberName = it.memberName,
+                    platform = it.platform,
+                    ordinal = it.ordinal,
+                    isFriend = it.isFriend
+                )
+            }
         )
     }
 

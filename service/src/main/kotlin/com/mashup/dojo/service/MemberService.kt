@@ -27,6 +27,11 @@ interface MemberService {
 
     fun findAllMember(): List<Member>
 
+    fun searchMember(
+        memberId: MemberId,
+        keyword: String,
+    ): List<Member>
+
     fun findAllByIds(memberIds: List<MemberId>): List<Member>
 
     data class CreateMember(
@@ -125,6 +130,13 @@ class DefaultMemberService(
     override fun findAllMember(): List<Member> {
         return memberRepository.findAll()
             .map { it.toMember() }
+    }
+
+    override fun searchMember(
+        memberId: MemberId,
+        keyword: String,
+    ): List<Member> {
+        return memberRepository.findByNameContaining(memberId.value, keyword).map { it.toMember() }
     }
 
     override fun findAllByIds(memberIds: List<MemberId>): List<Member> {

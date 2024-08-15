@@ -7,6 +7,7 @@ import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
 import com.mashup.dojo.domain.MemberRelationId
+import com.mashup.dojo.domain.RelationType
 import com.mashup.dojo.service.CoinService
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberRelationService
@@ -46,6 +47,15 @@ interface MemberUseCase {
         val toId: MemberId,
     )
 
+    data class MemberSearchInfo(
+        val memberId: String,
+        val profileImageUrl: String,
+        val memberName: String,
+        val platform: String,
+        val ordinal: Int,
+        val isFriend: Boolean,
+    )
+
     fun create(command: CreateCommand): MemberId
 
     fun update(command: UpdateCommand): MemberId
@@ -63,6 +73,11 @@ interface MemberUseCase {
     fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
 
     fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.MySpacePickDetail>
+
+    fun searchMember(
+        memberId: MemberId,
+        keyword: String,
+    ): List<MemberSearchInfo>
 }
 
 @Component
@@ -162,6 +177,33 @@ class DefaultMemberUseCase(
     @Transactional
     override fun updateFriendRelation(command: MemberUseCase.UpdateFriendCommand): MemberRelationId {
         return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
+    }
+
+    override fun searchMember(
+        memberId: MemberId,
+        keyword: String,
+    ): List<MemberUseCase.MemberSearchInfo> {
+        val members = memberService.searchMember(memberId, keyword)
+
+        val relations = memberRelationService.findRelationByIds(memberId, members.map { it.id })
+        val relationMap = relations.associateBy { it.toId.value }
+
+        // todo: 프로필 이미지 조회 (코드 중복으로 https://github.com/mash-up-kr/Dojo-Spring/pull/93 PR 머지 후 추가 예정)
+
+        return members.map { member ->
+            val relation =
+                relationMap[member.id.value]?.relation
+                    ?: throw DojoException.of(DojoExceptionType.RELATION_NOT_FOUND, "from : ${memberId.value}, to : ${member.id.value}")
+
+            MemberUseCase.MemberSearchInfo(
+                memberId = member.id.value,
+                profileImageUrl = "",
+                memberName = member.fullName,
+                platform = member.platform.name,
+                ordinal = member.ordinal,
+                isFriend = RelationType.FRIEND == relation
+            )
+        }
     }
 
     override fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.MySpacePickDetail> {

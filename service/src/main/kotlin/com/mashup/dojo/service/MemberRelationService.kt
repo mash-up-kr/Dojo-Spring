@@ -42,6 +42,11 @@ interface MemberRelationService {
     fun findCandidateOfFriend(memberId: MemberId): List<MemberId>
 
     fun findCandidateOfAccompany(memberId: MemberId): List<MemberId>
+
+    fun findRelationByIds(
+        fromId: MemberId,
+        toIds: List<MemberId>,
+    ): List<MemberRelation>
 }
 
 @Service
@@ -123,6 +128,13 @@ class DefaultMemberRelationService(
         ).map {
             MemberId(it)
         }
+    }
+
+    override fun findRelationByIds(
+        fromId: MemberId,
+        toIds: List<MemberId>,
+    ): List<MemberRelation> {
+        return memberRelationRepository.findByFromIdAndToIds(fromId.value, toIds.map { it.value }).map { it.toDomain() }
     }
 }
 

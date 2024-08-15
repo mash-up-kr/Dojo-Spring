@@ -59,6 +59,11 @@ interface MemberRelationQueryRepository {
         memberId: String,
         limit: Long,
     ): List<String>
+
+    fun findByFromIdAndToIds(
+        fromId: String,
+        toIds: List<String>,
+    ): List<MemberRelationEntity>
 }
 
 class MemberRelationQueryRepositoryImpl(
@@ -137,6 +142,20 @@ class MemberRelationQueryRepositoryImpl(
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('RAND')").asc())
             .limit(8)
             .fetch()
+    }
+
+    override fun findByFromIdAndToIds(
+        fromId: String,
+        toIds: List<String>,
+    ): List<MemberRelationEntity> {
+        val memberRelation = QMemberRelationEntity.memberRelationEntity
+        return jpaQueryFactory
+            .select(memberRelation)
+            .from(memberRelation)
+            .where(
+                memberRelation.fromId.eq(fromId),
+                memberRelation.toId.`in`(toIds)
+            ).fetch()
     }
 
     private fun findByFromIdAndRelationType(
