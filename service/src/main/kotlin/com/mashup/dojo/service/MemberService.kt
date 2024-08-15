@@ -27,6 +27,8 @@ interface MemberService {
 
     fun findAllMember(): List<Member>
 
+    fun findAllByIds(memberIds: List<MemberId>): List<Member>
+
     data class CreateMember(
         val fullName: String,
         val profileImageId: ImageId?,
@@ -123,6 +125,10 @@ class DefaultMemberService(
     override fun findAllMember(): List<Member> {
         return memberRepository.findAll()
             .map { it.toMember() }
+    }
+
+    override fun findAllByIds(memberIds: List<MemberId>): List<Member> {
+        return memberRepository.findAllById(memberIds.map { it.value }).map { it.toMember() }
     }
 
     private fun mockMember(memberId: MemberId) =

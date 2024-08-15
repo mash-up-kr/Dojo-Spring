@@ -6,6 +6,7 @@ import com.mashup.dojo.domain.Image
 import com.mashup.dojo.domain.ImageId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 interface ImageService {
     fun load(imageId: ImageId): Image?
@@ -14,6 +15,8 @@ interface ImageService {
         uuid: String,
         imageUrl: String,
     ): ImageId
+
+    fun loadAllByIds(imageIds: List<ImageId>): List<Image>
 }
 
 @Transactional(readOnly = true)
@@ -31,11 +34,22 @@ class DefaultImageService(
         return ImageId(saved.id)
     }
 
+    override fun loadAllByIds(imageIds: List<ImageId>): List<Image> {
+        return imageRepository.findAllById(imageIds.map { it.value }).map { it.toImage() }
+    }
+
     override fun load(imageId: ImageId): Image? {
-        return SAMPLE_IMAGE
+        return imageRepository.findById(imageId.value).getOrNull()?.toImage()
     }
 
     companion object {
         val SAMPLE_IMAGE = Image(ImageId("image"), "urlurl")
     }
+}
+
+private fun ImageEntity.toImage(): Image {
+    return Image(
+        id = ImageId(id),
+        url = url
+    )
 }
