@@ -1,0 +1,7 @@
+### SSE stream 연결
+GET {{host}}/notification-stream
+Authorization: {{authorization}}
+
+### notification test
+POST {{host}}/notification-test?questionId=testquestion&pickId=testetsqpickpick
+Authorization: {{authorization}}
