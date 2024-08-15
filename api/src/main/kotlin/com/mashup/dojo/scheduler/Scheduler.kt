@@ -26,8 +26,7 @@ class Scheduler(
     fun createQuestionSheet() {
         log.info { "=== Start Create questionSheet at ${LocalDateTime.now()}. ===" }
 
-        // ToDo 친구 관계 생성 후 주석 해제할 것
-        // questionUseCase.createQuestionSheet()
+        questionUseCase.createQuestionSheet()
         log.info { "=== Done Create questionSheet at ${LocalDateTime.now()}. ===" }
     }
 }
