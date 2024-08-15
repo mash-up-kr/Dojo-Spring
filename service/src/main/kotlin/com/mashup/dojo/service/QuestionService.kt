@@ -218,6 +218,7 @@ class DefaultQuestionService(
     ): QuestionSet {
         require(questionIds.size == questionSetSize) { "questions size for QuestionSet must be $questionSetSize" }
         require(publishedAt >= LocalDateTime.now()) { "publishedAt must be in the future" }
+        require(endAt > publishedAt) { "endAt must be later than publishedAt " }
 
         val questionOrders = questionIds.mapIndexed { idx, qId -> QuestionOrder(qId, idx + 1) }
         val questionSet = QuestionSet.create(questionOrders, publishedAt, endAt)
