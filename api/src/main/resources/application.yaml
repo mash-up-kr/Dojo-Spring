@@ -8,6 +8,8 @@ dojo:
   questionSet:
     size: 12
     friend-ratio: 0.6 # percent 
+    open-time-1: "08:00:00"
+    open-time-2: "23:00:00"
 
 scheduler:
   cron: "0 0 9,21 * * *"

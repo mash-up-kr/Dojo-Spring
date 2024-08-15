@@ -2,7 +2,6 @@ package com.mashup.dojo.domain
 
 import com.mashup.dojo.UUIDGenerator
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 @JvmInline
 value class QuestionSetId(val value: String)
@@ -42,9 +41,4 @@ enum class PublishStatus {
     TERMINATED, // 종료
     ACTIVE, // 운영중
     UPCOMING, // 예정
-}
-
-object PublishedTime {
-    val OPEN_TIME_1: LocalTime = LocalTime.of(8, 0, 0)
-    val OPEN_TIME_2: LocalTime = LocalTime.of(11, 0, 0)
 }
