@@ -170,19 +170,10 @@ class MemberController(
         return DojoApiResponse.success(MemberUpdateResponse(memberId))
     }
 
-    // todo : temp api for insert relationship data
-    @PostMapping("/public/member/relation/{id}")
-    fun createRelationShip(
-        @PathVariable id: MemberId,
-    ): DojoApiResponse<List<MemberRelationId>> {
-        return DojoApiResponse.success(memberUseCase.createDefaultMemberRelation(id))
-    }
-
-    // follow 생성 API - todo : mashup 내 인원들 follow 생성을 위해 url public 으로 시작 (이후 변경)
-    @PostMapping("/public/member/relation")
+    @PostMapping("/member/create-friend")
     @Operation(
-        summary = "팔로우 생성 API",
-        description = "팔로우 생성 API, 팔로우 기능에 대해서 from 이 to 를 follow 합니다. 이미 follow가 존재한다면 예외를 반환해요",
+        summary = "친구(팔로우)추가 API",
+        description = "친구(팔로우) 관계 생성 API, 친구 추가 기능에 대해서 from 이 to 를 follow 합니다. 이미 follow가 존재한다면 예외를 반환해요",
         responses = [
             ApiResponse(responseCode = "200", description = "생성된 관계 id")
         ]
@@ -190,7 +181,7 @@ class MemberController(
     fun createFriend(
         @RequestBody request: MemberCreateFriendRelationRequest,
     ): DojoApiResponse<MemberRelationId> {
-        return DojoApiResponse.success(memberUseCase.updateToFollowRelation(MemberUseCase.CreateFollowCommand(request.fromMemberId, request.toMemberId)))
+        return DojoApiResponse.success(memberUseCase.updateFriendRelation(MemberUseCase.CreateFollowCommand(request.fromMemberId, request.toMemberId)))
     }
 
     data class MemberCreateResponse(

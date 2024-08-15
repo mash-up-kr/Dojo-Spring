@@ -95,6 +95,7 @@ class DefaultMemberRelationService(
         if (toDomain.relation == RelationType.FRIEND) {
             throw DojoException.of(DojoExceptionType.ALREADY_FRIEND)
         }
+
         val updatedRelation = toDomain.updateToFriend()
         return MemberRelationId(memberRelationRepository.save(updatedRelation.toEntity()).id)
     }

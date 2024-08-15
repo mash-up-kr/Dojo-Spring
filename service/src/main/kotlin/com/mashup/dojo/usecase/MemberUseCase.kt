@@ -56,7 +56,7 @@ interface MemberUseCase {
 
     fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId>
 
-    fun updateToFollowRelation(command: CreateFollowCommand): MemberRelationId
+    fun updateFriendRelation(command: CreateFollowCommand): MemberRelationId
 }
 
 @Component
@@ -154,7 +154,7 @@ class DefaultMemberUseCase(
     }
 
     @Transactional
-    override fun updateToFollowRelation(command: MemberUseCase.CreateFollowCommand): MemberRelationId {
+    override fun updateFriendRelation(command: MemberUseCase.CreateFollowCommand): MemberRelationId {
         return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
     }
 }
