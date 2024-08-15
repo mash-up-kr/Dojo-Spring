@@ -1,11 +1,12 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseEntity
+import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface MemberRepository : JpaRepository<MemberEntity, String>
+interface MemberRepository : JpaRepository<MemberEntity, String>, MemberQueryRepository
 
 @Entity
 class MemberEntity(
@@ -18,3 +19,26 @@ class MemberEntity(
     val ordinal: Int,
     val gender: String,
 ) : BaseEntity()
+
+interface MemberQueryRepository {
+    fun findByNameContaining(
+        memberId: String,
+        keyword: String,
+    ): List<MemberEntity>
+}
+
+class MemberQueryRepositoryImpl(
+    private val jpaQueryFactory: JPAQueryFactory,
+) : MemberQueryRepository {
+    override fun findByNameContaining(
+        memberId: String,
+        keyword: String,
+    ): List<MemberEntity> {
+        val member = QMemberEntity.memberEntity
+        return jpaQueryFactory
+            .select(member)
+            .from(member)
+            .where(member.id.notIn(memberId), member.fullName.contains(keyword))
+            .fetch()
+    }
+}
