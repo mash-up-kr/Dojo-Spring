@@ -13,7 +13,6 @@ import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PublishStatus
-import com.mashup.dojo.domain.PublishedTime
 import com.mashup.dojo.domain.Question
 import com.mashup.dojo.domain.QuestionCategory
 import com.mashup.dojo.domain.QuestionId
@@ -84,6 +83,10 @@ class DefaultQuestionService(
     private val questionSetSize: Int,
     @Value("\${dojo.questionSet.friend-ratio}")
     private val friendQuestionRatio: Float,
+    @Value("\${dojo.questionSet.open-time-1}")
+    private val openTime1: LocalTime,
+    @Value("\${dojo.questionSet.open-time-2}")
+    private val openTime2: LocalTime,
     override val questionRepository: QuestionRepository,
     override val questionSetRepository: QuestionSetRepository,
     override val questionSheetRepository: QuestionSheetRepository,
@@ -181,17 +184,17 @@ class DefaultQuestionService(
                 val today = LocalDate.now()
 
                 when {
-                    now.isBefore(PublishedTime.OPEN_TIME_1) -> today.atTime(PublishedTime.OPEN_TIME_1)
-                    now.isBefore(PublishedTime.OPEN_TIME_2) -> today.atTime(PublishedTime.OPEN_TIME_2)
-                    else -> today.plusDays(1).atTime(PublishedTime.OPEN_TIME_1)
+                    now.isBefore(openTime1) -> today.atTime(openTime1)
+                    now.isBefore(openTime2) -> today.atTime(openTime2)
+                    else -> today.plusDays(1).atTime(openTime1)
                 }
             }
 
         val endTime =
-            if (publishedTime.toLocalTime() == PublishedTime.OPEN_TIME_1) {
-                publishedTime.toLocalDate().atTime(PublishedTime.OPEN_TIME_2)
+            if (publishedTime.toLocalTime() == openTime1) {
+                publishedTime.toLocalDate().atTime(openTime2)
             } else { //  publishedTime.toLocalTime() == PublishedTime.OPEN_TIME_2
-                publishedTime.toLocalDate().plusDays(1).atTime(PublishedTime.OPEN_TIME_1)
+                publishedTime.toLocalDate().plusDays(1).atTime(openTime1)
             }
 
         // 우선 만들어지는 시점이 다음 투표 이전에 만들어질 QSet 을 만든다고 가정, 따라서 해당 QSet 은 바로 다음 발행될 QSet
