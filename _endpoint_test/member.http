@@ -30,7 +30,7 @@ GET {{host}}/member/me
 Authorization: {{authorization}}
 
 ### 친구 관계 생성 API 
-POST {{host}}/member/create-friend
+POST {{host}}/member/friend
 Content-Type: application/json
 
 {

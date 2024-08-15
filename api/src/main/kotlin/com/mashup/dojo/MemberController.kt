@@ -170,7 +170,7 @@ class MemberController(
         return DojoApiResponse.success(MemberUpdateResponse(memberId))
     }
 
-    @PostMapping("/member/create-friend")
+    @PostMapping("/member/friend")
     @Operation(
         summary = "친구(팔로우)추가 API",
         description = "친구(팔로우) 관계 생성 API, 친구 추가 기능에 대해서 from 이 to 를 follow 합니다. 이미 follow가 존재한다면 예외를 반환해요",
