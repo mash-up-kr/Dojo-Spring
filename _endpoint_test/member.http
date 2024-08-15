@@ -28,3 +28,12 @@ GET {{host}}/member/mock/{{memberId}}}
 ### 내 프로필 조회 API
 GET {{host}}/member/me
 Authorization: {{authorization}}
+
+### 친구 관계 생성 API 
+POST {{host}}/member/create-friend
+Content-Type: application/json
+
+{
+    "fromMemberId": "22ee8f4c-c2db-49c5-ad5d-22db7bb67796",
+    "toMemberId": "71400a62-b535-48c3-967b-5a25a64137ae"
+}
