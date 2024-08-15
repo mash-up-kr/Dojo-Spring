@@ -24,10 +24,15 @@ interface MemberRelationService {
         toId: MemberId,
     )
 
+    fun bulkCreateRelation(
+        fromId: MemberId,
+        theOtherMemberIds: List<MemberId>,
+    ): List<MemberRelationId>
+
     fun updateRelationToFriend(
-        fromId: String,
-        toId: String,
-    )
+        fromId: MemberId,
+        toId: MemberId,
+    ): MemberRelationId
 
     fun isFriend(
         fromId: MemberId,
@@ -63,21 +68,36 @@ class DefaultMemberRelationService(
         fromId: MemberId,
         toId: MemberId,
     ) {
-        val memberRelation = MemberRelation.create(fromId, toId)
+        val memberRelation = MemberRelation.createAccompanyRelation(fromId, toId)
         memberRelationRepository.save(memberRelation.toEntity())
     }
 
     @Transactional
+    override fun bulkCreateRelation(
+        fromId: MemberId,
+        theOtherMemberIds: List<MemberId>,
+    ): List<MemberRelationId> {
+        val memberRelationEntityList =
+            theOtherMemberIds.map {
+                MemberRelation.createAccompanyRelation(fromId, it).toEntity()
+            }
+
+        val entities = memberRelationRepository.saveAll(memberRelationEntityList)
+        return entities.map { MemberRelationId(it.id) }
+    }
+
+    @Transactional
     override fun updateRelationToFriend(
-        fromId: String,
-        toId: String,
-    ) {
-        val toDomain = memberRelationRepository.findByFromIdAndToId(fromId, toId)?.toDomain() ?: throw DojoException.of(DojoExceptionType.FRIEND_NOT_FOUND)
+        fromId: MemberId,
+        toId: MemberId,
+    ): MemberRelationId {
+        val toDomain = memberRelationRepository.findByFromIdAndToId(fromId.value, toId.value)?.toDomain() ?: throw DojoException.of(DojoExceptionType.FRIEND_NOT_FOUND)
         if (toDomain.relation == RelationType.FRIEND) {
             throw DojoException.of(DojoExceptionType.ALREADY_FRIEND)
         }
+
         val updatedRelation = toDomain.updateToFriend()
-        memberRelationRepository.save(updatedRelation.toEntity())
+        return MemberRelationId(memberRelationRepository.save(updatedRelation.toEntity()).id)
     }
 
     override fun isFriend(

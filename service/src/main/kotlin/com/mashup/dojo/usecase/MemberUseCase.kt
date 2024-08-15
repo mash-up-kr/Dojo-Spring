@@ -6,6 +6,7 @@ import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
+import com.mashup.dojo.domain.MemberRelationId
 import com.mashup.dojo.service.CoinService
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberRelationService
@@ -39,6 +40,11 @@ interface MemberUseCase {
         val friendCount: Int,
     )
 
+    data class UpdateFriendCommand(
+        val fromId: MemberId,
+        val toId: MemberId,
+    )
+
     fun create(command: CreateCommand): MemberId
 
     fun update(command: UpdateCommand): MemberId
@@ -47,6 +53,10 @@ interface MemberUseCase {
 
     // ToDo 로직 연결 후 추후 제거
     fun findMemberByIdMock(targetMemberId: MemberId): ProfileResponse
+
+    fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId>
+
+    fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
 }
 
 @Component
@@ -131,5 +141,20 @@ class DefaultMemberUseCase(
             pickCount = 0,
             friendCount = 0
         )
+    }
+
+    @Transactional
+    override fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId> {
+        val allMemberIds =
+            memberService.findAllMember()
+                .filter { it.id != newMemberId }
+                .map { it.id }
+
+        return memberRelationService.bulkCreateRelation(newMemberId, allMemberIds)
+    }
+
+    @Transactional
+    override fun updateFriendRelation(command: MemberUseCase.UpdateFriendCommand): MemberRelationId {
+        return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
     }
 }

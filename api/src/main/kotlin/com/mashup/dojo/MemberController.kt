@@ -4,6 +4,8 @@ import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.config.security.JwtTokenService
 import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.domain.MemberRelationId
+import com.mashup.dojo.dto.MemberCreateFriendRelationRequest
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberLoginRequest
 import com.mashup.dojo.dto.MemberProfileResponse
@@ -54,6 +56,9 @@ class MemberController(
                     gender = request.gender
                 )
             )
+
+        // 가입된 멤버에 대해서 기본 관계 생성
+        memberUseCase.createDefaultMemberRelation(memberId)
 
         return DojoApiResponse.success(MemberCreateResponse(memberId))
     }
@@ -163,6 +168,20 @@ class MemberController(
             )
 
         return DojoApiResponse.success(MemberUpdateResponse(memberId))
+    }
+
+    @PostMapping("/member/friend")
+    @Operation(
+        summary = "친구(팔로우)추가 API",
+        description = "친구(팔로우) 관계 생성 API, 친구 추가 기능에 대해서 from 이 to 를 follow 합니다. 이미 follow가 존재한다면 예외를 반환해요",
+        responses = [
+            ApiResponse(responseCode = "200", description = "생성된 관계 id")
+        ]
+    )
+    fun createFriend(
+        @RequestBody request: MemberCreateFriendRelationRequest,
+    ): DojoApiResponse<MemberRelationId> {
+        return DojoApiResponse.success(memberUseCase.updateFriendRelation(MemberUseCase.UpdateFriendCommand(request.fromMemberId, request.toMemberId)))
     }
 
     data class MemberCreateResponse(
