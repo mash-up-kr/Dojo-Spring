@@ -12,6 +12,7 @@ import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
+import com.mashup.dojo.service.NotificationService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPick
@@ -93,6 +94,7 @@ class DefaultPickUseCase(
     private val questionService: QuestionService,
     private val imageService: ImageService,
     private val memberService: MemberService,
+    private val notificationService: NotificationService,
 ) : PickUseCase {
     override fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick> {
         val receivedPickList: List<Pick> = pickService.getReceivedPickList(command.memberId, command.sort)
@@ -147,7 +149,13 @@ class DefaultPickUseCase(
             questionSheetId = command.questionSheetId,
             pickerMemberId = command.pickerId,
             pickedMemberId = pickedMember.id
-        )
+        ).apply {
+            notificationService.notifyPicked(
+                pickId = this,
+                target = pickedMember,
+                questionId = question.id
+            )
+        }
     }
 
     override fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo {
