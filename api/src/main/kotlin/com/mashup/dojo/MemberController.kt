@@ -181,7 +181,7 @@ class MemberController(
     fun createFriend(
         @RequestBody request: MemberCreateFriendRelationRequest,
     ): DojoApiResponse<MemberRelationId> {
-        return DojoApiResponse.success(memberUseCase.updateFriendRelation(MemberUseCase.CreateFollowCommand(request.fromMemberId, request.toMemberId)))
+        return DojoApiResponse.success(memberUseCase.updateFriendRelation(MemberUseCase.UpdateFriendCommand(request.fromMemberId, request.toMemberId)))
     }
 
     data class MemberCreateResponse(

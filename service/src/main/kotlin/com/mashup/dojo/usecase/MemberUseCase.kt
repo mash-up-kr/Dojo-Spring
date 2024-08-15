@@ -40,7 +40,7 @@ interface MemberUseCase {
         val friendCount: Int,
     )
 
-    data class CreateFollowCommand(
+    data class UpdateFriendCommand(
         val fromId: MemberId,
         val toId: MemberId,
     )
@@ -56,7 +56,7 @@ interface MemberUseCase {
 
     fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId>
 
-    fun updateFriendRelation(command: CreateFollowCommand): MemberRelationId
+    fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
 }
 
 @Component
@@ -154,7 +154,7 @@ class DefaultMemberUseCase(
     }
 
     @Transactional
-    override fun updateFriendRelation(command: MemberUseCase.CreateFollowCommand): MemberRelationId {
+    override fun updateFriendRelation(command: MemberUseCase.UpdateFriendCommand): MemberRelationId {
         return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
     }
 }
