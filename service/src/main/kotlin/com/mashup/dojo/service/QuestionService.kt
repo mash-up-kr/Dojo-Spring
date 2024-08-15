@@ -61,7 +61,7 @@ interface QuestionService {
         emojiImageId: ImageId,
     ): QuestionId
 
-    fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId
+    fun createQuestionSet(latestQuestionSet: QuestionSet?): QuestionSetId
 
     fun createQuestionSet(
         questionIds: List<QuestionId>,
@@ -149,10 +149,10 @@ class DefaultQuestionService(
     }
 
     @Transactional
-    override fun createQuestionSet(excludedQuestionSet: QuestionSet?): QuestionSetId {
+    override fun createQuestionSet(latestQuestionSet: QuestionSet?): QuestionSetId {
         // 비율에 따라 questionType 선정
         val friendQuestionSize = floor(questionSetSize * friendQuestionRatio).toInt()
-        val excludedQuestionIds: List<String> = excludedQuestionSet?.questionIds?.map { it.questionId.value } ?: emptyList()
+        val excludedQuestionIds: List<String> = latestQuestionSet?.questionIds?.map { it.questionId.value } ?: emptyList()
 
         val friendQuestions =
             questionRepository.findRandomQuestions(com.mashup.dojo.QuestionType.FRIEND, excludedQuestionIds, Pageable.ofSize(friendQuestionSize))
@@ -167,7 +167,7 @@ class DefaultQuestionService(
             log.error {
                 "QSet 을 만들기 위한 남은 Question 들이 부족합니다. " +
                     "조회한 QuestionSize : ${questionList.size}, 친구용 질문 size : $friendQuestionSize, 전체용 질문 size : ${accompanyQuestions.size}, " +
-                    "이전 QSetId : ${excludedQuestionSet?.id}, 제외한 QuestionIds : $excludedQuestionIds"
+                    "이전 QSetId : ${latestQuestionSet?.id}, 제외한 QuestionIds : $excludedQuestionIds"
             }
 
             throw DojoException.of(DojoExceptionType.QUESTION_LACK_FOR_CREATE_QUESTION_SET)
@@ -179,10 +179,8 @@ class DefaultQuestionService(
             }
 
         // 마지막 QSet 의 발행 시각 가져오기
-        val latestQSet = getLatestPublishedQuestionSet()
-
         val publishedTime =
-            latestQSet?.endAt ?: run {
+            latestQuestionSet?.endAt ?: run {
                 val now = LocalTime.now()
                 val today = LocalDate.now()
 

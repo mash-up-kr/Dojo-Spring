@@ -110,7 +110,7 @@ class DefaultQuestionUseCase(
         // 가장 마지막에 만들어진 QSet 정보는 제외
         val latestQSet = questionService.getLatestPublishedQuestionSet()
 
-        return questionService.createQuestionSet(excludedQuestionSet = latestQSet)
+        return questionService.createQuestionSet(latestQuestionSet = latestQSet)
     }
 
     @Transactional
