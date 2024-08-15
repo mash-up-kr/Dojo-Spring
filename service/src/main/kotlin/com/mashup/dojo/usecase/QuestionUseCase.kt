@@ -122,7 +122,6 @@ class DefaultQuestionUseCase(
     override fun createQuestionSheet(): List<QuestionSheet> {
         val currentQuestionSet = questionService.getNextOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
         val allMemberRecords = memberService.findAllMember()
-        // ToDo Default 친구 수가 8명 이하일 경우 오류 발생하므로, 친구가 8명이 아니면 회원가입 불가능
 
         val allMemberQuestionSheets =
             allMemberRecords.flatMap { member ->
