@@ -17,6 +17,8 @@ interface MemberRelationUseCase {
     )
 
     fun getFriends(memberId: MemberId): List<FriendInfo>
+
+    fun getRecommendFriends(memberId: MemberId): List<FriendInfo>
 }
 
 @Component
@@ -33,6 +35,24 @@ class DefaultMemberRelationUseCase(
         val imageMap = images.associateBy { it.id.value }
 
         return friends.map { friend ->
+            FriendInfo(
+                memberId = friend.id.value,
+                profileImageUrl = imageMap[friend.profileImageId.value]?.url.let { "" },
+                memberName = friend.fullName,
+                platform = friend.platform.name,
+                ordinal = friend.ordinal
+            )
+        }
+    }
+
+    override fun getRecommendFriends(memberId: MemberId): List<FriendInfo> {
+        val recommendFriendIds = memberRelationService.getAccompanyRelationIds(memberId)
+        val recommendFriends = memberService.findAllByIds(recommendFriendIds)
+
+        val images = imageService.loadAllByIds(recommendFriends.map { it.profileImageId })
+        val imageMap = images.associateBy { it.id.value }
+
+        return recommendFriends.map { friend ->
             FriendInfo(
                 memberId = friend.id.value,
                 profileImageUrl = imageMap[friend.profileImageId.value]?.url.let { "" },

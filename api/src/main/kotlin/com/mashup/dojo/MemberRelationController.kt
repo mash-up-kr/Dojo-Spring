@@ -36,4 +36,27 @@ class MemberRelationController(
             }
         )
     }
+
+    @GetMapping("/recommend-friends")
+    @Operation(
+        summary = "추천 친구 목록 조회 API",
+        description = "추천 친구 목록을 조회하는 API"
+    )
+    fun getRecommendFriends(): DojoApiResponse<List<FriendInfoResponse>> {
+        val memberId = MemberPrincipalContextHolder.current().id
+
+        val recommendFriendInfos = memberRelationUseCase.getRecommendFriends(memberId)
+
+        return DojoApiResponse.success(
+            recommendFriendInfos.map {
+                FriendInfoResponse(
+                    memberId = it.memberId,
+                    profileImageUrl = it.profileImageUrl,
+                    memberName = it.memberName,
+                    platform = it.platform,
+                    ordinal = it.ordinal
+                )
+            }
+        )
+    }
 }
