@@ -15,7 +15,7 @@ POST {{host}}/public/member-login
 Content-Type: application/json
 
 {
-    "id": "df34d054-4534-4623-8996-9016162c430b"
+    "id": "f4b610eb-aa5d-47df-bd2a-d50fd9a94d2a"
 }
 
 ### 타인 프로필 조회 API
@@ -24,3 +24,7 @@ GET {{host}}/member/{{memberId}}}
 
 ### 타인 프로필 조회 Mock API
 GET {{host}}/member/mock/{{memberId}}}
+
+### 내 프로필 조회 API
+GET {{host}}/member/me
+Authorization: {{authorization}}
