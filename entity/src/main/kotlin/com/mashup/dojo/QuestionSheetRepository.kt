@@ -1,5 +1,6 @@
 package com.mashup.dojo
 
+import com.mashup.dojo.base.BaseTimeEntity
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
@@ -29,7 +30,7 @@ class QuestionSheetEntity(
     @Convert(converter = CandidateConverter::class)
     @Column(name = "candidates", nullable = false)
     val candidates: List<String>,
-)
+) : BaseTimeEntity()
 
 class CandidateConverter : AttributeConverter<List<String>, String> {
     override fun convertToDatabaseColumn(attribute: List<String>): String {
