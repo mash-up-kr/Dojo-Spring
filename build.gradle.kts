@@ -105,6 +105,7 @@ project(":entity") {
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 
     dependencies {
+        api(project(":common"))
         api("org.springframework.boot:spring-boot-starter-data-jpa")
         api("com.mysql:mysql-connector-j:${properties["mysqlConnectorVersion"]}")
         runtimeOnly("com.h2database:h2:${properties["h2DatabaseVersion"]}") // todo : fade out

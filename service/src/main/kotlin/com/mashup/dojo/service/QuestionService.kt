@@ -249,9 +249,8 @@ class DefaultQuestionService(
          * ToDo 아래는 추후 캐시에 넣는 작업을 해야합니다.
          * - cache put -> QuestionSet and return
          * - Temporarily set to create for all members, discuss details later
+         * 질문의 타입에 따라 적절한 후보자 리스트를 사용
          */
-
-        // 질문의 타입에 따라 적절한 후보자 리스트를 사용
 
         val candidates =
             if (questionType == QuestionType.FRIEND) {
