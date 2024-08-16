@@ -93,7 +93,12 @@ class MemberController(
     fun getProfile(
         @PathVariable memberId: String,
     ): DojoApiResponse<MemberProfileResponse> {
-        val profileResponse = memberUseCase.findMemberById(MemberId(memberId))
+        val currentMemberId = MemberPrincipalContextHolder.current().id
+        val profileResponse =
+            memberUseCase.findMemberById(
+                targetMemberId = MemberId(memberId),
+                currentMemberId = currentMemberId
+            )
 
         return DojoApiResponse.success(
             MemberProfileResponse(
@@ -210,7 +215,8 @@ class MemberController(
         ]
     )
     fun myPick(): DojoApiResponse<MySpacePickResponse> {
-        val receivedMySpacePicks = memberUseCase.receivedMySpacePicks()
+        val memberId = MemberPrincipalContextHolder.current().id
+        val receivedMySpacePicks = memberUseCase.receivedMySpacePicks(memberId)
         val response =
             receivedMySpacePicks.map {
                 MySpacePickDetail(

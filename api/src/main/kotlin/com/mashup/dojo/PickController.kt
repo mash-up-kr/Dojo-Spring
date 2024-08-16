@@ -1,6 +1,7 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
+import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
@@ -46,8 +47,14 @@ class PickController(
         // todo : add userinfo
         @RequestParam(required = false, defaultValue = "LATEST") sort: PickSort,
     ): DojoApiResponse<ReceivedPickListGetResponse> {
+        val currentMemberId = MemberPrincipalContextHolder.current().id
         val receivedPickList: List<PickUseCase.GetReceivedPick> =
-            pickUseCase.getReceivedPickList(PickUseCase.GetReceivedPickListCommand(MemberId("1"), sort))
+            pickUseCase.getReceivedPickList(
+                PickUseCase.GetReceivedPickListCommand(
+                    memberId = currentMemberId,
+                    sort = sort
+                )
+            )
 
         val pickResponseList =
             receivedPickList.map {
@@ -76,10 +83,9 @@ class PickController(
         @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
         @RequestParam(required = false, defaultValue = "10") pageSize: Int,
     ): DojoApiResponse<PickPaging> {
-        // ToDo 추후 실제 사용자로 변경
-        val currentMember = MemberId("1")
+        val currentMemberId = MemberPrincipalContextHolder.current().id
         val pickPaging: PickUseCase.GetPagingPick =
-            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(currentMember, QuestionId(questionId), pageNumber, pageSize))
+            pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(currentMemberId, QuestionId(questionId), pageNumber, pageSize))
 
         val pickDetails =
             pickPaging.picks.map {
