@@ -62,7 +62,6 @@ interface MemberUseCase {
     fun receivedMySpacePicks(): List<PickService.MySpacePickDetail>
 }
 
-
 @Component
 @Transactional(readOnly = true)
 class DefaultMemberUseCase(

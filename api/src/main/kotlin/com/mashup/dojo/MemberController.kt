@@ -226,7 +226,7 @@ class MemberController(
             MySpacePickResponse(response)
         )
     }
-    
+
     data class MemberCreateResponse(
         val id: MemberId,
     )
