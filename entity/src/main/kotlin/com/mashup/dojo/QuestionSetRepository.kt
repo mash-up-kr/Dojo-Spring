@@ -13,17 +13,14 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 
 interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
-    // publishedYn : True && publishedAt > now -> 현재 운영중인 QuestionSet
-    fun findByPublishedAtAfterAndEndAtBefore(
+    // publishedAt < now < endAt -> 현재 운영중인 QuestionSet
+    fun findByPublishedAtBeforeAndEndAtAfterOrderByPublishedAtAsc(
         publishedCompareTime: LocalDateTime = LocalDateTime.now(),
         endTimeCompareTime: LocalDateTime = LocalDateTime.now(),
     ): QuestionSetEntity?
 
-    // publishedYn : True && publishedAt < now -> 발행 직전(예정) QuestionSet
-    fun findByStatusAndPublishedAtAfter(
-        status: Status,
-        compareTime: LocalDateTime = LocalDateTime.now(),
-    ): QuestionSetEntity?
+    // publishedAt > now && 가장 작은 publishedAt -> 발행 직전(예정) QuestionSet
+    fun findFirstByPublishedAtAfterOrderByPublishedAtAsc(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
 
     fun findTopByOrderByPublishedAtDesc(): QuestionSetEntity?
 }
