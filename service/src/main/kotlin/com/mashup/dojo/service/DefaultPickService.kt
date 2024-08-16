@@ -27,7 +27,9 @@ interface PickService {
     fun getReceivedPickPaging(
         pickedMemberId: MemberId,
         sort: PickSort,
-    ): List<Pick>
+        pageNumber: Int,
+        pageSize: Int,
+    ): GetPickPaging
 
     fun getSolvedPickList(
         pickerMemberId: MemberId,
@@ -70,7 +72,24 @@ interface PickService {
     ): Int
 
     fun getReceivedMySpacePicks(memberId: MemberId): List<MySpacePickDetail>
-    
+
+    data class GetPickPaging(
+        val picks: List<GetReceivedPick>,
+        val totalPage: Int,
+        val totalElements: Long,
+        val isFirst: Boolean,
+        val isLast: Boolean,
+    )
+
+    data class GetReceivedPick(
+        val pickId: PickId,
+        val questionId: QuestionId,
+        val questionContent: String,
+        val questionEmojiImageUrl: String,
+        val latestPickedAt: LocalDateTime,
+        val totalReceivedPickCount: Int,
+    )
+
     data class GetPickDetailPaging(
         val picks: List<GetReceivedPickDetail>,
         val totalPage: Int,
@@ -116,9 +135,37 @@ class DefaultPickService(
     override fun getReceivedPickPaging(
         pickedMemberId: MemberId,
         sort: PickSort,
-    ): List<Pick> {
-        return pickRepository.findAllByPickedId(pickedMemberId.value)
-            .map { it.toPick() }
+        pageNumber: Int,
+        pageSize: Int,
+    ): PickService.GetPickPaging {
+        val pageable = PageRequest.of(pageNumber, pageSize)
+
+        val pickPaging =
+            pickRepository.findGroupByPickPaging(
+                pickedId = pickedMemberId.value,
+                sort = sort.name,
+                pageable = pageable
+            )
+
+        val receivedPicks =
+            pickPaging.content.map {
+                PickService.GetReceivedPick(
+                    pickId = PickId(it.pickId),
+                    questionId = QuestionId(it.questionId),
+                    questionContent = it.questionContent,
+                    questionEmojiImageUrl = it.questionEmojiImageUrl,
+                    latestPickedAt = it.latestPickedAt,
+                    totalReceivedPickCount = it.totalReceivedPickCount.toInt()
+                )
+            }
+
+        return PickService.GetPickPaging(
+            picks = receivedPicks,
+            totalPage = pickPaging.totalPages,
+            totalElements = pickPaging.totalElements,
+            isFirst = pickPaging.isFirst,
+            isLast = pickPaging.isLast
+        )
     }
 
     override fun getSolvedPickList(

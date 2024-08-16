@@ -100,4 +100,12 @@ enum class PickOpenItem(val value: String, val cost: Int) {
 enum class PickSort {
     LATEST,
     MOST_PICKED,
+    ;
+
+    companion object {
+        fun findByValue(value: String): PickSort {
+            return PickSort.entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw DojoException.of(DojoExceptionType.SORT_CLIENT_NOT_FOUND)
+        }
+    }
 }

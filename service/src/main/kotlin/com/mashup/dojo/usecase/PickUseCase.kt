@@ -3,7 +3,6 @@ package com.mashup.dojo.usecase
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberId
-import com.mashup.dojo.domain.Pick
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
@@ -16,16 +15,18 @@ import com.mashup.dojo.service.NotificationService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPick
-import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickListCommand
+import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickPagingCommand
 import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 interface PickUseCase {
-    data class GetReceivedPickListCommand(
+    data class GetReceivedPickPagingCommand(
         val memberId: MemberId,
         val sort: PickSort,
+        val pageNumber: Int,
+        val pageSize: Int,
     )
 
     data class GetReceivedPick(
@@ -77,7 +78,7 @@ interface PickUseCase {
         val value: String,
     )
 
-    fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick>
+    fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging
 
     fun createPick(command: CreatePickCommand): PickId
 
@@ -96,41 +97,13 @@ class DefaultPickUseCase(
     private val memberService: MemberService,
     private val notificationService: NotificationService,
 ) : PickUseCase {
-    override fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick> {
-        val receivedPickList: List<Pick> = pickService.getReceivedPickPaging(command.memberId, command.sort)
-
-        if (receivedPickList.isEmpty()) return EMPTY_RECEIVED_PICK
-
-        val result =
-            receivedPickList.groupBy { it.questionId }
-                .flatMap { (questionId, pickList) ->
-                    val question =
-                        questionService.getQuestionById(questionId)
-                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [$questionId]")
-
-                    val url =
-                        imageService.load(question.emojiImageId)?.url
-                            ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [${question.emojiImageId}]")
-
-                    val pickedTotalCount = pickList.size
-                    val latestPickedAt = pickList.maxBy { it.createdAt }.createdAt
-
-                    pickList.map { pick ->
-                        GetReceivedPick(
-                            pickId = pick.id,
-                            questionId = question.id,
-                            questionContent = question.content,
-                            questionEmojiImageUrl = url,
-                            totalReceivedPickCount = pickedTotalCount,
-                            latestPickedAt = latestPickedAt
-                        )
-                    }
-                }
-
-        return when (command.sort) {
-            PickSort.LATEST -> result.sortedByDescending { it.latestPickedAt }
-            PickSort.MOST_PICKED -> result.sortedByDescending { it.totalReceivedPickCount }
-        }
+    override fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging {
+        return pickService.getReceivedPickPaging(
+            pickedMemberId = command.memberId,
+            sort = command.sort,
+            pageNumber = command.pageNumber,
+            pageSize = command.pageSize
+        )
     }
 
     override fun createPick(command: PickUseCase.CreatePickCommand): PickId {
