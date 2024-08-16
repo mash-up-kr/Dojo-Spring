@@ -68,6 +68,8 @@ interface PickService {
         memberId: MemberId,
     ): Int
 
+    fun getReceivedMySpacePicks(memberId: MemberId): List<MySpacePickDetail>
+
     data class GetPagingPick(
         val picks: List<GetReceivedPickDetail>,
         val totalPage: Int,
@@ -90,6 +92,14 @@ interface PickService {
         val pickerFullNameOpen: Boolean,
         val pickerFullName: String,
         val latestPickedAt: LocalDateTime,
+    )
+
+    data class MySpacePickDetail(
+        val pickId: PickId,
+        val rank: Int = -1,
+        val pickContent: String,
+        val pickCount: Int,
+        val createdAt: LocalDateTime,
     )
 }
 
@@ -302,6 +312,18 @@ class DefaultPickService(
         return pickRepository.getOpenPickerCount(questionId.value, memberId.value).toInt()
     }
 
+    override fun getReceivedMySpacePicks(memberId: MemberId): List<PickService.MySpacePickDetail> {
+        return pickRepository.findTopRankPicksByMemberId(memberId = memberId.value, rank = DEFAULT_RANK).map { pick ->
+            val pickCount = pickRepository.findPickDetailCount(memberId = memberId.value, questionId = pick.questionId)
+            PickService.MySpacePickDetail(
+                pickId = PickId(pick.pickId),
+                pickCount = pickCount.toInt(),
+                pickContent = pick.questionContent,
+                createdAt = pick.createdAt
+            )
+        }
+    }
+
     companion object {
         private val ZONE_ID = ZoneId.of("Asia/Seoul")
 
@@ -322,6 +344,8 @@ class DefaultPickService(
             )
 
         private const val UNKNOWN = "UNKNOWN"
+
+        private const val DEFAULT_RANK = 3L
     }
 }
 
@@ -355,4 +379,31 @@ private fun PickEntity.toPick(): Pick {
         createdAt = createdAt,
         updatedAt = updatedAt
     )
+}
+
+fun List<PickService.MySpacePickDetail>.calculateRanks(): List<PickService.MySpacePickDetail> {
+    if (this.isEmpty()) return this
+
+    // 첫 번째 조건: pickCount 내림차순 정렬
+    // 두 번째 조건: createdAt 내림차순 정렬
+    val sortedPicks =
+        this.sortedWith(
+            compareByDescending<PickService.MySpacePickDetail> { it.pickCount }
+                .thenByDescending { it.createdAt }
+        )
+
+    var currentRank = 1
+    var previousRank = 1
+
+    return sortedPicks.mapIndexed { index, currentPick ->
+        if (index > 0) {
+            val previousPick = sortedPicks[index - 1]
+            // PickCount가 다르면 현재 등수 업데이트
+            if (currentPick.pickCount != previousPick.pickCount) {
+                currentRank = index + 1
+            }
+        }
+        previousRank = currentRank
+        currentPick.copy(rank = currentRank)
+    }
 }

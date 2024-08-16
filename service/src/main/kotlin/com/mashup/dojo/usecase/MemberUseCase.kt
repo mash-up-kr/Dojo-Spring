@@ -12,6 +12,7 @@ import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
+import com.mashup.dojo.service.calculateRanks
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -57,7 +58,10 @@ interface MemberUseCase {
     fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId>
 
     fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
+
+    fun receivedMySpacePicks(): List<PickService.MySpacePickDetail>
 }
+
 
 @Component
 @Transactional(readOnly = true)
@@ -156,5 +160,13 @@ class DefaultMemberUseCase(
     @Transactional
     override fun updateFriendRelation(command: MemberUseCase.UpdateFriendCommand): MemberRelationId {
         return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
+    }
+
+    override fun receivedMySpacePicks(): List<PickService.MySpacePickDetail> {
+        // ToDo 실제 로그인 값으로 사용
+        val currentMemberId = MemberId("currentMemberId")
+        val mySpacePicks = pickService.getReceivedMySpacePicks(currentMemberId)
+
+        return mySpacePicks.calculateRanks()
     }
 }
