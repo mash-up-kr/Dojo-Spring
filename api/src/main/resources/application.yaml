@@ -12,6 +12,8 @@ dojo:
     open-time-2: "23:00:00"
   candidate:
     size: 8
+  rank:
+    size: 3
 
 scheduler:
   cron: "0 0 9,21 * * *"
@@ -22,4 +24,3 @@ cloud:
     cloudwatch:
       access-key: ${CLOUDWATCH_ACCESS_KEY}
       secret-key: ${CLOUDWATCH_SECRET_KEY}
-      
