@@ -116,7 +116,7 @@ class DefaultQuestionService(
 
     // 현재 운영중인 QuestionSet
     override fun getOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findByPublishedAtAfterAndEndAtBefore(LocalDateTime.now(), LocalDateTime.now())
+        return questionSetRepository.findByPublishedAtBeforeAndEndAtAfterOrderByPublishedAtAsc()
             ?.toQuestionSet() ?: run {
             log.error { "Published And Operating QuestionSet Entity not found" }
             null
@@ -125,8 +125,7 @@ class DefaultQuestionService(
 
     // 발행 출격 준비 완료 QuestionSet
     override fun getNextOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findByStatusAndPublishedAtAfter(Status.UPCOMING, LocalDateTime.now())
-            ?.toQuestionSet() ?: run {
+        return questionSetRepository.findFirstByPublishedAtAfterOrderByPublishedAtAsc()?.toQuestionSet() ?: run {
             log.error { "Published And Prepared for sortie QuestionSet Entity not found" }
             null
         }
