@@ -84,6 +84,10 @@ project(":api") {
         implementation("io.jsonwebtoken:jjwt-api:0.12.6")
         runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
         runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
+        // Shedlock for Scheduler
+        implementation("net.javacrumbs.shedlock:shedlock-spring:4.14.0")
+        implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.14.0")
     }
 }
 
