@@ -91,6 +91,9 @@ project(":service") {
     dependencies {
         api(project(":entity"))
         api(project(":common"))
+
+        // for sse
+        implementation("org.springframework.boot:spring-boot-starter-web")
     }
 }
 
