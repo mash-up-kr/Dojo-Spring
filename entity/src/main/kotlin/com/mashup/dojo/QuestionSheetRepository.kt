@@ -28,7 +28,7 @@ class QuestionSheetEntity(
     @Column(name = "resolver_id", nullable = false)
     val resolverId: String,
     @Convert(converter = CandidateConverter::class)
-    @Column(name = "candidates", nullable = false)
+    @Column(name = "candidates", nullable = false, length = 2048)
     val candidates: List<String>,
 ) : BaseTimeEntity()
 

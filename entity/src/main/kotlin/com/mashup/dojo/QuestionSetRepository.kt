@@ -31,7 +31,7 @@ class QuestionSetEntity(
     @Id
     val id: String,
     @Convert(converter = QuestionIdConverter::class)
-    @Column(name = "question_ids", nullable = false)
+    @Column(name = "question_ids", nullable = false, length = 2048)
     val questionIds: List<String>,
     @Column(name = "published_yn", nullable = false)
     @Enumerated(EnumType.STRING)
