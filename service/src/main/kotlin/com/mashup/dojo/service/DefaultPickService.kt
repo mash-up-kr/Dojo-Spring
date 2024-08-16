@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 interface PickService {
-    fun getReceivedPickList(
+    fun getReceivedPickPaging(
         pickedMemberId: MemberId,
         sort: PickSort,
     ): List<Pick>
@@ -48,12 +48,12 @@ interface PickService {
         pickOpenItem: PickOpenItem,
     ): String
 
-    fun getPickPaging(
+    fun getPickDetailPaging(
         questionId: QuestionId,
         memberId: MemberId,
         pageNumber: Int,
         pageSize: Int,
-    ): GetPagingPick
+    ): GetPickDetailPaging
 
     fun getPickCount(
         questionId: QuestionId,
@@ -70,8 +70,8 @@ interface PickService {
     ): Int
 
     fun getReceivedMySpacePicks(memberId: MemberId): List<MySpacePickDetail>
-
-    data class GetPagingPick(
+    
+    data class GetPickDetailPaging(
         val picks: List<GetReceivedPickDetail>,
         val totalPage: Int,
         val totalElements: Long,
@@ -113,7 +113,7 @@ class DefaultPickService(
     @Value("\${dojo.rank.size}")
     private val defaultRankSize: Long,
 ) : PickService {
-    override fun getReceivedPickList(
+    override fun getReceivedPickPaging(
         pickedMemberId: MemberId,
         sort: PickSort,
     ): List<Pick> {
@@ -178,12 +178,12 @@ class DefaultPickService(
         return pickRepository.findByIdOrNull(pickId.value)?.toPick()
     }
 
-    override fun getPickPaging(
+    override fun getPickDetailPaging(
         questionId: QuestionId,
         memberId: MemberId,
         pageNumber: Int,
         pageSize: Int,
-    ): PickService.GetPagingPick {
+    ): PickService.GetPickDetailPaging {
         val pageable = PageRequest.of(pageNumber, pageSize)
         val pagingPick = pickRepository.findPickDetailPaging(memberId = memberId.value, questionId = questionId.value, pageable = pageable)
 
@@ -219,7 +219,7 @@ class DefaultPickService(
                 )
             }
 
-        return PickService.GetPagingPick(
+        return PickService.GetPickDetailPaging(
             picks = receivedPickDetails,
             totalPage = pagingPick.totalPages,
             totalElements = pagingPick.totalElements,

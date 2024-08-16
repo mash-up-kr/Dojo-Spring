@@ -44,7 +44,7 @@ interface PickUseCase {
         val pageSize: Int,
     )
 
-    data class GetPagingPick(
+    data class GetPickDetailPaging(
         val questionId: QuestionId,
         val questionContent: String,
         val questionEmojiImageUrl: String,
@@ -85,7 +85,7 @@ interface PickUseCase {
 
     fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo
 
-    fun getReceivedPickDetailPaging(command: GetPagingPickCommand): GetPagingPick
+    fun getReceivedPickDetailPaging(command: GetPagingPickCommand): GetPickDetailPaging
 }
 
 @Component
@@ -97,7 +97,7 @@ class DefaultPickUseCase(
     private val notificationService: NotificationService,
 ) : PickUseCase {
     override fun getReceivedPickList(command: GetReceivedPickListCommand): List<GetReceivedPick> {
-        val receivedPickList: List<Pick> = pickService.getReceivedPickList(command.memberId, command.sort)
+        val receivedPickList: List<Pick> = pickService.getReceivedPickPaging(command.memberId, command.sort)
 
         if (receivedPickList.isEmpty()) return EMPTY_RECEIVED_PICK
 
@@ -166,7 +166,7 @@ class DefaultPickUseCase(
         ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it) }
     }
 
-    override fun getReceivedPickDetailPaging(command: PickUseCase.GetPagingPickCommand): PickUseCase.GetPagingPick {
+    override fun getReceivedPickDetailPaging(command: PickUseCase.GetPagingPickCommand): PickUseCase.GetPickDetailPaging {
         val question =
             questionService.getQuestionById(command.questionId)
                 ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "등록되지 않은 QuestionId 입니다. QuestionId: [${command.questionId}]")
@@ -177,11 +177,11 @@ class DefaultPickUseCase(
 
         val pickCount: Int = pickService.getPickCount(question.id, command.memberId)
 
-        val receivedPickPaging = pickService.getPickPaging(question.id, command.memberId, command.pageNumber, command.pageSize)
+        val receivedPickPaging = pickService.getPickDetailPaging(question.id, command.memberId, command.pageNumber, command.pageSize)
 
         val anyOpenPickerCount = pickService.getAnyOpenPickerCount(question.id, command.memberId)
 
-        return PickUseCase.GetPagingPick(
+        return PickUseCase.GetPickDetailPaging(
             questionId = question.id,
             questionContent = question.content,
             questionEmojiImageUrl = imageUrl,

@@ -84,11 +84,11 @@ class PickController(
         @RequestParam(required = false, defaultValue = "10") pageSize: Int,
     ): DojoApiResponse<PickPaging> {
         val currentMemberId = MemberPrincipalContextHolder.current().id
-        val pickPaging: PickUseCase.GetPagingPick =
+        val pickDetailPaging: PickUseCase.GetPickDetailPaging =
             pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(currentMemberId, QuestionId(questionId), pageNumber, pageSize))
 
         val pickDetails =
-            pickPaging.picks.map {
+            pickDetailPaging.picks.map {
                 ReceivedPickDetail(
                     pickId = it.pickId,
                     pickerOrdinal = it.pickerOrdinal,
@@ -107,16 +107,16 @@ class PickController(
             }
         val pickPagingResponse =
             PickPaging(
-                questionId = pickPaging.questionId,
-                questionContent = pickPaging.questionContent,
-                questionEmojiImageUrl = pickPaging.questionEmojiImageUrl,
-                totalReceivedPickCount = pickPaging.totalReceivedPickCount,
-                anyOpenPickerCount = pickPaging.anyOpenPickerCount,
+                questionId = pickDetailPaging.questionId,
+                questionContent = pickDetailPaging.questionContent,
+                questionEmojiImageUrl = pickDetailPaging.questionEmojiImageUrl,
+                totalReceivedPickCount = pickDetailPaging.totalReceivedPickCount,
+                anyOpenPickerCount = pickDetailPaging.anyOpenPickerCount,
                 picks = pickDetails,
-                totalPage = pickPaging.totalPage,
-                totalElements = pickPaging.totalElements,
-                isFirst = pickPaging.isFirst,
-                isLast = pickPaging.isLast
+                totalPage = pickDetailPaging.totalPage,
+                totalElements = pickDetailPaging.totalElements,
+                isFirst = pickDetailPaging.isFirst,
+                isLast = pickDetailPaging.isLast
             )
 
         return DojoApiResponse.success(pickPagingResponse)
