@@ -15,6 +15,7 @@ import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -109,6 +110,8 @@ class DefaultPickService(
     private val pickRepository: PickRepository,
     private val memberService: MemberService,
     private val pickTimeRepository: PickTimeRepository,
+    @Value("\${dojo.rank.size}")
+    private val defaultRankSize: Long,
 ) : PickService {
     override fun getReceivedPickList(
         pickedMemberId: MemberId,
@@ -313,7 +316,7 @@ class DefaultPickService(
     }
 
     override fun getReceivedMySpacePicks(memberId: MemberId): List<PickService.MySpacePickDetail> {
-        return pickRepository.findTopRankPicksByMemberId(memberId = memberId.value, rank = DEFAULT_RANK).map { pick ->
+        return pickRepository.findTopRankPicksByMemberId(memberId = memberId.value, rank = defaultRankSize).map { pick ->
             val pickCount = pickRepository.findPickDetailCount(memberId = memberId.value, questionId = pick.questionId)
             PickService.MySpacePickDetail(
                 pickId = PickId(pick.pickId),
@@ -344,8 +347,6 @@ class DefaultPickService(
             )
 
         private const val UNKNOWN = "UNKNOWN"
-
-        private const val DEFAULT_RANK = 3L
     }
 }
 
