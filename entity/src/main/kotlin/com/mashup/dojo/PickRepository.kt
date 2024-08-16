@@ -67,6 +67,11 @@ interface PickRepositoryCustom {
         memberId: String,
         questionSetId: String,
     ): List<PickEntity>
+
+    fun findTopRankPicksByMemberId(
+        memberId: String,
+        rank: Long,
+    ): List<PickQuestionMapper>
 }
 
 class PickRepositoryImpl(
@@ -188,6 +193,34 @@ class PickRepositoryImpl(
             )
             .fetch()
     }
+
+    override fun findTopRankPicksByMemberId(
+        memberId: String,
+        rank: Long,
+    ): List<PickQuestionMapper> {
+        val pickEntity = QPickEntity.pickEntity
+        val questionEntity = QQuestionEntity.questionEntity
+
+        return jpaQueryFactory
+            .select(
+                QPickQuestionMapper(
+                    pickEntity.id,
+                    questionEntity.id,
+                    questionEntity.content,
+                    pickEntity.createdAt
+                )
+            )
+            .from(pickEntity)
+            .join(questionEntity).on(pickEntity.questionId.eq(questionEntity.id))
+            .where(pickEntity.pickedId.eq(memberId))
+            .groupBy(pickEntity.questionId)
+            .orderBy(
+                Wildcard.count.desc(),
+                pickEntity.createdAt.desc()
+            )
+            .limit(rank)
+            .fetch()
+    }
 }
 
 data class PickEntityMapper
@@ -210,4 +243,13 @@ data class PickEntityMapper
         val pickerPlatform: String,
         val pickerSecondInitialName: String,
         val pickerFullName: String,
+    )
+
+data class PickQuestionMapper
+    @QueryProjection
+    constructor(
+        val pickId: String,
+        val questionId: String,
+        val questionContent: String,
+        val createdAt: LocalDateTime,
     )

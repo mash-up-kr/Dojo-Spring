@@ -37,3 +37,8 @@ Content-Type: application/json
     "fromMemberId": "22ee8f4c-c2db-49c5-ad5d-22db7bb67796",
     "toMemberId": "71400a62-b535-48c3-967b-5a25a64137ae"
 }
+
+
+### 마이스페이스 내가 받은 픽 조회 API
+GET {{host}}/member/my-space/pick
+Authorization: {{authorization}}

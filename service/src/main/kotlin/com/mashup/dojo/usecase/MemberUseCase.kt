@@ -12,6 +12,7 @@ import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
+import com.mashup.dojo.service.calculateRanks
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -49,7 +50,10 @@ interface MemberUseCase {
 
     fun update(command: UpdateCommand): MemberId
 
-    fun findMemberById(targetMemberId: MemberId): ProfileResponse
+    fun findMemberById(
+        targetMemberId: MemberId,
+        currentMemberId: MemberId,
+    ): ProfileResponse
 
     // ToDo 로직 연결 후 추후 제거
     fun findMemberByIdMock(targetMemberId: MemberId): ProfileResponse
@@ -57,6 +61,8 @@ interface MemberUseCase {
     fun createDefaultMemberRelation(newMemberId: MemberId): List<MemberRelationId>
 
     fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
+
+    fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.MySpacePickDetail>
 }
 
 @Component
@@ -96,7 +102,10 @@ class DefaultMemberUseCase(
         )
     }
 
-    override fun findMemberById(targetMemberId: MemberId): MemberUseCase.ProfileResponse {
+    override fun findMemberById(
+        targetMemberId: MemberId,
+        currentMemberId: MemberId,
+    ): MemberUseCase.ProfileResponse {
         // ToDo 현재 프로필 조회시 query 5번 호출되는데 나중에 수정할 것인지
 
         val findMember =
@@ -111,10 +120,7 @@ class DefaultMemberUseCase(
 
         val pickCountByMemberId = pickService.findPickCountByMemberId(findMember.id)
 
-        // ToDo 실제 사용자 가져와야함
-        val currentMemberId = "currentMemberId"
-
-        val isFriend = memberRelationService.isFriend(MemberId(currentMemberId), targetMemberId)
+        val isFriend = memberRelationService.isFriend(currentMemberId, targetMemberId)
         val friendCount = memberRelationService.getFriendRelationIds(targetMemberId).size
 
         return MemberUseCase.ProfileResponse(
@@ -156,5 +162,11 @@ class DefaultMemberUseCase(
     @Transactional
     override fun updateFriendRelation(command: MemberUseCase.UpdateFriendCommand): MemberRelationId {
         return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
+    }
+
+    override fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.MySpacePickDetail> {
+        val mySpacePicks = pickService.getReceivedMySpacePicks(currentMemberId)
+
+        return mySpacePicks.calculateRanks()
     }
 }
