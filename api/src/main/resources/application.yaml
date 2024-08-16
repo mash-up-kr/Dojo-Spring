@@ -16,8 +16,8 @@ dojo:
     size: 3
 
 scheduler:
-  cron: "0 10 2 * * *"
-  sheet-cron: "0 15 2 * * *"
+  cron: "0 30 2 * * *"
+  sheet-cron: "0 35 2 * * *"
 
 cloud:
   aws:
