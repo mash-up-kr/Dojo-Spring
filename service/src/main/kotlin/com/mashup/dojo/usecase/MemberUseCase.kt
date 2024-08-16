@@ -188,7 +188,8 @@ class DefaultMemberUseCase(
         val relations = memberRelationService.findRelationByIds(memberId, members.map { it.id })
         val relationMap = relations.associateBy { it.toId.value }
 
-        // todo: 프로필 이미지 조회 (코드 중복으로 https://github.com/mash-up-kr/Dojo-Spring/pull/93 PR 머지 후 추가 예정)
+        var images = imageService.loadAllByIds(members.map { it.profileImageId })
+        var imageMap = images.associateBy { it.id.value }
 
         return members.map { member ->
             val relation =
@@ -197,7 +198,7 @@ class DefaultMemberUseCase(
 
             MemberUseCase.MemberSearchInfo(
                 memberId = member.id.value,
-                profileImageUrl = "",
+                profileImageUrl = imageMap[member.profileImageId.value]?.url.let { "" },
                 memberName = member.fullName,
                 platform = member.platform.name,
                 ordinal = member.ordinal,
