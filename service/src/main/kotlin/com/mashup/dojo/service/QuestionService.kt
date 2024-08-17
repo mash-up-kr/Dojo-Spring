@@ -49,6 +49,8 @@ interface QuestionService {
 
     fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet?
 
+    fun updateQuestionSetToReady(questionSet: QuestionSet): QuestionSetId
+
     fun getQuestionSheets(
         resolverId: MemberId,
         questionSetId: QuestionSetId,
@@ -129,7 +131,7 @@ class DefaultQuestionService(
 
     // 발행 출격 준비 완료 QuestionSet
     override fun getNextOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findFirstByPublishedAtAfterOrderByPublishedAtAsc()?.toQuestionSet() ?: run {
+        return questionSetRepository.findFirstByStatusAndPublishedAtAfterOrderByPublishedAtAsc(Status.UPCOMING)?.toQuestionSet() ?: run {
             log.error { "Published And Prepared for sortie QuestionSet Entity not found" }
             null
         }
@@ -141,6 +143,12 @@ class DefaultQuestionService(
 
     override fun getQuestionSetById(questionSetId: QuestionSetId): QuestionSet? {
         return questionSetRepository.findByIdOrNull(questionSetId.value)?.toQuestionSet()
+    }
+
+    @Transactional
+    override fun updateQuestionSetToReady(questionSet: QuestionSet): QuestionSetId {
+        val entity = questionSetRepository.save(questionSet.updateToReady().toEntity())
+        return QuestionSetId(entity.id)
     }
 
     override fun getQuestionSheets(
@@ -266,6 +274,7 @@ class DefaultQuestionService(
         )
     }
 
+    @Transactional
     override fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet> {
         val questionSheetEntities = allMemberQuestionSheets.map { it.toEntity() }
         val saveQuestionSheetEntities = questionSheetRepository.saveAll(questionSheetEntities)
@@ -381,6 +390,7 @@ private fun Status.toDomainPublishStatus(): PublishStatus {
     return when (this) {
         Status.TERMINATED -> PublishStatus.TERMINATED
         Status.ACTIVE -> PublishStatus.ACTIVE
+        Status.READY -> PublishStatus.READY
         Status.UPCOMING -> PublishStatus.UPCOMING
     }
 }
@@ -389,6 +399,7 @@ private fun PublishStatus.toDomainPublishStatus(): Status {
     return when (this) {
         PublishStatus.TERMINATED -> Status.TERMINATED
         PublishStatus.ACTIVE -> Status.ACTIVE
+        PublishStatus.READY -> Status.READY
         PublishStatus.UPCOMING -> Status.UPCOMING
     }
 }

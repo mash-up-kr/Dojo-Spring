@@ -21,6 +21,8 @@ data class QuestionSet(
     val publishedAt: LocalDateTime,
     val endAt: LocalDateTime,
 ) {
+    fun updateToReady() = this.copy(status = PublishStatus.READY)
+
     companion object {
         fun create(
             questionOrders: List<QuestionOrder>,
@@ -40,5 +42,6 @@ data class QuestionSet(
 enum class PublishStatus {
     TERMINATED, // 종료
     ACTIVE, // 운영중
+    READY, // QSheet 생성까지 준비 완료
     UPCOMING, // 예정
 }
