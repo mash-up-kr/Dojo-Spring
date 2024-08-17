@@ -47,4 +47,8 @@ enum class DojoExceptionType(
 
     // MemberRelation
     RELATION_NOT_FOUND("Relation not found", "MR001_RELATION_NOT_FOUND", 500),
+
+    // Pick Paging Sort
+    SORT_CLIENT_NOT_FOUND("Bad SortType", "SORT_NOT_FOUND", 400),
+    SORT_NOT_FOUND("Sort Type not found", "SORT_NOT_FOUND", 500),
 }

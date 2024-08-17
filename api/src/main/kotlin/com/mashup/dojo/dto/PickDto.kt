@@ -26,9 +26,15 @@ data class CreatePickRequest(
     val pickedId: MemberId,
 )
 
-data class ReceivedPickListGetResponse(
+data class ReceivedPickPagingGetResponse(
     val pickList: List<PickResponse>,
+    val totalPage: Int,
+    val totalElements: Long,
+    val isFirst: Boolean,
+    val isLast: Boolean,
     val sort: PickSort,
+    val pageNumber: Int,
+    val pageSize: Int,
 )
 
 // todo : 질문의 유형(카테고리)도 전달해줘야 하는가
@@ -41,7 +47,7 @@ data class PickResponse(
     val latestPickedAt: LocalDateTime,
 )
 
-data class PickPaging(
+data class PickDetailPaging(
     val questionId: QuestionId,
     val questionContent: String,
     val questionEmojiImageUrl: String,

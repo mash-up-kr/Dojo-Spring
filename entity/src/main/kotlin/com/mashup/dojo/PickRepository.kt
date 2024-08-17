@@ -4,6 +4,7 @@ import com.mashup.dojo.base.BaseTimeEntity
 import com.querydsl.core.annotations.QueryProjection
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Wildcard
+import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -72,6 +73,12 @@ interface PickRepositoryCustom {
         memberId: String,
         rank: Long,
     ): List<PickQuestionMapper>
+
+    fun findGroupByPickPaging(
+        pickedId: String,
+        sort: String,
+        pageable: Pageable,
+    ): Page<PickQuestionDetailMapper>
 }
 
 class PickRepositoryImpl(
@@ -221,6 +228,75 @@ class PickRepositoryImpl(
             .limit(rank)
             .fetch()
     }
+
+    override fun findGroupByPickPaging(
+        pickedId: String,
+        sort: String,
+        pageable: Pageable,
+    ): Page<PickQuestionDetailMapper> {
+        val content = getGroupByPickContent(pickedId, sort, pageable)
+        val totalCount = getGroupByPickTotalCount(pickedId)
+
+        return PageImpl(content, pageable, totalCount)
+    }
+
+    private fun getGroupByPickContent(
+        pickedId: String,
+        sort: String,
+        pageable: Pageable,
+    ): List<PickQuestionDetailMapper> {
+        val pickEntity = QPickEntity.pickEntity
+        val questionEntity = QQuestionEntity.questionEntity
+        val imageEntity = QImageEntity.imageEntity
+
+        val query =
+            jpaQueryFactory
+                .select(
+                    QPickQuestionDetailMapper(
+                        pickEntity.id,
+                        questionEntity.id,
+                        questionEntity.content,
+                        imageEntity.url,
+                        // 가장 최근의 Pick 시간 가져오기
+                        pickEntity.createdAt.max().`as`("latestPickedAt"),
+                        pickEntity.id.count().`as`("totalReceivedPickCount")
+                    )
+                )
+                .from(pickEntity)
+                .join(questionEntity).on(pickEntity.questionId.eq(questionEntity.id))
+                .join(imageEntity).on(questionEntity.emojiImageId.eq(imageEntity.id))
+                .where(pickEntity.pickedId.eq(pickedId))
+                // Question, Image URL 기준으로 그룹화
+                .groupBy(pickEntity.questionId, imageEntity.url)
+
+        val sortedQuery = getSorted(sort, query)
+
+        return sortedQuery
+            .limit(pageable.pageSize.toLong())
+            .offset(pageable.offset)
+            .fetch()
+    }
+
+    private fun getSorted(
+        sort: String,
+        query: JPAQuery<PickQuestionDetailMapper>,
+    ): JPAQuery<PickQuestionDetailMapper> {
+        val pickEntity = QPickEntity.pickEntity
+        return when (PickSort.findByValue(sort)) {
+            PickSort.MOST_PICKED -> query.orderBy(Wildcard.count.desc(), pickEntity.createdAt.desc())
+            PickSort.LATEST -> query.orderBy(pickEntity.createdAt.desc())
+        }
+    }
+
+    private fun getGroupByPickTotalCount(pickedId: String): Long {
+        val pickEntity = QPickEntity.pickEntity
+
+        return jpaQueryFactory
+            .select(pickEntity.questionId.countDistinct())
+            .from(pickEntity)
+            .where(pickEntity.pickedId.eq(pickedId))
+            .fetchOne() ?: 0L
+    }
 }
 
 data class PickEntityMapper
@@ -252,4 +328,28 @@ data class PickQuestionMapper
         val questionId: String,
         val questionContent: String,
         val createdAt: LocalDateTime,
+    )
+
+enum class PickSort {
+    LATEST,
+    MOST_PICKED,
+    ;
+
+    companion object {
+        fun findByValue(value: String): PickSort {
+            return PickSort.entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw DojoException.of(DojoExceptionType.SORT_CLIENT_NOT_FOUND)
+        }
+    }
+}
+
+data class PickQuestionDetailMapper
+    @QueryProjection
+    constructor(
+        val pickId: String,
+        val questionId: String,
+        val questionContent: String,
+        val questionEmojiImageUrl: String,
+        val latestPickedAt: LocalDateTime,
+        val totalReceivedPickCount: Long,
     )

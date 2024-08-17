@@ -1,6 +1,5 @@
 ### 내가 받은 픽 리스트 조회하기
-
-GET {{host}}/pick/picked-list?sort=MOST_PICKED
+GET {{host}}/pick/picked-list?pageSize=10&pageNumber=0&sort=MOST_PICKED
 
 ### 내가 받은 픽 중 특정 질문의 페이징 조회하기
 GET {{host}}/pick/picked-detail?questionId=abc

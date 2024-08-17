@@ -8,15 +8,17 @@ import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.dto.CreatePickRequest
+import com.mashup.dojo.dto.PickDetailPaging
 import com.mashup.dojo.dto.PickOpenItemDto
 import com.mashup.dojo.dto.PickOpenRequest
 import com.mashup.dojo.dto.PickOpenResponse
-import com.mashup.dojo.dto.PickPaging
 import com.mashup.dojo.dto.PickResponse
 import com.mashup.dojo.dto.ReceivedPickDetail
-import com.mashup.dojo.dto.ReceivedPickListGetResponse
+import com.mashup.dojo.dto.ReceivedPickPagingGetResponse
 import com.mashup.dojo.usecase.PickUseCase
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -37,27 +39,44 @@ class PickController(
 ) {
     @GetMapping("/picked-list")
     @Operation(
-        summary = "내가 받은 픽 List API",
-        description = "내가 받은 픽들을 정렬하여 보여주는 API. default sort : 최신 순",
+        summary = "내가 받은 픽 페이징 API",
+        description = "내가 받은 픽들을 페이징 처리 후 정렬하여 보여주는 API. default sort : 최신 순",
         responses = [
-            ApiResponse(responseCode = "200", description = "내가 받은 픽 리스트")
+            ApiResponse(responseCode = "200", description = "내가 받은 픽 리스트 페이징")
         ]
     )
     fun getReceivedPickList(
-        // todo : add userinfo
-        @RequestParam(required = false, defaultValue = "LATEST") sort: PickSort,
-    ): DojoApiResponse<ReceivedPickListGetResponse> {
+        @Parameter(
+            description = "정렬 기준. LATEST는 최근에 Pick된 항목을 기준으로 정렬하고, MOST_PICKED는 가장 많이 Pick된 항목을 기준으로 정렬합니다.",
+            schema = Schema(defaultValue = "LATEST")
+        )
+        @RequestParam(required = false, defaultValue = "LATEST") sort: String,
+        @Parameter(
+            description = "페이지 번호. 0부터 시작합니다.",
+            schema = Schema(defaultValue = "0")
+        )
+        @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
+        @Parameter(
+            description = "페이지 크기. 한 페이지에 포함될 항목의 개수를 설정합니다.",
+            schema = Schema(defaultValue = "10")
+        )
+        @RequestParam(required = false, defaultValue = "10") pageSize: Int,
+    ): DojoApiResponse<ReceivedPickPagingGetResponse> {
         val currentMemberId = MemberPrincipalContextHolder.current().id
-        val receivedPickList: List<PickUseCase.GetReceivedPick> =
+        val validSort = PickSort.findByValue(sort)
+
+        val receivedPickList =
             pickUseCase.getReceivedPickList(
-                PickUseCase.GetReceivedPickListCommand(
+                PickUseCase.GetReceivedPickPagingCommand(
                     memberId = currentMemberId,
-                    sort = sort
+                    sort = validSort,
+                    pageNumber = pageNumber,
+                    pageSize = pageSize
                 )
             )
 
         val pickResponseList =
-            receivedPickList.map {
+            receivedPickList.picks.map {
                 PickResponse(
                     pickId = it.pickId,
                     questionId = it.questionId,
@@ -67,7 +86,19 @@ class PickController(
                     latestPickedAt = it.latestPickedAt
                 )
             }
-        return DojoApiResponse.success(ReceivedPickListGetResponse(pickResponseList, sort))
+
+        return DojoApiResponse.success(
+            ReceivedPickPagingGetResponse(
+                pickList = pickResponseList,
+                totalPage = receivedPickList.totalPage,
+                totalElements = receivedPickList.totalElements,
+                isFirst = receivedPickList.isFirst,
+                isLast = receivedPickList.isLast,
+                sort = validSort,
+                pageNumber = pageNumber,
+                pageSize = pageSize
+            )
+        )
     }
 
     @GetMapping("/picked-detail")
@@ -82,13 +113,13 @@ class PickController(
         @RequestParam questionId: String,
         @RequestParam(required = false, defaultValue = "0") pageNumber: Int,
         @RequestParam(required = false, defaultValue = "10") pageSize: Int,
-    ): DojoApiResponse<PickPaging> {
+    ): DojoApiResponse<PickDetailPaging> {
         val currentMemberId = MemberPrincipalContextHolder.current().id
-        val pickPaging: PickUseCase.GetPagingPick =
+        val pickDetailPaging: PickUseCase.GetPickDetailPaging =
             pickUseCase.getReceivedPickDetailPaging(PickUseCase.GetPagingPickCommand(currentMemberId, QuestionId(questionId), pageNumber, pageSize))
 
         val pickDetails =
-            pickPaging.picks.map {
+            pickDetailPaging.picks.map {
                 ReceivedPickDetail(
                     pickId = it.pickId,
                     pickerOrdinal = it.pickerOrdinal,
@@ -105,21 +136,21 @@ class PickController(
                     latestPickedAt = it.latestPickedAt
                 )
             }
-        val pickPagingResponse =
-            PickPaging(
-                questionId = pickPaging.questionId,
-                questionContent = pickPaging.questionContent,
-                questionEmojiImageUrl = pickPaging.questionEmojiImageUrl,
-                totalReceivedPickCount = pickPaging.totalReceivedPickCount,
-                anyOpenPickerCount = pickPaging.anyOpenPickerCount,
+        val pickDetailPagingResponse =
+            PickDetailPaging(
+                questionId = pickDetailPaging.questionId,
+                questionContent = pickDetailPaging.questionContent,
+                questionEmojiImageUrl = pickDetailPaging.questionEmojiImageUrl,
+                totalReceivedPickCount = pickDetailPaging.totalReceivedPickCount,
+                anyOpenPickerCount = pickDetailPaging.anyOpenPickerCount,
                 picks = pickDetails,
-                totalPage = pickPaging.totalPage,
-                totalElements = pickPaging.totalElements,
-                isFirst = pickPaging.isFirst,
-                isLast = pickPaging.isLast
+                totalPage = pickDetailPaging.totalPage,
+                totalElements = pickDetailPaging.totalElements,
+                isFirst = pickDetailPaging.isFirst,
+                isLast = pickDetailPaging.isLast
             )
 
-        return DojoApiResponse.success(pickPagingResponse)
+        return DojoApiResponse.success(pickDetailPagingResponse)
     }
 
     @PostMapping
