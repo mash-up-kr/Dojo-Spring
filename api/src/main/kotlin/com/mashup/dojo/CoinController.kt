@@ -1,7 +1,7 @@
 package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
-import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.dto.CurrentCoinResponse
 import com.mashup.dojo.usecase.CoinUseCase
 import io.swagger.v3.oas.annotations.Operation
@@ -25,8 +25,9 @@ class CoinController(
             ApiResponse(responseCode = "200", description = "코인 정보 조회")
         ]
     )
-    fun getCurrentCoin(): DojoApiResponse<CurrentCoinResponse> { // TODO : param UserInfo
-        val currentCoin = coinUseCase.getCurrentCoin(CoinUseCase.GetCurrentCoinCommand(MemberId("1")))
+    fun getCurrentCoin(): DojoApiResponse<CurrentCoinResponse> {
+        val memberId = MemberPrincipalContextHolder.current().id
+        val currentCoin = coinUseCase.getCurrentCoin(CoinUseCase.GetCurrentCoinCommand(memberId))
 
         return DojoApiResponse.success(
             CurrentCoinResponse(

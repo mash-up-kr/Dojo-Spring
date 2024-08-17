@@ -4,7 +4,6 @@ import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.MemberEntity
 import com.mashup.dojo.MemberRepository
-import com.mashup.dojo.domain.Candidate
 import com.mashup.dojo.domain.ImageId
 import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberGender
@@ -17,8 +16,6 @@ import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrNull
 
 interface MemberService {
-    fun getCandidates(currentMemberId: MemberId): List<Candidate>
-
     fun findMemberById(memberId: MemberId): Member?
 
     fun create(command: CreateMember): MemberId
@@ -65,34 +62,6 @@ class DefaultMemberService(
             toId = toId,
             lastUpdatedAt = LocalDateTime.now()
         )
-    }
-
-    override fun getCandidates(currentMemberId: MemberId): List<Candidate> {
-        val memberRelation1 = mockMemberRelation(currentMemberId, MemberId("20"))
-        val memberRelation2 = mockMemberRelation(currentMemberId, MemberId("30"))
-        val memberRelation3 = mockMemberRelation(currentMemberId, MemberId("40"))
-        val memberRelation4 = mockMemberRelation(currentMemberId, MemberId("50"))
-        val memberRelation5 = mockMemberRelation(currentMemberId, MemberId("60"))
-        val memberRelation6 = mockMemberRelation(currentMemberId, MemberId("70"))
-
-        /**
-         * ToDo
-         * 친구들 중 랜덤 4명 뽑기
-         * Mock, 랜덤으로 뽑은 4명.
-         *
-         */
-
-        val targetMemberId1 = memberRelation1.toId
-        val targetMemberId2 = memberRelation2.toId
-        val targetMemberId3 = memberRelation3.toId
-        val targetMemberId4 = memberRelation4.toId
-
-        val candidate1 = Candidate(targetMemberId1, "한씨", ImageId("member-image-id-1"), MemberPlatform.SPRING)
-        val candidate2 = Candidate(targetMemberId2, "오씨", ImageId("member-image-id-2"), MemberPlatform.SPRING)
-        val candidate3 = Candidate(targetMemberId3, "박씨", ImageId("member-image-id-3"), MemberPlatform.SPRING)
-        val candidate4 = Candidate(targetMemberId4, "김", ImageId("member-image-id-4"), MemberPlatform.SPRING)
-
-        return listOf(candidate1, candidate2, candidate3, candidate4)
     }
 
     override fun findMemberById(memberId: MemberId): Member? {

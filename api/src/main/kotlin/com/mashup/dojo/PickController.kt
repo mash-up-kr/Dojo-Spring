@@ -2,7 +2,6 @@ package com.mashup.dojo
 
 import com.mashup.dojo.common.DojoApiResponse
 import com.mashup.dojo.config.security.MemberPrincipalContextHolder
-import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
@@ -164,14 +163,14 @@ class PickController(
     fun create(
         @RequestBody request: CreatePickRequest,
     ): DojoApiResponse<PickId> {
-        // todo : update memberId to AuthInfo
+        val currentMemberId = MemberPrincipalContextHolder.current().id
         val pickId =
             pickUseCase.createPick(
                 PickUseCase.CreatePickCommand(
                     questionSheetId = request.questionSheetId,
                     questionSetId = request.questionSetId,
                     questionId = request.questionId,
-                    pickerId = MemberId("1"),
+                    pickerId = currentMemberId,
                     pickedId = request.pickedId
                 )
             )
@@ -201,15 +200,14 @@ class PickController(
         ]
     )
     fun openPick(
-        // todo: add userInfo
         @PathVariable id: String,
         @Valid @RequestBody request: PickOpenRequest,
     ): DojoApiResponse<PickOpenResponse> {
-        // todd: pickedId에 실제 유저 id 전달
+        val memberId = MemberPrincipalContextHolder.current().id
         return pickUseCase.openPick(
             PickUseCase.OpenPickCommand(
                 pickId = PickId(id),
-                pickedId = MemberId("MOCK_MEMBER_ID"),
+                pickedId = memberId,
                 pickOpenItem = PickOpenItem.findByValue(request.pickOpenItemDto.value)
             )
         ).let { DojoApiResponse.success(PickOpenResponse(it.pickId.value, PickOpenItemDto.findByValue(it.pickOpenItem.value), it.value)) }

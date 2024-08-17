@@ -253,12 +253,9 @@ class DefaultQuestionService(
          */
 
         val candidates =
-            if (questionType == QuestionType.FRIEND) {
-                candidatesOfFriend
-            } else if (questionType == QuestionType.ACCOMPANY) {
-                candidatesOfAccompany
-            } else {
-                throw DojoException.of(DojoExceptionType.QUESTION_INVALID_TYPE)
+            when (questionType) {
+                QuestionType.FRIEND -> candidatesOfFriend
+                QuestionType.ACCOMPANY -> candidatesOfAccompany
             }
 
         return QuestionSheet.create(
@@ -278,59 +275,6 @@ class DefaultQuestionService(
     override fun getQuestionById(id: QuestionId): Question? {
         return questionRepository.findByIdOrNull(id.value)?.toQuestion()
             ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
-    }
-
-    companion object {
-        private const val DEFAULT_QUESTION_SIZE: Int = 12
-        val SAMPLE_QUESTION =
-            Question(
-                id = QuestionId("1234564"),
-                content = "세상에서 제일 멋쟁이인 사람",
-                type = QuestionType.FRIEND,
-                category = QuestionCategory.DATING,
-                emojiImageId = ImageId("345678")
-            )
-
-        private val SAMPLE_QUESTION_SET =
-            QuestionSet(
-                id = QuestionSetId("1"),
-                questionIds =
-                    listOf(
-                        QuestionOrder(QuestionId("1"), 1),
-                        QuestionOrder(QuestionId("2"), 2),
-                        QuestionOrder(QuestionId("3"), 3),
-                        QuestionOrder(QuestionId("4"), 4),
-                        QuestionOrder(QuestionId("5"), 5),
-                        QuestionOrder(QuestionId("6"), 6),
-                        QuestionOrder(QuestionId("7"), 7),
-                        QuestionOrder(QuestionId("8"), 8),
-                        QuestionOrder(QuestionId("9"), 9),
-                        QuestionOrder(QuestionId("10"), 10),
-                        QuestionOrder(QuestionId("11"), 11),
-                        QuestionOrder(QuestionId("12"), 12)
-                    ),
-                publishedAt = LocalDateTime.now(),
-                endAt = LocalDateTime.now().plusHours(12)
-            )
-
-        private val SAMPLE_QUESTION_SHEET =
-            QuestionSheet(
-                questionSheetId = QuestionSheetId("1"),
-                questionSetId = SAMPLE_QUESTION_SET.id,
-                questionId = QuestionId("1"),
-                resolverId = MemberId("1"),
-                candidates =
-                    listOf(
-                        MemberId("2"),
-                        MemberId("3"),
-                        MemberId("4"),
-                        MemberId("5")
-                    )
-            )
-
-        // TODO: Set to 3 sheets initially. Need to modify for all users later.
-        val LIST_SAMPLE_QUESTION_SHEET =
-            listOf(SAMPLE_QUESTION_SHEET, SAMPLE_QUESTION_SHEET, SAMPLE_QUESTION_SHEET)
     }
 }
 

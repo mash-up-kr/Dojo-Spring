@@ -1,6 +1,6 @@
 package com.mashup.dojo
 
-import com.mashup.dojo.domain.MemberId
+import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.dto.QuestionSheetCandidate
 import com.mashup.dojo.dto.QuestionSheetResponse
 import com.mashup.dojo.dto.QuestionSheetsGetResponse
@@ -29,11 +29,9 @@ class QuestionController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    fun getQuestionSheet(
-        // todo add auth for memberId
-    ): QuestionSheetsGetResponse {
-        // todo update to param Member auth info
-        return questionUseCase.getQuestionSheetList(MemberId("d")).toResponse()
+    fun getQuestionSheet(): QuestionSheetsGetResponse {
+        val memberId = MemberPrincipalContextHolder.current().id
+        return questionUseCase.getQuestionSheetList(memberId).toResponse()
     }
 }
 
