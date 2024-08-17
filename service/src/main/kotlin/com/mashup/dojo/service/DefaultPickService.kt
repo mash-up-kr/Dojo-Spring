@@ -104,13 +104,13 @@ interface PickService {
         val pickerIdOpen: Boolean,
         val pickerId: MemberId,
         val pickerGenderOpen: Boolean,
-        val pickerGender: MemberGender,
+        val pickerGender: MemberGender?,
         val pickerPlatformOpen: Boolean,
-        val pickerPlatform: MemberPlatform,
+        val pickerPlatform: MemberPlatform?,
         val pickerSecondInitialNameOpen: Boolean,
-        val pickerSecondInitialName: String,
+        val pickerSecondInitialName: String?,
         val pickerFullNameOpen: Boolean,
-        val pickerFullName: String,
+        val pickerFullName: String?,
         val latestPickedAt: LocalDateTime,
     )
 
@@ -288,41 +288,41 @@ class DefaultPickService(
     fun transformPickerGender(
         isOpen: Boolean,
         pickerGender: MemberGender,
-    ): MemberGender {
+    ): MemberGender? {
         if (isOpen) {
             return pickerGender
         }
-        return MemberGender.UNKNOWN
+        return null
     }
 
     fun transformPickerPlatform(
         isOpen: Boolean,
         pickerPlatform: MemberPlatform,
-    ): MemberPlatform {
+    ): MemberPlatform? {
         if (isOpen) {
             return pickerPlatform
         }
-        return MemberPlatform.UNKNOWN
+        return null
     }
 
     fun transformPickerSecondInitialName(
         isOpen: Boolean,
         secondInitialName: String,
-    ): String {
+    ): String? {
         if (isOpen) {
             return secondInitialName
         }
-        return UNKNOWN
+        return null
     }
 
     fun transformPickerFullName(
         isOpen: Boolean,
         fullName: String,
-    ): String {
+    ): String? {
         if (isOpen) {
             return fullName
         }
-        return UNKNOWN
+        return null
     }
 
     override fun getPickCount(
