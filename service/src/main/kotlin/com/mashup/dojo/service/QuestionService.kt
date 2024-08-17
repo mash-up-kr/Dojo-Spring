@@ -69,14 +69,18 @@ interface QuestionService {
         endAt: LocalDateTime,
     ): QuestionSet
 
-    fun createQuestionSheetsForMember(
-        questionSet: QuestionSet,
+    fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet>
+
+    fun createQuestionSheetForSingleQuestion(
+        questionSetId: QuestionSetId,
+        questionId: QuestionId,
+        resolver: MemberId,
         candidatesOfFriend: List<MemberId>,
         candidatesOfAccompany: List<MemberId>,
-        resolver: MemberId,
-    ): List<QuestionSheet>
+        questionType: QuestionType,
+    ): QuestionSheet
 
-    fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet>
+    fun getQuestionType(questionId: QuestionId): Question
 }
 
 @Service
@@ -227,44 +231,42 @@ class DefaultQuestionService(
         return questionSet
     }
 
+    override fun getQuestionType(questionId: QuestionId): Question {
+        return questionRepository.findByIdOrNull(questionId.value)?.toQuestion()
+            ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
+    }
+
     @Transactional
-    override fun createQuestionSheetsForMember(
-        questionSet: QuestionSet,
+    override fun createQuestionSheetForSingleQuestion(
+        questionSetId: QuestionSetId,
+        questionId: QuestionId,
+        resolver: MemberId,
         candidatesOfFriend: List<MemberId>,
         candidatesOfAccompany: List<MemberId>,
-        resolver: MemberId,
-    ): List<QuestionSheet> {
+        questionType: QuestionType,
+    ): QuestionSheet {
         /**
          * ToDo 아래는 추후 캐시에 넣는 작업을 해야합니다.
          * - cache put -> QuestionSet and return
          * - Temporarily set to create for all members, discuss details later
+         * 질문의 타입에 따라 적절한 후보자 리스트를 사용
          */
 
-        val questionIds = questionSet.questionIds.map { questionOrder -> questionOrder.questionId.value }
-        val friendQuestionIds = questionRepository.findFriendQuestionsByIds(questionIds)
-        val accompanyQuestionIds = questionRepository.findAccompanyQuestionsByIds(questionIds)
-
-        val friendQuestionSheets =
-            friendQuestionIds.map { friendQuestionId ->
-                QuestionSheet.create(
-                    questionSetId = questionSet.id,
-                    questionId = QuestionId(friendQuestionId),
-                    resolverId = resolver,
-                    candidates = candidatesOfFriend
-                )
+        val candidates =
+            if (questionType == QuestionType.FRIEND) {
+                candidatesOfFriend
+            } else if (questionType == QuestionType.ACCOMPANY) {
+                candidatesOfAccompany
+            } else {
+                throw DojoException.of(DojoExceptionType.QUESTION_INVALID_TYPE)
             }
 
-        val accompanyQuestionSheets =
-            accompanyQuestionIds.map { friendQuestionId ->
-                QuestionSheet.create(
-                    questionSetId = questionSet.id,
-                    questionId = QuestionId(friendQuestionId),
-                    resolverId = resolver,
-                    candidates = candidatesOfAccompany
-                )
-            }
-
-        return friendQuestionSheets + accompanyQuestionSheets
+        return QuestionSheet.create(
+            questionSetId = questionSetId,
+            questionId = questionId,
+            resolverId = resolver,
+            candidates = candidates
+        )
     }
 
     override fun saveQuestionSheets(allMemberQuestionSheets: List<QuestionSheet>): List<QuestionSheet> {
