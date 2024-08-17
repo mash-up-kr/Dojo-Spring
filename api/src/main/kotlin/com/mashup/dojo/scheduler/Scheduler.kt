@@ -2,7 +2,7 @@ package com.mashup.dojo.scheduler
 
 import com.mashup.dojo.usecase.QuestionUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.scheduling.annotation.Async
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -14,7 +14,7 @@ class Scheduler(
     private val questionUseCase: QuestionUseCase,
 ) {
     @Scheduled(cron = "\${scheduler.cron}")
-    @Async("questionSetSchedulerExecutor")
+    @SchedulerLock(name = "createQuestionSet", lockAtMostFor = "PT5M", lockAtLeastFor = "PT4M")
     fun createQuestionSet() {
         log.info { "=== Start Create questionSet at ${LocalDateTime.now()}. ===" }
         questionUseCase.createQuestionSet()
@@ -22,10 +22,9 @@ class Scheduler(
     }
 
     @Scheduled(cron = "\${scheduler.sheet-cron}")
-    @Async("questionSheetSchedulerExecutor")
+    @SchedulerLock(name = "createQuestionSheet", lockAtMostFor = "PT5M", lockAtLeastFor = "PT4M")
     fun createQuestionSheet() {
         log.info { "=== Start Create questionSheet at ${LocalDateTime.now()}. ===" }
-
         questionUseCase.createQuestionSheet()
         log.info { "=== Done Create questionSheet at ${LocalDateTime.now()}. ===" }
     }
