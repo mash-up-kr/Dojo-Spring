@@ -274,8 +274,8 @@ class DefaultQuestionService(
     }
 
     override fun getQuestionById(id: QuestionId): Question? {
-        // TODO("Not yet implemented")
-        return SAMPLE_QUESTION
+        return questionRepository.findByIdOrNull(id.value)?.toQuestion()
+            ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
     }
 
     companion object {
