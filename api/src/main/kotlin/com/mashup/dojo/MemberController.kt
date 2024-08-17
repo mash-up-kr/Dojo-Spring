@@ -12,6 +12,7 @@ import com.mashup.dojo.dto.MemberProfileResponse
 import com.mashup.dojo.dto.MemberSearchResponse
 import com.mashup.dojo.dto.MemberUpdateRequest
 import com.mashup.dojo.dto.MyProfileResponse
+import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -36,6 +37,7 @@ private val logger = KotlinLogging.logger { }
 class MemberController(
     private val memberUseCase: MemberUseCase,
     private val memberService: MemberService,
+    private val imageService: ImageService,
     private val jwtTokenService: JwtTokenService,
 ) {
     @PostMapping("/public/member")
@@ -125,9 +127,22 @@ class MemberController(
         val memberId = MemberPrincipalContextHolder.current().id
 
         logger.info { "read my profile, $memberId" }
+        val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+        val profileImage = imageService.load(member.profileImageId) ?: throw DojoException.of(DojoExceptionType.IMAGE_NOT_FOUND)
 
-        // TODO 로직 연결
-        return DojoApiResponse.success(MyProfileResponse.mock())
+        return DojoApiResponse.success(
+            MyProfileResponse(
+                memberId = member.id.value,
+                profileImageUrl = profileImage.url,
+                memberName = member.fullName,
+                platform = member.platform.name,
+                ordinal = member.ordinal,
+                // TODO MOCK 값들 채우기
+                pickCount = 10,
+                friendCount = 20,
+                coinCount = 0
+            )
+        )
     }
 
     // ToDo 로직 연결 후 추후 제거

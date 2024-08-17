@@ -20,18 +20,4 @@ data class MyProfileResponse(
     val friendCount: Int,
     @Schema(description = "소유한 코인 개수")
     val coinCount: Int,
-) {
-    companion object {
-        fun mock() =
-            MyProfileResponse(
-                memberId = "memberI123456754231",
-                profileImageUrl = "https://t1.daumcdn.net/daumtop_chanel/op/20200723055344399.png",
-                memberName = "낭은영",
-                platform = "Product Design",
-                ordinal = 14,
-                pickCount = 8186,
-                friendCount = 1925,
-                coinCount = 3994
-            )
-    }
-}
+)

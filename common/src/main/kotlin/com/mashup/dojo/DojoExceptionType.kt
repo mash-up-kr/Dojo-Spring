@@ -18,6 +18,7 @@ enum class DojoExceptionType(
     INVALID_MEMBER_GENDER("The gender does not exist.", "C011_INVALID_MEMBER_GENDER", 400),
     INVALID_MEMBER_PLATFORM("The platform does not exist.", "C010_INVALID_MEMBER_PLATFORM", 400),
     MEMBER_NOT_FOUND("Member not found", "C012_MEMBER_NOT_FOUND", 400),
+    IMAGE_NOT_FOUND("Image not found", "C013_IMAGE_NOT_FOUND", 400),
 
     // pick
     PICK_NOT_FOUND("Pick not found", "C050_PICK_NOT_FOUND", 400),
