@@ -154,7 +154,10 @@ class DefaultQuestionUseCase(
                 questionSheets
             }
 
-        return questionService.saveQuestionSheets(allMemberQuestionSheets)
+        val questionSheetList = questionService.saveQuestionSheets(allMemberQuestionSheets)
+        // QSheet 생성 완료된 QSet 상태 변경
+        questionService.updateQuestionSetToReady(currentQuestionSet)
+        return questionSheetList
     }
 
     override fun getQuestionSheetList(memberId: MemberId): QuestionUseCase.GetQuestionSheetsResult {

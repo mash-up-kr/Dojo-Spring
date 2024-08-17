@@ -20,7 +20,10 @@ interface QuestionSetRepository : JpaRepository<QuestionSetEntity, String> {
     ): QuestionSetEntity?
 
     // publishedAt > now && 가장 작은 publishedAt -> 발행 직전(예정) QuestionSet
-    fun findFirstByPublishedAtAfterOrderByPublishedAtAsc(compareTime: LocalDateTime = LocalDateTime.now()): QuestionSetEntity?
+    fun findFirstByStatusAndPublishedAtAfterOrderByPublishedAtAsc(
+        status: Status,
+        compareTime: LocalDateTime = LocalDateTime.now(),
+    ): QuestionSetEntity?
 
     fun findTopByOrderByPublishedAtDesc(): QuestionSetEntity?
 }
@@ -45,6 +48,7 @@ class QuestionSetEntity(
 enum class Status {
     TERMINATED, // 종료
     ACTIVE, // 운영중
+    READY, // QSheet 까지 만들어진 경우
     UPCOMING, // 예정
 }
 
