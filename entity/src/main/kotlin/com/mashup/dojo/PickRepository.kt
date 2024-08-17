@@ -282,15 +282,10 @@ class PickRepositoryImpl(
         query: JPAQuery<PickQuestionDetailMapper>,
     ): JPAQuery<PickQuestionDetailMapper> {
         val pickEntity = QPickEntity.pickEntity
-        if (sort == PickSort.MOST_PICKED.name) {
-            return query.orderBy(Wildcard.count.desc(), pickEntity.createdAt.desc())
+        return when (PickSort.findByValue(sort)) {
+            PickSort.MOST_PICKED -> query.orderBy(Wildcard.count.desc(), pickEntity.createdAt.desc())
+            PickSort.LATEST -> query.orderBy(pickEntity.createdAt.desc())
         }
-
-        if (sort == PickSort.LATEST.name) {
-            return query.orderBy(pickEntity.createdAt.desc())
-        }
-
-        throw DojoException.of(DojoExceptionType.SORT_NOT_FOUND)
     }
 
     private fun getGroupByPickTotalCount(pickedId: String): Long {
@@ -338,6 +333,14 @@ data class PickQuestionMapper
 enum class PickSort {
     LATEST,
     MOST_PICKED,
+    ;
+
+    companion object {
+        fun findByValue(value: String): PickSort {
+            return PickSort.entries.find { it.name.equals(value, ignoreCase = true) }
+                ?: throw DojoException.of(DojoExceptionType.SORT_CLIENT_NOT_FOUND)
+        }
+    }
 }
 
 data class PickQuestionDetailMapper
