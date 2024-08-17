@@ -158,8 +158,6 @@ class DefaultQuestionUseCase(
     }
 
     override fun getQuestionSheetList(memberId: MemberId): QuestionUseCase.GetQuestionSheetsResult {
-        return TEMP_GET_QUESTION_SHEETS_RESULT
-        // 운영중인 questionSet 조회 (todo : scheduler 가 최신 QuestionSet 을 발행 시각 2분전에 publishedYn Y 로 변경 예정)
         val operatingQSet =
             questionService.getOperatingQuestionSet()
                 ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_OPERATING_NOT_EXIST)
