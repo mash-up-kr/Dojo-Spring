@@ -3,6 +3,7 @@ package com.mashup.dojo.config.security
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.domain.MemberId
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.SIG
@@ -17,6 +18,8 @@ class MemberAuthToken(
         return credentials
     }
 }
+
+private val logger = KotlinLogging.logger { }
 
 class JwtTokenService(
     private val secretKey: String,
@@ -65,6 +68,10 @@ class JwtTokenService(
                 .build()
                 .parseSignedClaims(token.credentials)
                 .payload
-        }.getOrElse { throw DojoException.of(DojoExceptionType.INVALID_TOKEN) }
+        }.onFailure { error ->
+            logger.info { "Error parsing token: ${error.message}" }
+        }.getOrElse {
+            throw DojoException.of(DojoExceptionType.INVALID_TOKEN)
+        }
     }
 }
