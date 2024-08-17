@@ -42,8 +42,16 @@ class MemberAuthTokenAuthenticationFilter(
 
     private fun resolveMemberAuthToken(request: HttpServletRequest): MemberAuthToken? {
         return kotlin.runCatching {
-            val token = request.getHeader(AUTHORIZATION_HEADER_NAME)
-            MemberAuthToken(token)
+            // 헤더 자체를 trim
+            val header = request.getHeader(AUTHORIZATION_HEADER_NAME)?.trim()
+            logger.info("Authorization header = $header")
+
+            // "Bearer " 접두사 제거
+            val token = header?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_START_INDEX)?.trim()
+            logger.info("Token after removing Bearer and trimming = $token")
+
+            // token이 null이 아닌 경우에만 MemberAuthToken 생성
+            token?.let { MemberAuthToken(it) }
         }.getOrNull()
     }
 
@@ -69,5 +77,7 @@ class MemberAuthTokenAuthenticationFilter(
 
     companion object {
         private const val AUTHORIZATION_HEADER_NAME = "Authorization"
+        private const val BEARER_PREFIX = "Bearer "
+        private const val BEARER_START_INDEX = 7
     }
 }
