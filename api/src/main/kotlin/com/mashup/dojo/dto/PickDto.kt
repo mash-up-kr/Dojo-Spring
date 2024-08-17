@@ -61,18 +61,18 @@ data class PickDetailPaging(
 )
 
 data class ReceivedPickDetail(
-    val pickId: PickId,
+    val pickId: PickId?,
     val pickerOrdinal: Int,
     val pickerIdOpen: Boolean,
-    val pickerId: MemberId,
+    val pickerId: PickId?,
     val pickerGenderOpen: Boolean,
-    val pickerGender: MemberGender,
+    val pickerGender: MemberGender?,
     val pickerPlatformOpen: Boolean,
-    val pickerPlatform: MemberPlatform,
+    val pickerPlatform: MemberPlatform?,
     val pickerSecondInitialNameOpen: Boolean,
-    val pickerSecondInitialName: String,
+    val pickerSecondInitialName: String?,
     val pickerFullNameOpen: Boolean,
-    val pickerFullName: String,
+    val pickerFullName: String?,
     val latestPickedAt: LocalDateTime,
 )
 

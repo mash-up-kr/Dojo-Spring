@@ -119,11 +119,14 @@ class PickController(
 
         val pickDetails =
             pickDetailPaging.picks.map {
+                val pickId = if (it.pickId.value == "UNKNOWN") null else it.pickId
+                val pickerId = if (it.pickerId.value == "UNKNOWN") null else it.pickId
+
                 ReceivedPickDetail(
-                    pickId = it.pickId,
+                    pickId = pickId,
                     pickerOrdinal = it.pickerOrdinal,
                     pickerIdOpen = it.pickerIdOpen,
-                    pickerId = it.pickerId,
+                    pickerId = pickerId,
                     pickerGenderOpen = it.pickerGenderOpen,
                     pickerGender = it.pickerGender,
                     pickerPlatformOpen = it.pickerPlatformOpen,
