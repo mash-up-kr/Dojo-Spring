@@ -1,3 +1,4 @@
 
 ### QuestionSheet API 
 GET {{host}}/question
+Authorization: {{authorization}}

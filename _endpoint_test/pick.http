@@ -7,11 +7,14 @@ GET {{host}}/pick/picked-detail?questionId=abc
 ### CREATE PICK 
 
 POST {{host}}/pick
+Authorization: {{authorization}}
 Content-Type: application/json
 
 {
-    "questionId": "1234564",
-    "pickedId": "1"
+    "questionId": "3fda95ae-13af-4fb2-b872-07874c064344",
+    "pickedId": "409c9126-7e69-4496-b4eb-90354ae48945",
+    "questionSheetId": "b0613860-cd5b-4755-aaa3-b2d41956075a",
+    "questionSetId": "2d1bdd19-c198-4df1-a4fe-f3378c4d8377"
 }
 
 ### 픽 정보 오픈하기
