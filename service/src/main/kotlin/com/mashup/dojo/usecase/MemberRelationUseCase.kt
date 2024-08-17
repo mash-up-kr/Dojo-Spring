@@ -29,7 +29,11 @@ class DefaultMemberRelationUseCase(
 ) : MemberRelationUseCase {
     override fun getFriends(memberId: MemberId): List<FriendInfo> {
         val friendIds = memberRelationService.getFriendRelationIds(memberId)
-        val friends = memberService.findAllByIds(friendIds)
+        val friends =
+            memberService.findAllByIds(friendIds).sortedBy {
+                // 가나다순 정렬
+                it.fullName
+            }
 
         val images = imageService.loadAllByIds(friends.map { it.profileImageId })
         val imageMap = images.associateBy { it.id.value }
