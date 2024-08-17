@@ -120,19 +120,38 @@ class DefaultQuestionUseCase(
 
     @Transactional
     override fun createQuestionSheet(): List<QuestionSheet> {
-        val currentQuestionSet = questionService.getNextOperatingQuestionSet() ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
+        val currentQuestionSet =
+            questionService.getNextOperatingQuestionSet()
+                ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
+
         val allMemberRecords = memberService.findAllMember()
+
+        val questions =
+            currentQuestionSet.questionIds.map { questionOrder ->
+                questionService.getQuestionType(questionOrder.questionId)
+            }
 
         val allMemberQuestionSheets =
             allMemberRecords.flatMap { member ->
-                val candidateOfFriend = memberRelationService.findCandidateOfFriend(member.id)
-                val candidateOfAccompany = memberRelationService.findCandidateOfAccompany(member.id)
-                questionService.createQuestionSheetsForMember(
-                    questionSet = currentQuestionSet,
-                    candidatesOfFriend = candidateOfFriend,
-                    candidatesOfAccompany = candidateOfAccompany,
-                    resolver = member.id
-                )
+                // 각 질문별로 후보자를 선택
+                val questionSheets =
+                    questions.map { questionOrder ->
+                        val candidatesOfFriend = memberRelationService.findCandidateOfFriend(member.id)
+                        val candidatesOfAccompany = memberRelationService.findCandidateOfAccompany(member.id)
+
+                        val questionType = questionOrder.type
+
+                        // 질문의 타입에 따라 다른 후보자 리스트를 전달
+                        questionService.createQuestionSheetForSingleQuestion(
+                            questionSetId = currentQuestionSet.id,
+                            questionId = questionOrder.id,
+                            questionType = questionType,
+                            resolver = member.id,
+                            candidatesOfFriend = candidatesOfFriend,
+                            candidatesOfAccompany = candidatesOfAccompany
+                        )
+                    }
+                questionSheets
             }
 
         return questionService.saveQuestionSheets(allMemberQuestionSheets)
