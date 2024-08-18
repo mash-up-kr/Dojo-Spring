@@ -29,15 +29,6 @@ interface PickUseCase {
         val pageSize: Int,
     )
 
-    data class GetReceivedPick(
-        val pickId: PickId,
-        val questionId: QuestionId,
-        val questionContent: String,
-        val questionEmojiImageUrl: String,
-        val totalReceivedPickCount: Int,
-        val latestPickedAt: LocalDateTime,
-    )
-
     data class GetPagingPickCommand(
         val memberId: MemberId,
         val questionId: QuestionId,
