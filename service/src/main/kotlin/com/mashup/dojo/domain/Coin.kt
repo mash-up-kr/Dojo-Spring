@@ -48,6 +48,7 @@ data class CoinUseDetail(
 ) {
     companion object {
         const val REASON_PROVIDE_DEFAULT = "provide by default"
+        const val REASON_USED_FOR_OPEN_PICK = "used for open pick"
 
         fun createEarnedCoinUseDetail(
             coinId: CoinId,

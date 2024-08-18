@@ -16,6 +16,13 @@ interface CoinService {
     fun getCoin(memberId: MemberId): Coin?
 
     fun create(memberId: MemberId): CoinId
+
+    fun updateCoin(
+        useType: CoinUseType,
+        detail: String,
+        cost: Int,
+        coin: Coin,
+    )
 }
 
 @Service
@@ -35,6 +42,24 @@ class DefaultCoinService(
         coinUseDetailRepository.save(coinUseDetail.toEntity())
 
         return coin.id
+    }
+
+    override fun updateCoin(
+        useType: CoinUseType,
+        detail: String,
+        cost: Int,
+        coin: Coin,
+    ) {
+        coinRepository.save(coin.toEntity())
+
+        val coinUseDetail =
+            if (CoinUseType.USED == useType) {
+                CoinUseDetail.createUsedCoinUseDetail(coin.id, cost.toLong(), detail)
+            } else {
+                CoinUseDetail.createEarnedCoinUseDetail(coin.id, cost.toLong(), detail)
+            }
+
+        coinUseDetailRepository.save(coinUseDetail.toEntity())
     }
 }
 
