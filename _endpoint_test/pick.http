@@ -29,4 +29,7 @@ Content-Type: application/json
 ### Variables
 @id=1
 
+### GET NEXT PICK TIME 
+GET {{host}}/pick/next-pick-time
+Authorization: {{authorization}}
 
