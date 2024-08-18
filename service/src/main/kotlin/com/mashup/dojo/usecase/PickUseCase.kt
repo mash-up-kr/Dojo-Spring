@@ -3,6 +3,8 @@ package com.mashup.dojo.usecase
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.Status
+import com.mashup.dojo.domain.CoinUseDetail
+import com.mashup.dojo.domain.CoinUseType
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
@@ -10,6 +12,7 @@ import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
+import com.mashup.dojo.service.CoinService
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.NotificationService
@@ -19,6 +22,7 @@ import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickPagingCommand
 import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 interface PickUseCase {
@@ -86,6 +90,7 @@ class DefaultPickUseCase(
     private val imageService: ImageService,
     private val memberService: MemberService,
     private val notificationService: NotificationService,
+    private val coinService: CoinService,
 ) : PickUseCase {
     override fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging {
         return pickService.getReceivedPickPaging(
@@ -121,7 +126,13 @@ class DefaultPickUseCase(
         }
     }
 
+    @Transactional
     override fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo {
+        val coin = coinService.getCoin(openPickCommand.pickedId) ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "유저의 코인정보가 없습니다")
+        val updatedCoin = coin.useCoin(openPickCommand.pickOpenItem.cost.toLong())
+
+        coinService.updateCoin(CoinUseType.USED, CoinUseDetail.REASON_USED_FOR_OPEN_PICK, openPickCommand.pickOpenItem.cost, updatedCoin)
+
         return pickService.openPick(
             openPickCommand.pickId,
             openPickCommand.pickedId,
