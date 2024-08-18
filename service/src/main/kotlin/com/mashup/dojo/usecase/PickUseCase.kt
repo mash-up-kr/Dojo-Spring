@@ -2,6 +2,7 @@ package com.mashup.dojo.usecase
 
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
+import com.mashup.dojo.Status
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
@@ -14,7 +15,6 @@ import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.NotificationService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
-import com.mashup.dojo.usecase.PickUseCase.GetReceivedPick
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickPagingCommand
 import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
@@ -169,10 +169,10 @@ class DefaultPickUseCase(
     }
 
     override fun getNextPickTime(): LocalDateTime {
-        return pickService.getNextPickTime()
-    }
+        val nextOperatingQuestionSet =
+            questionService.getNextOperatingQuestionSet(Status.READY)
+                ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
 
-    companion object {
-        private val EMPTY_RECEIVED_PICK = emptyList<GetReceivedPick>()
+        return nextOperatingQuestionSet.publishedAt
     }
 }
