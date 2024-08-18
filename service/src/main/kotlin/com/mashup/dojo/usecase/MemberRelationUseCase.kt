@@ -41,7 +41,7 @@ class DefaultMemberRelationUseCase(
         return friends.map { friend ->
             FriendInfo(
                 memberId = friend.id.value,
-                profileImageUrl = imageMap[friend.profileImageId.value]?.url.let { "" },
+                profileImageUrl = imageMap[friend.profileImageId.value]?.url ?: "",
                 memberName = friend.fullName,
                 platform = friend.platform.name,
                 ordinal = friend.ordinal
@@ -59,7 +59,7 @@ class DefaultMemberRelationUseCase(
         return recommendFriends.map { friend ->
             FriendInfo(
                 memberId = friend.id.value,
-                profileImageUrl = imageMap[friend.profileImageId.value]?.url.let { "" },
+                profileImageUrl = imageMap[friend.profileImageId.value]?.url ?: "",
                 memberName = friend.fullName,
                 platform = friend.platform.name,
                 ordinal = friend.ordinal
