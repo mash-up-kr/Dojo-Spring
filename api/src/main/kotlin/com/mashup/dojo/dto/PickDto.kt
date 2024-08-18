@@ -96,7 +96,7 @@ enum class PickOpenItemDto(val value: String) {
     ;
 
     companion object {
-        fun findByValue(value: String): PickOpenItemDto {
+        fun findByName(value: String): PickOpenItemDto {
             return PickOpenItemDto.entries.find { it.name.equals(value, ignoreCase = true) }
                 ?: throw DojoException.of(DojoExceptionType.INVALID_PICK_OPEN_ITEM)
         }

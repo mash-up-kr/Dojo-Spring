@@ -211,8 +211,8 @@ class PickController(
             PickUseCase.OpenPickCommand(
                 pickId = PickId(id),
                 pickedId = memberId,
-                pickOpenItem = PickOpenItem.findByValue(request.pickOpenItemDto.value)
+                pickOpenItem = PickOpenItem.findByName(request.pickOpenItemDto.name)
             )
-        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId.value, PickOpenItemDto.findByValue(it.pickOpenItem.value), it.value)) }
+        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId.value, PickOpenItemDto.findByName(it.pickOpenItem.name), it.value)) }
     }
 }
