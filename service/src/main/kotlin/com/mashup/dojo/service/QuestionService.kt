@@ -43,7 +43,7 @@ interface QuestionService {
 
     fun getOperatingQuestionSet(): QuestionSet?
 
-    fun getNextOperatingQuestionSet(): QuestionSet?
+    fun getNextOperatingQuestionSet(status: Status = Status.UPCOMING): QuestionSet?
 
     fun getLatestPublishedQuestionSet(): QuestionSet?
 
@@ -130,9 +130,9 @@ class DefaultQuestionService(
     }
 
     // 발행 출격 준비 완료 QuestionSet
-    override fun getNextOperatingQuestionSet(): QuestionSet? {
-        return questionSetRepository.findFirstByStatusAndPublishedAtAfterOrderByPublishedAtAsc(Status.UPCOMING)?.toQuestionSet() ?: run {
-            log.error { "Published And Prepared for sortie QuestionSet Entity not found" }
+    override fun getNextOperatingQuestionSet(status: Status): QuestionSet? {
+        return questionSetRepository.findFirstByStatusAndPublishedAtAfterOrderByPublishedAtAsc(status)?.toQuestionSet() ?: run {
+            log.error { "next Operating QuestionSet status : [$status] Entity not found" }
             null
         }
     }
