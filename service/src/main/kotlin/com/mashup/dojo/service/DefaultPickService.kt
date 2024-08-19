@@ -62,7 +62,8 @@ interface PickService {
         memberId: MemberId,
     ): Int
 
-    fun findPickCountByMemberId(memberId: MemberId): Int
+    // 픽 당한 횟수 조회
+    fun findPickedCountByMemberId(memberId: MemberId): Int
 
     fun getNextPickTime(): LocalDateTime
 
@@ -332,8 +333,8 @@ class DefaultPickService(
         return pickRepository.findPickDetailCount(memberId = memberId.value, questionId = questionId.value).toInt()
     }
 
-    override fun findPickCountByMemberId(memberId: MemberId): Int {
-        return pickRepository.findPickCountByMemberId(memberId = memberId.value).toInt()
+    override fun findPickedCountByMemberId(memberId: MemberId): Int {
+        return pickRepository.findPickedCountByMemberId(memberId = memberId.value).toInt()
     }
 
     override fun getNextPickTime(): LocalDateTime {

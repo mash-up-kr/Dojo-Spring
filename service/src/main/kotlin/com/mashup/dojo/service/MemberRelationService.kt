@@ -47,6 +47,8 @@ interface MemberRelationService {
         fromId: MemberId,
         toIds: List<MemberId>,
     ): List<MemberRelation>
+
+    fun countFriend(memberId: MemberId): Int
 }
 
 @Service
@@ -135,6 +137,10 @@ class DefaultMemberRelationService(
         toIds: List<MemberId>,
     ): List<MemberRelation> {
         return memberRelationRepository.findByFromIdAndToIds(fromId.value, toIds.map { it.value }).map { it.toDomain() }
+    }
+
+    override fun countFriend(memberId: MemberId): Int {
+        return memberRelationRepository.countFriend(memberId.value).toInt()
     }
 }
 

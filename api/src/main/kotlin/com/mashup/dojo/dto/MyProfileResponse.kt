@@ -15,7 +15,10 @@ data class MyProfileResponse(
     @Schema(description = "유저 기수")
     val ordinal: Int,
     @Schema(description = "유저가 받은 픽 개수")
+    @Deprecated("picked count를 대신 사용해주세요.")
     val pickCount: Int,
+    @Schema(description = "유저가 받은 픽 개수")
+    val pickedCount: Int,
     @Schema(description = "유저의 친구 수")
     val friendCount: Int,
     @Schema(description = "소유한 코인 개수")

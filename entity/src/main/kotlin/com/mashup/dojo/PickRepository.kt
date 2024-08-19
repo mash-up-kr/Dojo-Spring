@@ -62,7 +62,8 @@ interface PickRepositoryCustom {
         memberId: String,
     ): Long
 
-    fun findPickCountByMemberId(memberId: String): Long
+    // 픽 당한 횟수 카운트
+    fun findPickedCountByMemberId(memberId: String): Long
 
     fun findSolvedPick(
         memberId: String,
@@ -175,7 +176,7 @@ class PickRepositoryImpl(
             .or(pickEntity.isFullNameOpen)
     }
 
-    override fun findPickCountByMemberId(memberId: String): Long {
+    override fun findPickedCountByMemberId(memberId: String): Long {
         val pickEntity = QPickEntity.pickEntity
         return jpaQueryFactory
             .select(Wildcard.count)
