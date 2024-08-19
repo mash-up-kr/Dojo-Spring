@@ -145,7 +145,6 @@ class PickController(
                 questionContent = pickDetailPaging.questionContent,
                 questionEmojiImageUrl = pickDetailPaging.questionEmojiImageUrl,
                 totalReceivedPickCount = pickDetailPaging.totalReceivedPickCount,
-                anyOpenPickerCount = pickDetailPaging.anyOpenPickerCount,
                 picks = pickDetails,
                 totalPage = pickDetailPaging.totalPage,
                 totalElements = pickDetailPaging.totalElements,
