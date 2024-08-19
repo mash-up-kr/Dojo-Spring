@@ -352,14 +352,11 @@ class DefaultPickService(
         pickerGender: MemberGender?,
         pickerFullName: String?,
     ): String {
-        return if (pickerFullName != null) {
-            pickerProfileImageUrl
-        } else {
-            when (pickerGender) {
-                MemberGender.MALE -> profileImageProperties.male
-                MemberGender.FEMALE -> profileImageProperties.female
-                else -> profileImageProperties.unknown
-            }
+        return when {
+            pickerFullName != null -> pickerProfileImageUrl
+            pickerGender == MemberGender.MALE -> profileImageProperties.male
+            pickerGender == MemberGender.FEMALE -> profileImageProperties.female
+            else -> profileImageProperties.unknown
         }
     }
 
