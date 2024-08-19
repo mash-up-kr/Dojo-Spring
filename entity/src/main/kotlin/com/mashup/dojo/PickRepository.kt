@@ -102,6 +102,7 @@ class PickRepositoryImpl(
     ): List<PickEntityMapper> {
         val pickEntity = QPickEntity.pickEntity
         val memberEntity = QMemberEntity.memberEntity
+        val imageEntity = QImageEntity.imageEntity
 
         return jpaQueryFactory
             .select(
@@ -112,6 +113,7 @@ class PickRepositoryImpl(
                     pickEntity.questionSheetId,
                     pickEntity.pickerId,
                     pickEntity.pickedId,
+                    imageEntity.url,
                     pickEntity.isGenderOpen,
                     pickEntity.isPlatformOpen,
                     pickEntity.isMidInitialNameOpen,
@@ -127,6 +129,7 @@ class PickRepositoryImpl(
             )
             .from(pickEntity)
             .join(memberEntity).on(pickEntity.pickerId.eq(memberEntity.id))
+            .join(imageEntity).on(memberEntity.profileImageId.eq(imageEntity.id))
             .where(
                 pickEntity.pickedId.eq(memberId),
                 pickEntity.questionId.eq(questionId)
@@ -307,6 +310,7 @@ data class PickEntityMapper
         val questionSetId: String,
         val questionSheetId: String,
         val pickerId: String,
+        val pickerProfileImageUrl: String,
         val pickedId: String,
         val isGenderOpen: Boolean,
         val isPlatformOpen: Boolean,
