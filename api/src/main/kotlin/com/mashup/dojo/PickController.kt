@@ -124,6 +124,7 @@ class PickController(
 
                 ReceivedPickDetail(
                     pickId = pickId,
+                    pickerProfileImageUrl = it.pickerProfileImageUrl,
                     pickerOrdinal = it.pickerOrdinal,
                     pickerIdOpen = it.pickerIdOpen,
                     pickerId = pickerId,

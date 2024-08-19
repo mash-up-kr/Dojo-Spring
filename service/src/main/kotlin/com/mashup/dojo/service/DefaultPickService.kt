@@ -16,8 +16,10 @@ import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -100,6 +102,7 @@ interface PickService {
 
     data class GetReceivedPickDetail(
         val pickId: PickId,
+        val pickerProfileImageUrl: String,
         val pickerOrdinal: Int,
         val pickerIdOpen: Boolean,
         val pickerId: MemberId,
@@ -123,6 +126,14 @@ interface PickService {
     )
 }
 
+@Component
+@ConfigurationProperties(prefix = "dojo.profile")
+class ProfileImageProperties {
+    lateinit var male: String
+    lateinit var female: String
+    lateinit var unknown: String
+}
+
 @Transactional(readOnly = true)
 @Service
 class DefaultPickService(
@@ -131,6 +142,7 @@ class DefaultPickService(
     private val pickTimeRepository: PickTimeRepository,
     @Value("\${dojo.rank.size}")
     private val defaultRankSize: Long,
+    private val profileImageProperties: ProfileImageProperties,
 ) : PickService {
     override fun getReceivedPickPaging(
         pickedMemberId: MemberId,
@@ -249,8 +261,18 @@ class DefaultPickService(
                 val pickerSecondInitialName = transformPickerSecondInitialName(isOpen = secondInitialNameOpen, secondInitialName = pickEntity.pickerSecondInitialName)
                 val pickerFullName = transformPickerFullName(isOpen = fullNameOpen, fullName = pickEntity.pickerFullName)
 
+                val pickerProfileImageUrl = pickEntity.pickerProfileImageUrl
+
+                val transformProfileImageUrl: String =
+                    transformPickerProfileImageUrl(
+                        pickerProfileImageUrl = pickerProfileImageUrl,
+                        pickerGender = pickerGender,
+                        pickerFullName = pickerFullName
+                    )
+
                 PickService.GetReceivedPickDetail(
                     pickId = PickId(pickEntity.pickId),
+                    pickerProfileImageUrl = transformProfileImageUrl,
                     pickerOrdinal = pickEntity.pickerOrdinal,
                     pickerIdOpen = pickerIdOpen,
                     pickerId = pickerId,
@@ -323,6 +345,19 @@ class DefaultPickService(
             return fullName
         }
         return null
+    }
+
+    fun transformPickerProfileImageUrl(
+        pickerProfileImageUrl: String,
+        pickerGender: MemberGender?,
+        pickerFullName: String?,
+    ): String {
+        return when {
+            pickerFullName != null -> pickerProfileImageUrl
+            pickerGender == MemberGender.MALE -> profileImageProperties.male
+            pickerGender == MemberGender.FEMALE -> profileImageProperties.female
+            else -> profileImageProperties.unknown
+        }
     }
 
     override fun getPickCount(

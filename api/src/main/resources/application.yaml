@@ -14,6 +14,10 @@ dojo:
     size: 8
   rank:
     size: 3
+  profile:
+    male: ENC(y7SDgKPyWwAg4dJMql9v7uWrAdJRQoMCHyPLxvma89kwZgpCKhva2Qi9Yfn7XBEyP6Z1hPVdfAJ4cuvcjoglQ1Obp3HtOc6+4+IXG7jttKCIA+sWpf9D3FagSvybbjN7BxgXrWIkloQ=)
+    female: ENC(G6ycXZSiw82d4TkZ8q5TOGbV/PnPW5TMvBPx6a0hojXGIm3c3Ho/K5FqNBhuKl/m2pSIPzK5ammRqCCKpFw6+S8YvjrmWumC/ky6ciXrIKAbriS45RwKNuprrpnT+zyVcdf0M8VXBnI=)
+    unknown: ENC(y7UKDjMVbaNQGLjGCwIWbTegx63laHRT038rGr7SH0FYmA394A14T9ber2WCFZBM4OEicjxMaME2ikQujns2nbebzVjZrNbN4OuBtA05M2ma1IF4OhDIbZaxh10i+jZ/6Ei4FCBwDB0=)
 
 scheduler:
   cron: "0 0 9,21 * * *"
@@ -24,3 +28,4 @@ cloud:
     cloudwatch:
       access-key: ${CLOUDWATCH_ACCESS_KEY}
       secret-key: ${CLOUDWATCH_SECRET_KEY}
+

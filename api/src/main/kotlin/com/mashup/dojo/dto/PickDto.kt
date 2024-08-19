@@ -62,6 +62,7 @@ data class PickDetailPaging(
 
 data class ReceivedPickDetail(
     val pickId: PickId?,
+    val pickerProfileImageUrl: String,
     val pickerOrdinal: Int,
     val pickerIdOpen: Boolean,
     val pickerId: PickId?,
