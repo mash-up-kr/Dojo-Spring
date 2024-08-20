@@ -41,7 +41,6 @@ interface PickUseCase {
         val questionContent: String,
         val questionEmojiImageUrl: String,
         val totalReceivedPickCount: Int,
-        val anyOpenPickerCount: Int,
         val picks: List<PickService.GetReceivedPickDetail>,
         val totalPage: Int,
         val totalElements: Long,
@@ -143,14 +142,11 @@ class DefaultPickUseCase(
 
         val receivedPickPaging = pickService.getPickDetailPaging(question.id, command.memberId, command.pageNumber, command.pageSize)
 
-        val anyOpenPickerCount = pickService.getAnyOpenPickerCount(question.id, command.memberId)
-
         return PickUseCase.GetPickDetailPaging(
             questionId = question.id,
             questionContent = question.content,
             questionEmojiImageUrl = imageUrl,
             totalReceivedPickCount = pickCount,
-            anyOpenPickerCount = anyOpenPickerCount,
             picks = receivedPickPaging.picks,
             totalPage = receivedPickPaging.totalPage,
             totalElements = receivedPickPaging.totalElements,
