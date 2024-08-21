@@ -17,8 +17,10 @@ import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
@@ -231,12 +233,12 @@ class MemberController(
             )
         ]
     )
-    fun myPick(): DojoApiResponse<MySpacePickResponse> {
+    fun mySpace(): DojoApiResponse<MySpacePickResponse> {
         val memberId = MemberPrincipalContextHolder.current().id
         val receivedMySpacePicks = memberUseCase.receivedMySpacePicks(memberId)
         val response =
             receivedMySpacePicks.map {
-                MySpacePickDetail(
+                SpacePickDetail(
                     pickId = it.pickId.value,
                     rank = it.rank,
                     pickContent = it.pickContent,
@@ -247,6 +249,48 @@ class MemberController(
 
         return DojoApiResponse.success(
             MySpacePickResponse(response)
+        )
+    }
+
+    @GetMapping("/member/friend-space/{friendId}/pick")
+    @Operation(
+        summary = "친구 스페이스 친구가 받은 픽 API",
+        description = "친구 스페이스 탭 중 친구가 받은 픽의 대한 API입니다. 공동 등수를 자동으로 계산하고 반환합니다. Pick이 많은 순서대로 등수를 나누고, 최신순, 내림차순으로 정렬합니다.",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "친구스페이스 - 친구가 받은 픽 Response",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [
+                            ExampleObject(
+                                name = "Example Response",
+                                value = EXAMPLE_VALUE
+                            )
+                        ]
+                    )
+                ]
+            )
+        ]
+    )
+    fun friendSpace(
+        @PathVariable friendId: String,
+    ): DojoApiResponse<FriendSpacePickResponse> {
+        val receivedMySpacePicks = memberUseCase.receivedFriendSpacePicks(MemberId(friendId))
+        val response =
+            receivedMySpacePicks.map {
+                SpacePickDetail(
+                    pickId = it.pickId.value,
+                    rank = it.rank,
+                    pickContent = it.pickContent,
+                    pickCount = it.pickCount,
+                    createdAt = it.createdAt
+                )
+            }
+
+        return DojoApiResponse.success(
+            FriendSpacePickResponse(response)
         )
     }
 
@@ -287,16 +331,27 @@ class MemberController(
         val authToken: String,
     )
 
-    data class MySpacePickDetail(
+    data class SpacePickDetail(
+        @Schema(description = "픽의 고유 ID", example = "pickId1")
         val pickId: String,
+        @Schema(description = "픽의 순위", example = "1")
         val rank: Int,
+        @Schema(description = "픽의 내용", example = "대충 작업해도 퀄리티 잘 내오는 사람은?")
         val pickContent: String,
+        @Schema(description = "픽의 투표 수", example = "999")
         val pickCount: Int,
+        @Schema(description = "픽이 생성된 날짜", example = "2024-08-12T17:18:52.132Z")
         val createdAt: LocalDateTime,
     )
 
     data class MySpacePickResponse(
-        val mySpaceResponses: List<MySpacePickDetail>,
+        @ArraySchema(arraySchema = Schema(description = "MySpace 내가 받은 픽 목록"))
+        val mySpaceResponses: List<SpacePickDetail>,
+    )
+
+    data class FriendSpacePickResponse(
+        @ArraySchema(arraySchema = Schema(description = "FriendSpace 친구가 받은 픽 목록"))
+        val friendSpaceResponses: List<SpacePickDetail>,
     )
 
     companion object {

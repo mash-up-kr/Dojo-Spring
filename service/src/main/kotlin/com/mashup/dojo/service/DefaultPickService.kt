@@ -68,7 +68,7 @@ interface PickService {
 
     fun getNextPickTime(): LocalDateTime
 
-    fun getReceivedMySpacePicks(memberId: MemberId): List<MySpacePickDetail>
+    fun getReceivedSpacePicks(memberId: MemberId): List<SpacePickDetail>
 
     data class GetPickPaging(
         val picks: List<GetReceivedPick>,
@@ -112,7 +112,7 @@ interface PickService {
         val latestPickedAt: LocalDateTime,
     )
 
-    data class MySpacePickDetail(
+    data class SpacePickDetail(
         val pickId: PickId,
         val rank: Int = -1,
         val pickContent: String,
@@ -385,10 +385,10 @@ class DefaultPickService(
         return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
     }
 
-    override fun getReceivedMySpacePicks(memberId: MemberId): List<PickService.MySpacePickDetail> {
+    override fun getReceivedSpacePicks(memberId: MemberId): List<PickService.SpacePickDetail> {
         return pickRepository.findTopRankPicksByMemberId(memberId = memberId.value, rank = defaultRankSize).map { pick ->
             val pickCount = pickRepository.findPickDetailCount(memberId = memberId.value, questionId = pick.questionId)
-            PickService.MySpacePickDetail(
+            PickService.SpacePickDetail(
                 pickId = PickId(pick.pickId),
                 pickCount = pickCount.toInt(),
                 pickContent = pick.questionContent,
@@ -452,14 +452,14 @@ private fun PickEntity.toPick(): Pick {
     )
 }
 
-fun List<PickService.MySpacePickDetail>.calculateRanks(): List<PickService.MySpacePickDetail> {
+fun List<PickService.SpacePickDetail>.calculateRanks(): List<PickService.SpacePickDetail> {
     if (this.isEmpty()) return this
 
     // 첫 번째 조건: pickCount 내림차순 정렬
     // 두 번째 조건: createdAt 내림차순 정렬
     val sortedPicks =
         this.sortedWith(
-            compareByDescending<PickService.MySpacePickDetail> { it.pickCount }
+            compareByDescending<PickService.SpacePickDetail> { it.pickCount }
                 .thenByDescending { it.createdAt }
         )
 

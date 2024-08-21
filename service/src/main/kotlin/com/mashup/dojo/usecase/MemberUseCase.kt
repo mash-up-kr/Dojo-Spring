@@ -73,12 +73,14 @@ interface MemberUseCase {
 
     fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
 
-    fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.MySpacePickDetail>
+    fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail>
 
     fun searchMember(
         memberId: MemberId,
         keyword: String,
     ): List<MemberSearchInfo>
+
+    fun receivedFriendSpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail>
 }
 
 @Component
@@ -209,9 +211,13 @@ class DefaultMemberUseCase(
         }
     }
 
-    override fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.MySpacePickDetail> {
-        val mySpacePicks = pickService.getReceivedMySpacePicks(currentMemberId)
+    override fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail> {
+        val mySpacePicks = pickService.getReceivedSpacePicks(currentMemberId)
+        return mySpacePicks.calculateRanks()
+    }
 
+    override fun receivedFriendSpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail> {
+        val mySpacePicks = pickService.getReceivedSpacePicks(currentMemberId)
         return mySpacePicks.calculateRanks()
     }
 }
