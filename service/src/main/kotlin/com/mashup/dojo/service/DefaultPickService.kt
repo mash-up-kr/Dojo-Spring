@@ -5,6 +5,7 @@ import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.PickEntity
 import com.mashup.dojo.PickRepository
 import com.mashup.dojo.PickTimeRepository
+import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
@@ -15,6 +16,7 @@ import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
+import com.mashup.dojo.service.PickService.PickOpenInfo
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.data.domain.PageRequest
@@ -50,7 +52,7 @@ interface PickService {
         pickId: PickId,
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
-    ): String
+    ): PickOpenInfo
 
     fun getPickDetailPaging(
         questionId: QuestionId,
@@ -119,6 +121,11 @@ interface PickService {
         val pickCount: Int,
         val createdAt: LocalDateTime,
     )
+
+    data class PickOpenInfo(
+        val pickOpenValue: String,
+        val pickOpenImageUrl: String,
+    )
 }
 
 @Component
@@ -127,6 +134,17 @@ class ProfileImageProperties {
     lateinit var male: String
     lateinit var female: String
     lateinit var unknown: String
+}
+
+@Component
+@ConfigurationProperties(prefix = "dojo.platform")
+class PlatformImageProperties {
+    lateinit var android: String
+    lateinit var design: String
+    lateinit var ios: String
+    lateinit var node: String
+    lateinit var spring: String
+    lateinit var web: String
 }
 
 @Transactional(readOnly = true)
@@ -138,6 +156,8 @@ class DefaultPickService(
     @Value("\${dojo.rank.size}")
     private val defaultRankSize: Long,
     private val profileImageProperties: ProfileImageProperties,
+    private val platformImageProperties: PlatformImageProperties,
+    private val imageService: ImageService,
 ) : PickService {
     override fun getReceivedPickPaging(
         pickedMemberId: MemberId,
@@ -209,7 +229,7 @@ class DefaultPickService(
         pickId: PickId,
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
-    ): String {
+    ): PickOpenInfo {
         val pick = findPickById(pickId) ?: throw DojoException.of(DojoExceptionType.PICK_NOT_FOUND)
 
         if (pick.pickedId != pickedId) {
@@ -225,7 +245,45 @@ class DefaultPickService(
         )
 
         val picker = memberService.findMemberById(pick.pickerId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
-        return pick.getOpenItem(pickOpenItem, picker)
+
+        return getOpenItem(pickOpenItem, picker)
+    }
+
+    private fun getOpenItem(
+        pickOpenItem: PickOpenItem,
+        picker: Member,
+    ): PickOpenInfo {
+        val pickOpenValue: String
+        var pickOpenImageUrl = ""
+
+        if (PickOpenItem.GENDER == pickOpenItem) {
+            pickOpenValue = picker.gender.name
+            pickOpenImageUrl =
+                when (picker.gender) {
+                    MemberGender.MALE -> profileImageProperties.male
+                    MemberGender.FEMALE -> profileImageProperties.female
+                    MemberGender.UNKNOWN -> profileImageProperties.unknown
+                }
+        } else if (PickOpenItem.PLATFORM == pickOpenItem) {
+            pickOpenValue = picker.platform.name
+            pickOpenImageUrl =
+                when (picker.platform) {
+                    MemberPlatform.ANDROID -> platformImageProperties.android
+                    MemberPlatform.IOS -> platformImageProperties.ios
+                    MemberPlatform.WEB -> platformImageProperties.web
+                    MemberPlatform.NODE -> platformImageProperties.node
+                    MemberPlatform.DESIGN -> platformImageProperties.design
+                    MemberPlatform.SPRING -> platformImageProperties.spring
+                    MemberPlatform.UNKNOWN -> ""
+                }
+        } else if (PickOpenItem.MID_INITIAL_NAME == pickOpenItem) {
+            pickOpenValue = picker.secondInitialName
+        } else {
+            pickOpenValue = picker.fullName
+            pickOpenImageUrl = imageService.load(picker.profileImageId)?.url ?: profileImageProperties.unknown
+        }
+
+        return PickOpenInfo(pickOpenValue, pickOpenImageUrl)
     }
 
     private fun findPickById(pickId: PickId): Pick? {

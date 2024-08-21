@@ -213,6 +213,6 @@ class PickController(
                 pickedId = memberId,
                 pickOpenItem = PickOpenItem.findByName(request.pickOpenItemDto.name)
             )
-        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId.value, PickOpenItemDto.findByName(it.pickOpenItem.name), it.value)) }
+        ).let { DojoApiResponse.success(PickOpenResponse(it.pickId.value, PickOpenItemDto.findByName(it.pickOpenItem.name), it.pickOpenValue, it.pickOpenImageUrl)) }
     }
 }

@@ -69,7 +69,8 @@ interface PickUseCase {
     data class PickOpenInfo(
         val pickId: PickId,
         val pickOpenItem: PickOpenItem,
-        val value: String,
+        val pickOpenValue: String,
+        val pickOpenImageUrl: String,
     )
 
     fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging
@@ -137,7 +138,7 @@ class DefaultPickUseCase(
             openPickCommand.pickId,
             openPickCommand.pickedId,
             openPickCommand.pickOpenItem
-        ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it) }
+        ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it.pickOpenValue, it.pickOpenImageUrl) }
     }
 
     override fun getReceivedPickDetailPaging(command: PickUseCase.GetPagingPickCommand): PickUseCase.GetPickDetailPaging {
