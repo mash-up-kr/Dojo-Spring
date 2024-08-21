@@ -5,6 +5,7 @@ import com.mashup.dojo.config.security.JwtTokenService
 import com.mashup.dojo.config.security.MemberPrincipalContextHolder
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberRelationId
+import com.mashup.dojo.dto.FriendSpacePickResponse
 import com.mashup.dojo.dto.MemberCreateFriendRelationRequest
 import com.mashup.dojo.dto.MemberCreateRequest
 import com.mashup.dojo.dto.MemberLoginRequest
@@ -12,15 +13,13 @@ import com.mashup.dojo.dto.MemberProfileResponse
 import com.mashup.dojo.dto.MemberSearchResponse
 import com.mashup.dojo.dto.MemberUpdateRequest
 import com.mashup.dojo.dto.MyProfileResponse
+import com.mashup.dojo.dto.MySpacePickResponse
+import com.mashup.dojo.dto.SpacePickDetail
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.ExampleObject
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
 
 private val logger = KotlinLogging.logger { }
 
@@ -216,21 +214,7 @@ class MemberController(
         summary = "마이 스페이스 내가 받은 픽 API",
         description = "마이스페이스 탭 중 내가 받은 픽의 대한 API입니다. 공동 등수를 자동으로 계산하고 반환합니다. Pick이 많은 순서대로 등수를 나누고, 최신순, 내림차순으로 정렬합니다.",
         responses = [
-            ApiResponse(
-                responseCode = "200",
-                description = "마이스페이스 - 내가 받은 픽 Response",
-                content = [
-                    Content(
-                        mediaType = "application/json",
-                        examples = [
-                            ExampleObject(
-                                name = "Example Response",
-                                value = EXAMPLE_VALUE
-                            )
-                        ]
-                    )
-                ]
-            )
+            ApiResponse(responseCode = "200", description = "마이 스페이스 - 내가 받은 픽 TOP3")
         ]
     )
     fun mySpace(): DojoApiResponse<MySpacePickResponse> {
@@ -257,21 +241,7 @@ class MemberController(
         summary = "친구 스페이스 친구가 받은 픽 API",
         description = "친구 스페이스 탭 중 친구가 받은 픽의 대한 API입니다. 공동 등수를 자동으로 계산하고 반환합니다. Pick이 많은 순서대로 등수를 나누고, 최신순, 내림차순으로 정렬합니다.",
         responses = [
-            ApiResponse(
-                responseCode = "200",
-                description = "친구스페이스 - 친구가 받은 픽 Response",
-                content = [
-                    Content(
-                        mediaType = "application/json",
-                        examples = [
-                            ExampleObject(
-                                name = "Example Response",
-                                value = EXAMPLE_VALUE
-                            )
-                        ]
-                    )
-                ]
-            )
+            ApiResponse(responseCode = "200", description = "친구 스페이스 - 친구가 받은 픽 TOP3")
         ]
     )
     fun friendSpace(
@@ -330,64 +300,4 @@ class MemberController(
         val id: MemberId,
         val authToken: String,
     )
-
-    data class SpacePickDetail(
-        @Schema(description = "픽의 고유 ID", example = "pickId1")
-        val pickId: String,
-        @Schema(description = "픽의 순위", example = "1")
-        val rank: Int,
-        @Schema(description = "픽의 내용", example = "대충 작업해도 퀄리티 잘 내오는 사람은?")
-        val pickContent: String,
-        @Schema(description = "픽의 투표 수", example = "999")
-        val pickCount: Int,
-        @Schema(description = "픽이 생성된 날짜", example = "2024-08-12T17:18:52.132Z")
-        val createdAt: LocalDateTime,
-    )
-
-    data class MySpacePickResponse(
-        @ArraySchema(arraySchema = Schema(description = "MySpace 내가 받은 픽 목록"))
-        val mySpaceResponses: List<SpacePickDetail>,
-    )
-
-    data class FriendSpacePickResponse(
-        @ArraySchema(arraySchema = Schema(description = "FriendSpace 친구가 받은 픽 목록"))
-        val friendSpaceResponses: List<SpacePickDetail>,
-    )
-
-    companion object {
-        private const val EXAMPLE_VALUE = """
-                        {
-                          "success": true,
-                          "data": {
-                            "mySpaceResponses": [
-                              {
-                                "pickId": "pickId1",
-                                "rank": 1,
-                                "pickContent": "대충 작업해도 퀄리티 잘 내오는 사람은?",
-                                "pickCount": 999,
-                                "createdAt": "2024-08-12T17:18:52.132Z"
-                              },
-                              {
-                                "pickId": "pickId2",
-                                "rank": 2,
-                                "pickContent": "매쉬업에서 운동 제일 잘할 것 같은 사람은?",
-                                "pickCount": 500,
-                                "createdAt": "2024-08-12T17:18:52.132Z"
-                              },
-                              {
-                                "pickId": "pickId3",
-                                "rank": 3,
-                                "pickContent": "매쉬업에서 이성으로 소개시켜주고 싶은 사람은?",
-                                "pickCount": 300,
-                                "createdAt": "2024-08-12T17:18:52.132Z"
-                              }
-                            ]
-                          },
-                          "error": {
-                            "code": "string",
-                            "message": "string"
-                          }
-                        }
-                        """
-    }
 }
