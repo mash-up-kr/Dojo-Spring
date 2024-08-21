@@ -87,10 +87,11 @@ data class PickOpenResponse(
     @Schema(description = "픽 id")
     val pickId: String,
     @Schema(description = "오픈 항목")
-    val pickOpenItemDto: PickOpenItemDto,
+    val pickOpenItem: PickOpenItemDto,
     @Schema(description = "오픈된 값")
-    val value: String,
-    // to-do: imageUrl 추가
+    val pickOpenValue: String,
+    @Schema(description = "이미지 url")
+    val pickOpenImageUrl: String,
 )
 
 enum class PickOpenItemDto(val value: String) {
