@@ -13,6 +13,7 @@ import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
+import com.mashup.dojo.service.ProfileImageProperties
 import com.mashup.dojo.service.calculateRanks
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -88,6 +89,7 @@ class DefaultMemberUseCase(
     private val coinService: CoinService,
     private val imageService: ImageService,
     private val pickService: PickService,
+    private val imageProperties: ProfileImageProperties,
 ) : MemberUseCase {
     @Transactional
     override fun create(command: MemberUseCase.CreateCommand): MemberId {
@@ -198,7 +200,7 @@ class DefaultMemberUseCase(
 
             MemberUseCase.MemberSearchInfo(
                 memberId = member.id.value,
-                profileImageUrl = imageMap[member.profileImageId.value]?.url.let { "" },
+                profileImageUrl = imageMap[member.profileImageId.value]?.url ?: imageProperties.unknown,
                 memberName = member.fullName,
                 platform = member.platform.name,
                 ordinal = member.ordinal,
