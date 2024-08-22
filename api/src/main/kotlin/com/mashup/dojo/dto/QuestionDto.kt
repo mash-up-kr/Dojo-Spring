@@ -65,7 +65,7 @@ data class QuestionSheetResponse(
     val resolverId: MemberId,
     @Schema(description = "질문 고유 id")
     val questionId: QuestionId,
-    @Schema(description = "질문지 묶음 중 해당 질문지의 순서")
+    @Schema(description = "질문지 묶음 중 해당 질문지의 순서. 1부터 시작(1based) ~ max : QuestionSheetsGetResponse.sheetTotalCount")
     val questionOrder: Int,
     @Schema(description = "질문 내용")
     val questionContent: String,
