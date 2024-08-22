@@ -2,6 +2,7 @@ package com.mashup.dojo
 
 import com.mashup.dojo.base.BaseTimeEntity
 import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.core.types.dsl.Wildcard
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -64,6 +65,8 @@ interface MemberRelationQueryRepository {
         fromId: String,
         toIds: List<String>,
     ): List<MemberRelationEntity>
+
+    fun countFriend(memberId: String): Long
 }
 
 class MemberRelationQueryRepositoryImpl(
@@ -79,6 +82,19 @@ class MemberRelationQueryRepositoryImpl(
                 memberRelation.fromId.eq(fromId)
             )
             .fetch()
+    }
+
+    override fun countFriend(memberId: String): Long {
+        val memberRelation = QMemberRelationEntity.memberRelationEntity
+
+        return jpaQueryFactory
+            .select(Wildcard.count)
+            .from(memberRelation)
+            .where(
+                memberRelation.fromId.eq(memberId),
+                memberRelation.relationType.eq(RelationType.FRIEND)
+            )
+            .fetchOne() ?: 0
     }
 
     override fun findFriendsByFromId(fromId: String): List<String> {

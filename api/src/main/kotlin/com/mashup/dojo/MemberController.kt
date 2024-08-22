@@ -16,7 +16,10 @@ import com.mashup.dojo.dto.MyProfileResponse
 import com.mashup.dojo.dto.MySpacePickResponse
 import com.mashup.dojo.dto.SpacePickDetail
 import com.mashup.dojo.service.ImageService
+import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
+import com.mashup.dojo.service.PickService
+import com.mashup.dojo.usecase.CoinUseCase
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
@@ -37,7 +40,10 @@ private val logger = KotlinLogging.logger { }
 class MemberController(
     private val memberUseCase: MemberUseCase,
     private val memberService: MemberService,
+    private val coinUseCase: CoinUseCase,
     private val imageService: ImageService,
+    private val pickService: PickService,
+    private val memberRelationService: MemberRelationService,
     private val jwtTokenService: JwtTokenService,
 ) {
     @PostMapping("/public/member")
@@ -129,6 +135,12 @@ class MemberController(
         logger.info { "read my profile, $memberId" }
         val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
         val profileImage = imageService.load(member.profileImageId) ?: throw DojoException.of(DojoExceptionType.IMAGE_NOT_FOUND)
+        val currentCoin =
+            coinUseCase.getCurrentCoin(
+                CoinUseCase.GetCurrentCoinCommand(member.id)
+            )
+        val pickedCount = pickService.findPickedCountByMemberId(member.id)
+        val friendCount = memberRelationService.countFriend(member.id)
 
         return DojoApiResponse.success(
             MyProfileResponse(
@@ -137,10 +149,10 @@ class MemberController(
                 memberName = member.fullName,
                 platform = member.platform.name,
                 ordinal = member.ordinal,
-                // TODO MOCK 값들 채우기
-                pickCount = 10,
-                friendCount = 20,
-                coinCount = 0
+                pickCount = pickedCount,
+                pickedCount = pickedCount,
+                friendCount = friendCount,
+                coinCount = currentCoin.amount.toInt()
             )
         )
     }

@@ -137,7 +137,7 @@ class DefaultMemberUseCase(
                 ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "해당하는 이미지를 찾을 수 없습니다. EmojiImageId: [$profileImageId}]")
         )
 
-        val pickCountByMemberId = pickService.findPickCountByMemberId(findMember.id)
+        val pickCountByMemberId = pickService.findPickedCountByMemberId(findMember.id)
 
         val isFriend = memberRelationService.isFriend(currentMemberId, targetMemberId)
         val friendCount = memberRelationService.getFriendRelationIds(targetMemberId).size
