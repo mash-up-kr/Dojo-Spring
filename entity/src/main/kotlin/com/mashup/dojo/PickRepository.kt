@@ -57,7 +57,7 @@ interface PickRepositoryCustom {
         questionId: String,
     ): Long
 
-    fun findPickCountByMemberId(memberId: String): Long
+    fun findPickedCountByMemberId(memberId: String): Long
 
     fun findSolvedPick(
         memberId: String,
