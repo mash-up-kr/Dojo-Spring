@@ -57,13 +57,7 @@ interface PickRepositoryCustom {
         questionId: String,
     ): Long
 
-    fun getOpenPickerCount(
-        questionId: String,
-        memberId: String,
-    ): Long
-
-    // 픽 당한 횟수 카운트
-    fun findPickedCountByMemberId(memberId: String): Long
+    fun findPickCountByMemberId(memberId: String): Long
 
     fun findSolvedPick(
         memberId: String,
@@ -103,6 +97,7 @@ class PickRepositoryImpl(
     ): List<PickEntityMapper> {
         val pickEntity = QPickEntity.pickEntity
         val memberEntity = QMemberEntity.memberEntity
+        val imageEntity = QImageEntity.imageEntity
 
         return jpaQueryFactory
             .select(
@@ -113,6 +108,7 @@ class PickRepositoryImpl(
                     pickEntity.questionSheetId,
                     pickEntity.pickerId,
                     pickEntity.pickedId,
+                    imageEntity.url,
                     pickEntity.isGenderOpen,
                     pickEntity.isPlatformOpen,
                     pickEntity.isMidInitialNameOpen,
@@ -128,6 +124,7 @@ class PickRepositoryImpl(
             )
             .from(pickEntity)
             .join(memberEntity).on(pickEntity.pickerId.eq(memberEntity.id))
+            .join(imageEntity).on(memberEntity.profileImageId.eq(imageEntity.id))
             .where(
                 pickEntity.pickedId.eq(memberId),
                 pickEntity.questionId.eq(questionId)
@@ -149,22 +146,6 @@ class PickRepositoryImpl(
             .where(
                 pickEntity.pickedId.eq(memberId),
                 pickEntity.questionId.eq(questionId)
-            )
-            .fetchOne() ?: 0
-    }
-
-    override fun getOpenPickerCount(
-        questionId: String,
-        memberId: String,
-    ): Long {
-        val pickEntity = QPickEntity.pickEntity
-        return jpaQueryFactory
-            .select(Wildcard.count)
-            .from(pickEntity)
-            .where(
-                pickEntity.questionId.eq(questionId),
-                pickEntity.pickedId.eq(memberId),
-                isAnyOpen(pickEntity)
             )
             .fetchOne() ?: 0
     }
@@ -308,6 +289,7 @@ data class PickEntityMapper
         val questionSetId: String,
         val questionSheetId: String,
         val pickerId: String,
+        val pickerProfileImageUrl: String,
         val pickedId: String,
         val isGenderOpen: Boolean,
         val isPlatformOpen: Boolean,

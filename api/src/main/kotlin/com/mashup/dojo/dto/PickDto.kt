@@ -52,7 +52,6 @@ data class PickDetailPaging(
     val questionContent: String,
     val questionEmojiImageUrl: String,
     val totalReceivedPickCount: Int,
-    val anyOpenPickerCount: Int,
     val picks: List<ReceivedPickDetail>,
     val totalPage: Int,
     val totalElements: Long,
@@ -62,6 +61,7 @@ data class PickDetailPaging(
 
 data class ReceivedPickDetail(
     val pickId: PickId?,
+    val pickerProfileImageUrl: String,
     val pickerOrdinal: Int,
     val pickerIdOpen: Boolean,
     val pickerId: PickId?,
@@ -82,10 +82,16 @@ data class PickOpenRequest(
     val pickOpenItemDto: PickOpenItemDto,
 )
 
+@Schema(description = "픽 오픈 응답")
 data class PickOpenResponse(
+    @Schema(description = "픽 id")
     val pickId: String,
-    val pickOpenItemDto: PickOpenItemDto,
-    val value: String,
+    @Schema(description = "오픈 항목")
+    val pickOpenItem: PickOpenItemDto,
+    @Schema(description = "오픈된 값")
+    val pickOpenValue: String,
+    @Schema(description = "이미지 url")
+    val pickOpenImageUrl: String,
 )
 
 enum class PickOpenItemDto(val value: String) {
@@ -96,7 +102,7 @@ enum class PickOpenItemDto(val value: String) {
     ;
 
     companion object {
-        fun findByValue(value: String): PickOpenItemDto {
+        fun findByName(value: String): PickOpenItemDto {
             return PickOpenItemDto.entries.find { it.name.equals(value, ignoreCase = true) }
                 ?: throw DojoException.of(DojoExceptionType.INVALID_PICK_OPEN_ITEM)
         }

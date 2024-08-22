@@ -3,6 +3,8 @@ package com.mashup.dojo.usecase
 import com.mashup.dojo.DojoException
 import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.Status
+import com.mashup.dojo.domain.CoinUseDetail
+import com.mashup.dojo.domain.CoinUseType
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.PickId
 import com.mashup.dojo.domain.PickOpenItem
@@ -10,6 +12,7 @@ import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
+import com.mashup.dojo.service.CoinService
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.NotificationService
@@ -19,6 +22,7 @@ import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickPagingCommand
 import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 interface PickUseCase {
@@ -41,7 +45,6 @@ interface PickUseCase {
         val questionContent: String,
         val questionEmojiImageUrl: String,
         val totalReceivedPickCount: Int,
-        val anyOpenPickerCount: Int,
         val picks: List<PickService.GetReceivedPickDetail>,
         val totalPage: Int,
         val totalElements: Long,
@@ -66,7 +69,8 @@ interface PickUseCase {
     data class PickOpenInfo(
         val pickId: PickId,
         val pickOpenItem: PickOpenItem,
-        val value: String,
+        val pickOpenValue: String,
+        val pickOpenImageUrl: String,
     )
 
     fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging
@@ -87,6 +91,7 @@ class DefaultPickUseCase(
     private val imageService: ImageService,
     private val memberService: MemberService,
     private val notificationService: NotificationService,
+    private val coinService: CoinService,
 ) : PickUseCase {
     override fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging {
         return pickService.getReceivedPickPaging(
@@ -122,12 +127,18 @@ class DefaultPickUseCase(
         }
     }
 
+    @Transactional
     override fun openPick(openPickCommand: OpenPickCommand): PickOpenInfo {
+        val coin = coinService.getCoin(openPickCommand.pickedId) ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "유저의 코인정보가 없습니다")
+        val updatedCoin = coin.useCoin(openPickCommand.pickOpenItem.cost.toLong())
+
+        coinService.updateCoin(CoinUseType.USED, CoinUseDetail.REASON_USED_FOR_OPEN_PICK, openPickCommand.pickOpenItem.cost, updatedCoin)
+
         return pickService.openPick(
             openPickCommand.pickId,
             openPickCommand.pickedId,
             openPickCommand.pickOpenItem
-        ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it) }
+        ).let { PickOpenInfo(openPickCommand.pickId, openPickCommand.pickOpenItem, it.pickOpenValue, it.pickOpenImageUrl) }
     }
 
     override fun getReceivedPickDetailPaging(command: PickUseCase.GetPagingPickCommand): PickUseCase.GetPickDetailPaging {
@@ -143,14 +154,11 @@ class DefaultPickUseCase(
 
         val receivedPickPaging = pickService.getPickDetailPaging(question.id, command.memberId, command.pageNumber, command.pageSize)
 
-        val anyOpenPickerCount = pickService.getAnyOpenPickerCount(question.id, command.memberId)
-
         return PickUseCase.GetPickDetailPaging(
             questionId = question.id,
             questionContent = question.content,
             questionEmojiImageUrl = imageUrl,
             totalReceivedPickCount = pickCount,
-            anyOpenPickerCount = anyOpenPickerCount,
             picks = receivedPickPaging.picks,
             totalPage = receivedPickPaging.totalPage,
             totalElements = receivedPickPaging.totalElements,

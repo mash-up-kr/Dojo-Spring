@@ -5,6 +5,7 @@ import com.mashup.dojo.DojoExceptionType
 import com.mashup.dojo.PickEntity
 import com.mashup.dojo.PickRepository
 import com.mashup.dojo.PickTimeRepository
+import com.mashup.dojo.domain.Member
 import com.mashup.dojo.domain.MemberGender
 import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.domain.MemberPlatform
@@ -15,9 +16,12 @@ import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.domain.QuestionSetId
 import com.mashup.dojo.domain.QuestionSheetId
+import com.mashup.dojo.service.PickService.PickOpenInfo
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -48,7 +52,7 @@ interface PickService {
         pickId: PickId,
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
-    ): String
+    ): PickOpenInfo
 
     fun getPickDetailPaging(
         questionId: QuestionId,
@@ -67,12 +71,7 @@ interface PickService {
 
     fun getNextPickTime(): LocalDateTime
 
-    fun getAnyOpenPickerCount(
-        questionId: QuestionId,
-        memberId: MemberId,
-    ): Int
-
-    fun getReceivedMySpacePicks(memberId: MemberId): List<MySpacePickDetail>
+    fun getReceivedSpacePicks(memberId: MemberId): List<SpacePickDetail>
 
     data class GetPickPaging(
         val picks: List<GetReceivedPick>,
@@ -101,6 +100,7 @@ interface PickService {
 
     data class GetReceivedPickDetail(
         val pickId: PickId,
+        val pickerProfileImageUrl: String,
         val pickerOrdinal: Int,
         val pickerIdOpen: Boolean,
         val pickerId: MemberId,
@@ -115,13 +115,38 @@ interface PickService {
         val latestPickedAt: LocalDateTime,
     )
 
-    data class MySpacePickDetail(
+    data class SpacePickDetail(
         val pickId: PickId,
+        val questionId: QuestionId,
         val rank: Int = -1,
         val pickContent: String,
         val pickCount: Int,
         val createdAt: LocalDateTime,
     )
+
+    data class PickOpenInfo(
+        val pickOpenValue: String,
+        val pickOpenImageUrl: String,
+    )
+}
+
+@Component
+@ConfigurationProperties(prefix = "dojo.profile")
+class ProfileImageProperties {
+    lateinit var male: String
+    lateinit var female: String
+    lateinit var unknown: String
+}
+
+@Component
+@ConfigurationProperties(prefix = "dojo.platform")
+class PlatformImageProperties {
+    lateinit var android: String
+    lateinit var design: String
+    lateinit var ios: String
+    lateinit var node: String
+    lateinit var spring: String
+    lateinit var web: String
 }
 
 @Transactional(readOnly = true)
@@ -132,6 +157,9 @@ class DefaultPickService(
     private val pickTimeRepository: PickTimeRepository,
     @Value("\${dojo.rank.size}")
     private val defaultRankSize: Long,
+    private val profileImageProperties: ProfileImageProperties,
+    private val platformImageProperties: PlatformImageProperties,
+    private val imageService: ImageService,
 ) : PickService {
     override fun getReceivedPickPaging(
         pickedMemberId: MemberId,
@@ -203,7 +231,7 @@ class DefaultPickService(
         pickId: PickId,
         pickedId: MemberId,
         pickOpenItem: PickOpenItem,
-    ): String {
+    ): PickOpenInfo {
         val pick = findPickById(pickId) ?: throw DojoException.of(DojoExceptionType.PICK_NOT_FOUND)
 
         if (pick.pickedId != pickedId) {
@@ -219,7 +247,45 @@ class DefaultPickService(
         )
 
         val picker = memberService.findMemberById(pick.pickerId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
-        return pick.getOpenItem(pickOpenItem, picker)
+
+        return getOpenItem(pickOpenItem, picker)
+    }
+
+    private fun getOpenItem(
+        pickOpenItem: PickOpenItem,
+        picker: Member,
+    ): PickOpenInfo {
+        val pickOpenValue: String
+        var pickOpenImageUrl = ""
+
+        if (PickOpenItem.GENDER == pickOpenItem) {
+            pickOpenValue = picker.gender.name
+            pickOpenImageUrl =
+                when (picker.gender) {
+                    MemberGender.MALE -> profileImageProperties.male
+                    MemberGender.FEMALE -> profileImageProperties.female
+                    MemberGender.UNKNOWN -> profileImageProperties.unknown
+                }
+        } else if (PickOpenItem.PLATFORM == pickOpenItem) {
+            pickOpenValue = picker.platform.name
+            pickOpenImageUrl =
+                when (picker.platform) {
+                    MemberPlatform.ANDROID -> platformImageProperties.android
+                    MemberPlatform.IOS -> platformImageProperties.ios
+                    MemberPlatform.WEB -> platformImageProperties.web
+                    MemberPlatform.NODE -> platformImageProperties.node
+                    MemberPlatform.DESIGN -> platformImageProperties.design
+                    MemberPlatform.SPRING -> platformImageProperties.spring
+                    MemberPlatform.UNKNOWN -> ""
+                }
+        } else if (PickOpenItem.MID_INITIAL_NAME == pickOpenItem) {
+            pickOpenValue = picker.secondInitialName
+        } else {
+            pickOpenValue = picker.fullName
+            pickOpenImageUrl = imageService.load(picker.profileImageId)?.url ?: profileImageProperties.unknown
+        }
+
+        return PickOpenInfo(pickOpenValue, pickOpenImageUrl)
     }
 
     private fun findPickById(pickId: PickId): Pick? {
@@ -250,8 +316,18 @@ class DefaultPickService(
                 val pickerSecondInitialName = transformPickerSecondInitialName(isOpen = secondInitialNameOpen, secondInitialName = pickEntity.pickerSecondInitialName)
                 val pickerFullName = transformPickerFullName(isOpen = fullNameOpen, fullName = pickEntity.pickerFullName)
 
+                val pickerProfileImageUrl = pickEntity.pickerProfileImageUrl
+
+                val transformProfileImageUrl: String =
+                    transformPickerProfileImageUrl(
+                        pickerProfileImageUrl = pickerProfileImageUrl,
+                        pickerGender = pickerGender,
+                        pickerFullName = pickerFullName
+                    )
+
                 PickService.GetReceivedPickDetail(
                     pickId = PickId(pickEntity.pickId),
+                    pickerProfileImageUrl = transformProfileImageUrl,
                     pickerOrdinal = pickEntity.pickerOrdinal,
                     pickerIdOpen = pickerIdOpen,
                     pickerId = pickerId,
@@ -326,6 +402,19 @@ class DefaultPickService(
         return null
     }
 
+    fun transformPickerProfileImageUrl(
+        pickerProfileImageUrl: String,
+        pickerGender: MemberGender?,
+        pickerFullName: String?,
+    ): String {
+        return when {
+            pickerFullName != null -> pickerProfileImageUrl
+            pickerGender == MemberGender.MALE -> profileImageProperties.male
+            pickerGender == MemberGender.FEMALE -> profileImageProperties.female
+            else -> profileImageProperties.unknown
+        }
+    }
+
     override fun getPickCount(
         questionId: QuestionId,
         memberId: MemberId,
@@ -356,18 +445,12 @@ class DefaultPickService(
         return nextPickTime ?: today.plusDays(1).atTime(pickTimes.first())
     }
 
-    override fun getAnyOpenPickerCount(
-        questionId: QuestionId,
-        memberId: MemberId,
-    ): Int {
-        return pickRepository.getOpenPickerCount(questionId.value, memberId.value).toInt()
-    }
-
-    override fun getReceivedMySpacePicks(memberId: MemberId): List<PickService.MySpacePickDetail> {
+    override fun getReceivedSpacePicks(memberId: MemberId): List<PickService.SpacePickDetail> {
         return pickRepository.findTopRankPicksByMemberId(memberId = memberId.value, rank = defaultRankSize).map { pick ->
             val pickCount = pickRepository.findPickDetailCount(memberId = memberId.value, questionId = pick.questionId)
-            PickService.MySpacePickDetail(
+            PickService.SpacePickDetail(
                 pickId = PickId(pick.pickId),
+                questionId = QuestionId(pick.questionId),
                 pickCount = pickCount.toInt(),
                 pickContent = pick.questionContent,
                 createdAt = pick.createdAt
@@ -430,14 +513,14 @@ private fun PickEntity.toPick(): Pick {
     )
 }
 
-fun List<PickService.MySpacePickDetail>.calculateRanks(): List<PickService.MySpacePickDetail> {
+fun List<PickService.SpacePickDetail>.calculateRanks(): List<PickService.SpacePickDetail> {
     if (this.isEmpty()) return this
 
     // 첫 번째 조건: pickCount 내림차순 정렬
     // 두 번째 조건: createdAt 내림차순 정렬
     val sortedPicks =
         this.sortedWith(
-            compareByDescending<PickService.MySpacePickDetail> { it.pickCount }
+            compareByDescending<PickService.SpacePickDetail> { it.pickCount }
                 .thenByDescending { it.createdAt }
         )
 

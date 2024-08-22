@@ -4,6 +4,7 @@ import com.mashup.dojo.domain.MemberId
 import com.mashup.dojo.service.ImageService
 import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
+import com.mashup.dojo.service.ProfileImageProperties
 import com.mashup.dojo.usecase.MemberRelationUseCase.FriendInfo
 import org.springframework.stereotype.Component
 
@@ -26,6 +27,7 @@ class DefaultMemberRelationUseCase(
     private val memberRelationService: MemberRelationService,
     private val memberService: MemberService,
     private val imageService: ImageService,
+    private val imageProperties: ProfileImageProperties,
 ) : MemberRelationUseCase {
     override fun getFriends(memberId: MemberId): List<FriendInfo> {
         val friendIds = memberRelationService.getFriendRelationIds(memberId)
@@ -41,7 +43,7 @@ class DefaultMemberRelationUseCase(
         return friends.map { friend ->
             FriendInfo(
                 memberId = friend.id.value,
-                profileImageUrl = imageMap[friend.profileImageId.value]?.url.let { "" },
+                profileImageUrl = imageMap[friend.profileImageId.value]?.url ?: imageProperties.unknown,
                 memberName = friend.fullName,
                 platform = friend.platform.name,
                 ordinal = friend.ordinal
@@ -59,7 +61,7 @@ class DefaultMemberRelationUseCase(
         return recommendFriends.map { friend ->
             FriendInfo(
                 memberId = friend.id.value,
-                profileImageUrl = imageMap[friend.profileImageId.value]?.url.let { "" },
+                profileImageUrl = imageMap[friend.profileImageId.value]?.url ?: imageProperties.unknown,
                 memberName = friend.fullName,
                 platform = friend.platform.name,
                 ordinal = friend.ordinal
