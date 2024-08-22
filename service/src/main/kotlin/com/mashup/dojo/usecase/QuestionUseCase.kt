@@ -199,10 +199,11 @@ class DefaultQuestionUseCase(
 
                     val question = questionService.getQuestionById(qSheet.questionId) ?: throw DojoException.of(DojoExceptionType.QUESTION_NOT_EXIST)
                     val imageUrl = imageService.load(question.emojiImageId)?.url ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "image id ${question.emojiImageId} not exist")
-                    val questionOrder = questionIds.indexOf(qSheet.questionId)
+                    val questionOrder = questionIds.indexOf(qSheet.questionId) + 1 // 순서는 1based
 
                     qSheet.toQuestionSheetResult(questionOrder, question.content, question.category, imageUrl, candidateResults)
                 }
+                .sortedBy { it.questionOrder }
 
         return QuestionUseCase.GetQuestionSheetsResult(
             resolverId = memberId,
