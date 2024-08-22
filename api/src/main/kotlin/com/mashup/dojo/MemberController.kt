@@ -224,6 +224,7 @@ class MemberController(
             receivedMySpacePicks.map {
                 SpacePickDetail(
                     pickId = it.pickId.value,
+                    questionId = it.questionId.value,
                     rank = it.rank,
                     pickContent = it.pickContent,
                     pickCount = it.pickCount,
@@ -252,6 +253,7 @@ class MemberController(
             receivedMySpacePicks.map {
                 SpacePickDetail(
                     pickId = it.pickId.value,
+                    questionId = it.questionId.value,
                     rank = it.rank,
                     pickContent = it.pickContent,
                     pickCount = it.pickCount,

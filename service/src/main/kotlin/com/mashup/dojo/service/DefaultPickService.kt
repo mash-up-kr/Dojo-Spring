@@ -116,6 +116,7 @@ interface PickService {
 
     data class SpacePickDetail(
         val pickId: PickId,
+        val questionId: QuestionId,
         val rank: Int = -1,
         val pickContent: String,
         val pickCount: Int,
@@ -448,6 +449,7 @@ class DefaultPickService(
             val pickCount = pickRepository.findPickDetailCount(memberId = memberId.value, questionId = pick.questionId)
             PickService.SpacePickDetail(
                 pickId = PickId(pick.pickId),
+                questionId = QuestionId(pick.questionId),
                 pickCount = pickCount.toInt(),
                 pickContent = pick.questionContent,
                 createdAt = pick.createdAt
