@@ -55,15 +55,15 @@ class SSENotificationService : NotificationService {
         emitters[memberId.value] = emitter
         emitter.onCompletion {
             logger.debug { "emitter($memberId) completed successfully" }
-            emitters.remove(memberId.value)
+//            emitters.remove(memberId.value)
         }
         emitter.onError {
             logger.debug { "emitter error occurred: $it" }
-            emitters.remove(memberId.value)
+//            emitters.remove(memberId.value)
         }
         emitter.onTimeout {
             logger.debug { "emitter($memberId) timed out" }
-            emitters.remove(memberId.value)
+//            emitters.remove(memberId.value)
         }
     }
 }
