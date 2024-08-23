@@ -57,6 +57,17 @@ interface MemberUseCase {
         val isFriend: Boolean,
     )
 
+    data class MyPageInfo(
+        val memberId: String,
+        val profileImageUrl: String,
+        val memberName: String,
+        val platform: String,
+        val ordinal: Int,
+        val pickCount: Int,
+        val pickedCount: Int,
+        val friendCount: Int,
+    )
+
     fun create(command: CreateCommand): MemberId
 
     fun update(command: UpdateCommand): MemberId
@@ -81,6 +92,8 @@ interface MemberUseCase {
     ): List<MemberSearchInfo>
 
     fun receivedFriendSpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail>
+
+    fun findMyProfile(memberId: MemberId): MyPageInfo
 }
 
 @Component
@@ -219,5 +232,23 @@ class DefaultMemberUseCase(
     override fun receivedFriendSpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail> {
         val mySpacePicks = pickService.getReceivedSpacePicks(currentMemberId)
         return mySpacePicks.calculateRanks()
+    }
+
+    override fun findMyProfile(memberId: MemberId): MemberUseCase.MyPageInfo {
+        val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+        val profileImage = imageService.load(member.profileImageId) ?: throw DojoException.of(DojoExceptionType.IMAGE_NOT_FOUND)
+        val pickedCount = pickService.findPickedCountByMemberId(member.id)
+        val friendCount = memberRelationService.countFriend(member.id)
+
+        return MemberUseCase.MyPageInfo(
+            memberId = memberId.value,
+            profileImageUrl = profileImage.url,
+            memberName = member.fullName,
+            platform = member.platform.name,
+            ordinal = member.ordinal,
+            pickCount = pickedCount,
+            pickedCount = pickedCount,
+            friendCount = friendCount
+        )
     }
 }

@@ -21,6 +21,4 @@ data class MyProfileResponse(
     val pickedCount: Int,
     @Schema(description = "유저의 친구 수")
     val friendCount: Int,
-    @Schema(description = "소유한 코인 개수")
-    val coinCount: Int,
 )

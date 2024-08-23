@@ -133,26 +133,19 @@ class MemberController(
         val memberId = MemberPrincipalContextHolder.current().id
 
         logger.info { "read my profile, $memberId" }
-        val member = memberService.findMemberById(memberId) ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
-        val profileImage = imageService.load(member.profileImageId) ?: throw DojoException.of(DojoExceptionType.IMAGE_NOT_FOUND)
-        val currentCoin =
-            coinUseCase.getCurrentCoin(
-                CoinUseCase.GetCurrentCoinCommand(member.id)
-            )
-        val pickedCount = pickService.findPickedCountByMemberId(member.id)
-        val friendCount = memberRelationService.countFriend(member.id)
+
+        val response = memberUseCase.findMyProfile(memberId)
 
         return DojoApiResponse.success(
             MyProfileResponse(
-                memberId = member.id.value,
-                profileImageUrl = profileImage.url,
-                memberName = member.fullName,
-                platform = member.platform.name,
-                ordinal = member.ordinal,
-                pickCount = pickedCount,
-                pickedCount = pickedCount,
-                friendCount = friendCount,
-                coinCount = currentCoin.amount.toInt()
+                memberId = response.memberId,
+                profileImageUrl = response.profileImageUrl,
+                memberName = response.memberName,
+                platform = response.platform,
+                ordinal = response.ordinal,
+                pickCount = response.pickCount,
+                pickedCount = response.pickedCount,
+                friendCount = response.friendCount
             )
         )
     }
