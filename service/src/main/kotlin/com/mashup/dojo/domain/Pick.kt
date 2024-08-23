@@ -65,7 +65,13 @@ data class Pick(
             PickOpenItem.GENDER -> copy(isGenderOpen = true)
             PickOpenItem.PLATFORM -> copy(isPlatformOpen = true)
             PickOpenItem.MID_INITIAL_NAME -> copy(isMidInitialNameOpen = true)
-            PickOpenItem.FULL_NAME -> copy(isFullNameOpen = true)
+            PickOpenItem.FULL_NAME ->
+                copy(
+                    isGenderOpen = true,
+                    isPlatformOpen = true,
+                    isMidInitialNameOpen = true,
+                    isFullNameOpen = true
+                )
         }
     }
 
