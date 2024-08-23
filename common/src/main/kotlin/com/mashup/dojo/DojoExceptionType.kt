@@ -35,6 +35,9 @@ enum class DojoExceptionType(
     QUESTION_INVALID_TYPE("Question Type is Invalid Type", "Q007_QUESTION_TYPE", 500),
     QUESTION_NOT_FOUND("Question is not found", "Q005_QUESTION_NOT_EXIST", 404),
 
+    // candidates
+    CANDIDATE_INVALID_SIZE("candidates is invalid size", "C_200_CANDIDATE_INVALID_SIZE", 500),
+
     // friend
     FRIEND_NOT_FOUND("Friend not found", "C070_FRIEND_NOT_FOUND", 400),
     ALREADY_FRIEND("Already Friend", "C071_ALREADY_FRIEND", 400),

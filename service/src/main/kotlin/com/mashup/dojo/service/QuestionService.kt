@@ -96,6 +96,8 @@ class DefaultQuestionService(
     private val openTime1: LocalTime,
     @Value("\${dojo.questionSet.open-time-2}")
     private val openTime2: LocalTime,
+    @Value("\${dojo.candidate.size}")
+    private val defaultCandidateSize: Long,
     override val questionRepository: QuestionRepository,
     override val questionSetRepository: QuestionSetRepository,
     override val questionSheetRepository: QuestionSheetRepository,
@@ -260,10 +262,19 @@ class DefaultQuestionService(
          * 질문의 타입에 따라 적절한 후보자 리스트를 사용
          */
 
+        if (candidatesOfFriend.size < defaultCandidateSize && candidatesOfAccompany.size < defaultCandidateSize) {
+            throw DojoException.of(DojoExceptionType.CANDIDATE_INVALID_SIZE)
+        }
+
         val candidates =
             when (questionType) {
-                QuestionType.FRIEND -> candidatesOfFriend
-                QuestionType.ACCOMPANY -> candidatesOfAccompany
+                QuestionType.FRIEND ->
+                    // 친구 후보자의 크기가 기본 크기보다 작을 경우 비친구 후보자를 사용
+                    if (candidatesOfFriend.size < defaultCandidateSize) candidatesOfAccompany else candidatesOfFriend
+
+                QuestionType.ACCOMPANY ->
+                    // 비친구 후보자의 크기가 기본 크기보다 작을 경우 친구 후보자를 사용
+                    if (candidatesOfAccompany.size < defaultCandidateSize) candidatesOfFriend else candidatesOfAccompany
             }
 
         return QuestionSheet.create(
