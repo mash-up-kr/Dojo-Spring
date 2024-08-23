@@ -3,6 +3,8 @@ spring:
     name: api
   profiles:
     include: entity, common
+  jackson:
+    time-zone: Asia/Seoul
 
 dojo:
   questionSet:
