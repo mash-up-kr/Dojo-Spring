@@ -15,11 +15,7 @@ import com.mashup.dojo.dto.MemberUpdateRequest
 import com.mashup.dojo.dto.MyProfileResponse
 import com.mashup.dojo.dto.MySpacePickResponse
 import com.mashup.dojo.dto.SpacePickDetail
-import com.mashup.dojo.service.ImageService
-import com.mashup.dojo.service.MemberRelationService
 import com.mashup.dojo.service.MemberService
-import com.mashup.dojo.service.PickService
-import com.mashup.dojo.usecase.CoinUseCase
 import com.mashup.dojo.usecase.MemberUseCase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
@@ -40,10 +36,6 @@ private val logger = KotlinLogging.logger { }
 class MemberController(
     private val memberUseCase: MemberUseCase,
     private val memberService: MemberService,
-    private val coinUseCase: CoinUseCase,
-    private val imageService: ImageService,
-    private val pickService: PickService,
-    private val memberRelationService: MemberRelationService,
     private val jwtTokenService: JwtTokenService,
 ) {
     @PostMapping("/public/member")
