@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter
 
 @Component
 class TimeLogger {
-
     private val logger: Logger = LoggerFactory.getLogger(TimeLogger::class.java)
 
     @PostConstruct
