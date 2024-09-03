@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException
 
 private val log = KotlinLogging.logger {}
 
@@ -22,6 +23,12 @@ class ControllerExceptionAdvice {
     fun handleDojoException(ex: DojoException): ResponseEntity<DojoApiResponse<Any>> {
         log.error { "Dojo Exception Handler $ex" }
         return errorResponse(ex.httpStatusCode, ex.toApiErrorResponse())
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException::class)
+    fun handleSseAsync(ex: DojoException): ResponseEntity<DojoApiResponse<Any>> {
+        log.info { "Dojo eat AsyncRequestTimeoutException" }
+        return ResponseEntity(HttpStatus.OK)
     }
 
     private fun DojoException.toApiErrorResponse(): DojoApiErrorResponse = DojoApiErrorResponse(code = errorCode, message = message)
