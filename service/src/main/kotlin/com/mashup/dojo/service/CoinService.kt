@@ -8,6 +8,7 @@ import com.mashup.dojo.UsageStatus
 import com.mashup.dojo.domain.Coin
 import com.mashup.dojo.domain.CoinId
 import com.mashup.dojo.domain.CoinUseDetail
+import com.mashup.dojo.domain.CoinUseDetailId
 import com.mashup.dojo.domain.CoinUseType
 import com.mashup.dojo.domain.MemberId
 import org.springframework.stereotype.Service
@@ -22,7 +23,7 @@ interface CoinService {
         detail: String,
         cost: Int,
         coin: Coin,
-    )
+    ): CoinUseDetailId
 }
 
 @Service
@@ -49,7 +50,7 @@ class DefaultCoinService(
         detail: String,
         cost: Int,
         coin: Coin,
-    ) {
+    ): CoinUseDetailId {
         coinRepository.save(coin.toEntity())
 
         val coinUseDetail =
@@ -59,7 +60,8 @@ class DefaultCoinService(
                 CoinUseDetail.createEarnedCoinUseDetail(coin.id, cost.toLong(), detail)
             }
 
-        coinUseDetailRepository.save(coinUseDetail.toEntity())
+        val coinUseDetailEntity = coinUseDetailRepository.save(coinUseDetail.toEntity())
+        return CoinUseDetailId(coinUseDetailEntity.id)
     }
 }
 
