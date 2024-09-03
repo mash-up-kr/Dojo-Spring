@@ -12,6 +12,9 @@ plugins {
 
     // lint
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    
+    // gatling
+    id("io.gatling.gradle") version "3.11.5.2"
 
     idea
 }
@@ -88,6 +91,10 @@ project(":api") {
         // Shedlock for Scheduler
         implementation("net.javacrumbs.shedlock:shedlock-spring:4.14.0")
         implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.14.0")
+
+        // gatling
+        implementation("io.gatling.highcharts:gatling-charts-highcharts:3.9.0")
+        implementation("io.gatling:gatling-core:3.9.0")
     }
 }
 
