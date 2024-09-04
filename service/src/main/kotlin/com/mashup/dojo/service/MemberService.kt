@@ -31,6 +31,13 @@ interface MemberService {
 
     fun findAllByIds(memberIds: List<MemberId>): List<Member>
 
+    fun findByFullNameAndPlatform(
+        fullName: String,
+        platform: MemberPlatform,
+    ): Member
+
+    fun findMemberByFullName(fullName: String): Member
+
     data class CreateMember(
         val fullName: String,
         val profileImageId: ImageId?,
@@ -110,6 +117,17 @@ class DefaultMemberService(
 
     override fun findAllByIds(memberIds: List<MemberId>): List<Member> {
         return memberRepository.findAllById(memberIds.map { it.value }).map { it.toMember() }
+    }
+
+    override fun findByFullNameAndPlatform(
+        fullName: String,
+        platform: MemberPlatform,
+    ): Member {
+        return memberRepository.findSingleMemberByFullNameAndPlatform(fullName, platform.name).toMember()
+    }
+
+    override fun findMemberByFullName(fullName: String): Member {
+        return memberRepository.findSingleMemberByFullName(fullName).toMember()
     }
 
     private fun mockMember(memberId: MemberId) =
