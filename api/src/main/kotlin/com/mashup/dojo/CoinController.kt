@@ -58,6 +58,30 @@ class CoinController(
         return coinUseCase.earnCoin(CoinUseCase.EarnCoinCommand(memberId, amount))
             .let { DojoApiResponse.success(it) }
     }
+
+    @PostMapping("/admin/update")
+    @Operation(
+        summary = "관리자가 직접 특정 사용자에게 잼을 제공하는 API",
+        description = "특정 사용자에게 잼을 제공하는 API (관리자 전용)",
+        responses = [
+            ApiResponse(responseCode = "200", description = "관리자 보상 제공 성공")
+        ]
+    )
+    fun provideCoinByEvent(
+        @RequestParam fullName: String,
+        @RequestParam amount: Long,
+        @RequestParam(required = false) platform: String?,
+    ): DojoApiResponse<CoinUseDetailId> {
+        val currentMemberId = MemberPrincipalContextHolder.current().id
+        return coinUseCase.earnCoinByEvent(
+            CoinUseCase.EarnCoinByEventCommand(
+                currentMemberId = currentMemberId,
+                fullName = fullName,
+                platform = platform,
+                coinAmount = amount
+            )
+        ).let { DojoApiResponse.success(it) }
+    }
 }
 
 private const val DEFAULT_COMPLETE_PICK_OFFER_AMOUNT = 200L
