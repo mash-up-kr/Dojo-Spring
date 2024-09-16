@@ -21,9 +21,13 @@ import com.mashup.dojo.service.QuestionService
 import com.mashup.dojo.usecase.PickUseCase.GetReceivedPickPagingCommand
 import com.mashup.dojo.usecase.PickUseCase.OpenPickCommand
 import com.mashup.dojo.usecase.PickUseCase.PickOpenInfo
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+
+private val log = KotlinLogging.logger {}
 
 interface PickUseCase {
     data class GetReceivedPickPagingCommand(
@@ -86,6 +90,8 @@ interface PickUseCase {
 
 @Component
 class DefaultPickUseCase(
+    @Value("\${dojo.questionSet.size}")
+    private val questionSetSize: Int,
     private val pickService: PickService,
     private val questionService: QuestionService,
     private val imageService: ImageService,
@@ -112,19 +118,32 @@ class DefaultPickUseCase(
 
         val questionSet = questionService.getQuestionSetById(command.questionSetId) ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_EXIST)
 
-        return pickService.create(
-            questionId = question.id,
-            questionSetId = questionSet.id,
-            questionSheetId = command.questionSheetId,
-            pickerMemberId = command.pickerId,
-            pickedMemberId = pickedMember.id
-        ).apply {
-            notificationService.notifyPicked(
-                pickId = this,
-                target = pickedMember,
-                questionId = question.id
-            )
+        val pickId =
+            pickService.create(
+                questionId = question.id,
+                questionSetId = questionSet.id,
+                questionSheetId = command.questionSheetId,
+                pickerMemberId = command.pickerId,
+                pickedMemberId = pickedMember.id
+            ).apply {
+                notificationService.notifyPicked(
+                    pickId = this,
+                    target = pickedMember,
+                    questionId = question.id
+                )
+            }
+
+        // QSet 에 대한 모든 픽을 완료한 경우, 보상으로 코인 제공
+        if (pickService.getSolvedPickList(command.pickerId, questionSet.id).size == questionSetSize) {
+            coinService.rewardCoinForCompletePick(command.pickerId)
+                .also { coinUseDetailId ->
+                    log.info {
+                        "reward for Complete pick. memberId: [${command.pickerId}], QSetId: [${questionSet.id}], coinUseDetailId: $coinUseDetailId"
+                    }
+                }
         }
+
+        return pickId
     }
 
     @Transactional
