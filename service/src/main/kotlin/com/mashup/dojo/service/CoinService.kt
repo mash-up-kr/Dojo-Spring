@@ -53,11 +53,13 @@ class DefaultCoinService(
     @Transactional
     override fun rewardCoinForCompletePick(memberId: MemberId): CoinUseDetailId {
         val coin = getCoin(memberId) ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "유저의 코인정보가 없습니다")
+        val updatedCoin = coin.earnCoin(COMPLETE_PICK_COIN_AMOUNT.toLong())
+
         return updateCoin(
             useType = CoinUseType.EARNED,
             detail = CoinUseDetail.REASON_COMPLETE_PICK,
             cost = COMPLETE_PICK_COIN_AMOUNT,
-            coin = coin
+            coin = updatedCoin
         )
     }
 
