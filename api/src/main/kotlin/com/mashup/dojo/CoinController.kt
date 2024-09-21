@@ -60,6 +60,13 @@ class CoinController(
     }
 
     @GetMapping("/current/question-set/solved-picks")
+    @Operation(
+        summary = "현재 운영중인 QuestionSheet에서 지급된 코인을 반환합니다.",
+        description = "현재 운영중인 QuestionSheet에서 지급된 코인 반환 API",
+        responses = [
+            ApiResponse(responseCode = "200", description = "투표 완료 보상 제공 성공")
+        ]
+    )
     fun getCoinBySolvedPick(): DojoApiResponse<CoinUseCase.CoinBySolvedPick> {
         val memberId = MemberPrincipalContextHolder.current().id
         return coinUseCase.getCoinBySolvedPickList(memberId).let {
