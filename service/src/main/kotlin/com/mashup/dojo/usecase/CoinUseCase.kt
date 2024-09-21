@@ -14,6 +14,7 @@ import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,6 +44,7 @@ class DefaultCoinUseCase(
     private val pickService: PickService,
     @Value("\${dojo.coin.solvedPick}")
     private val provideCoinByCompletePick: Int,
+    private val properties: AdminProperties,
 ) : CoinUseCase {
     override fun getCurrentCoin(command: CoinUseCase.GetCurrentCoinCommand): Coin {
         return coinService.getCoin(command.memberId) ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "유저의 코인정보가 없습니다")
@@ -79,13 +81,9 @@ class DefaultCoinUseCase(
 
     // todo 추후 Role을 넣어서 Security에서 관리하도록하면 좋을듯합니다.
     private fun validAdmin(currentMemberId: MemberId) {
-        val currentMember =
-            membersService.findMemberById(currentMemberId)
-                ?: throw DojoException.of(DojoExceptionType.MEMBER_NOT_FOUND)
+        val adminKeys = listOf(properties.adminKey1, properties.adminKey2, properties.adminKey3)
 
-        val dojo = listOf("한정민", "오예원", "박세원", "임준형", "이현재", "황태규", "최민석", "낭은영", "오시연")
-
-        if (currentMember.fullName !in dojo) {
+        if (currentMemberId.value !in adminKeys) {
             throw DojoException.of(DojoExceptionType.AUTHENTICATION_FAILURE, "You Are Not Dojo")
         }
     }
@@ -101,4 +99,13 @@ class DefaultCoinUseCase(
             return membersService.findByFullNameAndPlatform(fullName, platform)
         }
     }
+}
+
+@Component
+@ConfigurationProperties(prefix = "dojo.coin")
+class AdminProperties {
+    lateinit var adminKey1: String
+    lateinit var adminKey2: String
+    lateinit var adminKey3: String
+    lateinit var adminKey4: String
 }

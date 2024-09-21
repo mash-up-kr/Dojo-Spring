@@ -18,6 +18,10 @@ dojo:
     size: 3
   coin:
     solvedPick: 20
+    adminKey1: ENC(6vmD1X1w6fIO+6hM92EYo9IF6hQIvuN2d6NSY38sjTR+SWGMdSQzueGJ/Wtkw1bd)
+    adminKey2: ENC(pwjY18V7A5eWi0NAG05+aBF/VtAtMfP9v0wyuu/94ReQ6nNbuSlWQ8JgBZwCVGo2)
+    adminKey3: ENC(y5CzhWOriopg+6katqbz4HtwJPPoMQfYR3Uh42LLIi8Q+ovIXXeTqonYro0JiVSq)
+    adminKey4: ENC(nLz//A9qbEFOXcrcyh/Gp2PfHjcojlJxVPjXY1TBG9WKFehW6La/OWO/sVWWyHIP)
   profile:
     male: ENC(y7SDgKPyWwAg4dJMql9v7uWrAdJRQoMCHyPLxvma89kwZgpCKhva2Qi9Yfn7XBEyP6Z1hPVdfAJ4cuvcjoglQ1Obp3HtOc6+4+IXG7jttKCIA+sWpf9D3FagSvybbjN7BxgXrWIkloQ=)
     female: ENC(G6ycXZSiw82d4TkZ8q5TOGbV/PnPW5TMvBPx6a0hojXGIm3c3Ho/K5FqNBhuKl/m2pSIPzK5ammRqCCKpFw6+S8YvjrmWumC/ky6ciXrIKAbriS45RwKNuprrpnT+zyVcdf0M8VXBnI=)
