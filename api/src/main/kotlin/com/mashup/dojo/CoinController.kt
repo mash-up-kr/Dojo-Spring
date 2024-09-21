@@ -59,6 +59,14 @@ class CoinController(
             .let { DojoApiResponse.success(it) }
     }
 
+    @GetMapping("/solved-pick")
+    fun getCoinBySolvedPick(): DojoApiResponse<CoinUseCase.CoinBySolvedPick> {
+        val memberId = MemberPrincipalContextHolder.current().id
+        return coinUseCase.getCoinBySolvedPickList(memberId).let {
+            DojoApiResponse.success(it)
+        }
+    }
+
     @PostMapping("/admin/update")
     @Operation(
         summary = "관리자가 직접 특정 사용자에게 잼을 제공하는 API",
