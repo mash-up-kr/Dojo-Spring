@@ -136,8 +136,8 @@ class DefaultQuestionUseCase(
                 val questionSheets =
                     questions.map { questionOrder ->
                         val candidatesOfFriend = memberRelationService.findCandidateOfFriend(member.id)
-                        val candidatesOfAccompany = memberRelationService.findCandidateOfAccompany(member.id)
-
+                        // all -> accompany + friend
+                        val candidatesOfAll = memberRelationService.findCandidateOfAll(member.id)
                         val questionType = questionOrder.type
 
                         // 질문의 타입에 따라 다른 후보자 리스트를 전달
@@ -147,7 +147,7 @@ class DefaultQuestionUseCase(
                             questionType = questionType,
                             resolver = member.id,
                             candidatesOfFriend = candidatesOfFriend,
-                            candidatesOfAccompany = candidatesOfAccompany
+                            candidatesOfAll = candidatesOfAll
                         )
                     }
                 questionSheets

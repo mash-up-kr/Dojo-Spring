@@ -78,7 +78,7 @@ interface QuestionService {
         questionId: QuestionId,
         resolver: MemberId,
         candidatesOfFriend: List<MemberId>,
-        candidatesOfAccompany: List<MemberId>,
+        candidatesOfAll: List<MemberId>,
         questionType: QuestionType,
     ): QuestionSheet
 
@@ -252,7 +252,7 @@ class DefaultQuestionService(
         questionId: QuestionId,
         resolver: MemberId,
         candidatesOfFriend: List<MemberId>,
-        candidatesOfAccompany: List<MemberId>,
+        candidatesOfAll: List<MemberId>,
         questionType: QuestionType,
     ): QuestionSheet {
         /**
@@ -262,19 +262,15 @@ class DefaultQuestionService(
          * 질문의 타입에 따라 적절한 후보자 리스트를 사용
          */
 
-        if (candidatesOfFriend.size < defaultCandidateSize && candidatesOfAccompany.size < defaultCandidateSize) {
+        if (candidatesOfFriend.size < defaultCandidateSize && candidatesOfAll.size < defaultCandidateSize) {
             throw DojoException.of(DojoExceptionType.CANDIDATE_INVALID_SIZE)
         }
 
         val candidates =
             when (questionType) {
-                QuestionType.FRIEND ->
-                    // 친구 후보자의 크기가 기본 크기보다 작을 경우 비친구 후보자를 사용
-                    if (candidatesOfFriend.size < defaultCandidateSize) candidatesOfAccompany else candidatesOfFriend
-
-                QuestionType.ACCOMPANY ->
-                    // 비친구 후보자의 크기가 기본 크기보다 작을 경우 친구 후보자를 사용
-                    if (candidatesOfAccompany.size < defaultCandidateSize) candidatesOfFriend else candidatesOfAccompany
+                // 친구 후보자의 크기가 기본 크기보다 작을 경우 전체 후보자를 사용
+                QuestionType.FRIEND -> if (candidatesOfFriend.size < defaultCandidateSize) candidatesOfAll else candidatesOfFriend
+                QuestionType.ACCOMPANY -> candidatesOfAll
             }
 
         return QuestionSheet.create(

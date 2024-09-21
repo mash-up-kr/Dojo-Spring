@@ -56,7 +56,7 @@ interface MemberRelationQueryRepository {
         limit: Long,
     ): List<String>
 
-    fun findRandomOfAccompany(
+    fun findRandomOfAll(
         memberId: String,
         limit: Long,
     ): List<String>
@@ -142,7 +142,7 @@ class MemberRelationQueryRepositoryImpl(
             .fetch()
     }
 
-    override fun findRandomOfAccompany(
+    override fun findRandomOfAll(
         memberId: String,
         limit: Long,
     ): List<String> {
@@ -151,10 +151,7 @@ class MemberRelationQueryRepositoryImpl(
         return jpaQueryFactory
             .select(memberRelation.toId)
             .from(memberRelation)
-            .where(
-                memberRelation.fromId.eq(memberId),
-                memberRelation.relationType.eq(RelationType.ACCOMPANY)
-            )
+            .where(memberRelation.fromId.eq(memberId))
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('RAND')").asc())
             .limit(8)
             .fetch()
