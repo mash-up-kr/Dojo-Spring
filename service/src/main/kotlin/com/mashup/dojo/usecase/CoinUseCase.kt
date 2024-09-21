@@ -81,7 +81,7 @@ class DefaultCoinUseCase(
 
     // todo 추후 Role을 넣어서 Security에서 관리하도록하면 좋을듯합니다.
     private fun validAdmin(currentMemberId: MemberId) {
-        val adminKeys = listOf(properties.adminKey1, properties.adminKey2, properties.adminKey3)
+        val adminKeys = listOf(properties.adminKey1, properties.adminKey2, properties.adminKey3, properties.adminKey4)
 
         if (currentMemberId.value !in adminKeys) {
             throw DojoException.of(DojoExceptionType.AUTHENTICATION_FAILURE, "You Are Not Dojo")
