@@ -62,6 +62,7 @@ interface PickUseCase {
         val questionId: QuestionId,
         val pickerId: MemberId,
         val pickedId: MemberId,
+        val skip: Boolean,
     )
 
     data class OpenPickCommand(
@@ -77,9 +78,14 @@ interface PickUseCase {
         val pickOpenImageUrl: String,
     )
 
+    data class CreatePickInfo(
+        val pickId: PickId,
+        val coin: Int,
+    )
+
     fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging
 
-    fun createPick(command: CreatePickCommand): PickId
+    fun createPick(command: CreatePickCommand): CreatePickInfo
 
     fun getNextPickTime(): LocalDateTime
 
@@ -97,6 +103,9 @@ class DefaultPickUseCase(
     private val imageService: ImageService,
     private val memberService: MemberService,
     private val notificationService: NotificationService,
+    @Value("\${dojo.coin.solvedPick}")
+    private val provideCoinByCompletePick: Int,
+    private val coinUseCase: CoinUseCase,
     private val coinService: CoinService,
 ) : PickUseCase {
     override fun getReceivedPickList(command: GetReceivedPickPagingCommand): PickService.GetPickPaging {
@@ -108,42 +117,50 @@ class DefaultPickUseCase(
         )
     }
 
-    override fun createPick(command: PickUseCase.CreatePickCommand): PickId {
+    override fun createPick(command: PickUseCase.CreatePickCommand): PickUseCase.CreatePickInfo {
         val question =
             questionService.getQuestionById(command.questionId)
                 ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST QUESTION ID ${command.questionId}")
-        val pickedMember =
-            memberService.findMemberById(command.pickedId)
-                ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID ${command.pickedId}")
 
         val questionSet = questionService.getQuestionSetById(command.questionSetId) ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_EXIST)
 
-        val pickId =
-            pickService.create(
-                questionId = question.id,
-                questionSetId = questionSet.id,
-                questionSheetId = command.questionSheetId,
-                pickerMemberId = command.pickerId,
-                pickedMemberId = pickedMember.id
-            ).apply {
-                notificationService.notifyPicked(
-                    pickId = this,
-                    target = pickedMember,
-                    questionId = question.id
-                )
-            }
+        val createPickInfo: PickUseCase.CreatePickInfo
 
-        // QSet 에 대한 모든 픽을 완료한 경우, 보상으로 코인 제공
-        if (pickService.getSolvedPickList(command.pickerId, questionSet.id).size == questionSetSize) {
-            coinService.rewardCoinForCompletePick(command.pickerId)
-                .also { coinUseDetailId ->
-                    log.info {
-                        "reward for Complete pick. memberId: [${command.pickerId}], QSetId: [${questionSet.id}], coinUseDetailId: $coinUseDetailId"
-                    }
+        if (command.skip) {
+            val pickId =
+                pickService.create(
+                    questionId = question.id,
+                    questionSetId = questionSet.id,
+                    questionSheetId = command.questionSheetId,
+                    pickerMemberId = command.pickerId,
+                    pickedMemberId = MemberId(SKIP_ID)
+                )
+            createPickInfo = PickUseCase.CreatePickInfo(pickId, 0)
+        } else {
+            val pickedMember =
+                memberService.findMemberById(command.pickedId)
+                    ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "NOT EXIST PICKED MEMBER ID ${command.pickedId}")
+
+            val pickId =
+                pickService.create(
+                    questionId = question.id,
+                    questionSetId = questionSet.id,
+                    questionSheetId = command.questionSheetId,
+                    pickerMemberId = command.pickerId,
+                    pickedMemberId = pickedMember.id
+                ).apply {
+                    notificationService.notifyPicked(
+                        pickId = this,
+                        target = pickedMember,
+                        questionId = question.id
+                    )
                 }
+
+            coinUseCase.earnCoin(CoinUseCase.EarnCoinCommand(command.pickerId, provideCoinByCompletePick.toLong()))
+            createPickInfo = PickUseCase.CreatePickInfo(pickId, provideCoinByCompletePick)
         }
 
-        return pickId
+        return createPickInfo
     }
 
     @Transactional
@@ -192,5 +209,9 @@ class DefaultPickUseCase(
                 ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
 
         return nextOperatingQuestionSet.publishedAt
+    }
+
+    companion object {
+        const val SKIP_ID = "SKIP"
     }
 }
