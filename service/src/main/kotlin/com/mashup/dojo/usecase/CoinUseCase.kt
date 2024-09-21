@@ -13,6 +13,7 @@ import com.mashup.dojo.service.CoinService
 import com.mashup.dojo.service.MemberService
 import com.mashup.dojo.service.PickService
 import com.mashup.dojo.service.QuestionService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,6 +41,8 @@ class DefaultCoinUseCase(
     private val membersService: MemberService,
     private val questionService: QuestionService,
     private val pickService: PickService,
+    @Value("\${dojo.coin.solvedPick}")
+    private val provideCoinByCompletePick: Int,
 ) : CoinUseCase {
     override fun getCurrentCoin(command: CoinUseCase.GetCurrentCoinCommand): Coin {
         return coinService.getCoin(command.memberId) ?: throw DojoException.of(DojoExceptionType.NOT_EXIST, "유저의 코인정보가 없습니다")
@@ -71,7 +74,7 @@ class DefaultCoinUseCase(
                 questionSetId = operatingQSet.id
             ).size
 
-        return CoinUseCase.CoinBySolvedPick(solvedPickCount * PROVIDE_COIN_BY_COMPLETE_PICK)
+        return CoinUseCase.CoinBySolvedPick(solvedPickCount * provideCoinByCompletePick)
     }
 
     // todo 추후 Role을 넣어서 Security에서 관리하도록하면 좋을듯합니다.
@@ -97,9 +100,5 @@ class DefaultCoinUseCase(
             val platform = MemberPlatform.findByValue(inputPlatform)
             return membersService.findByFullNameAndPlatform(fullName, platform)
         }
-    }
-
-    companion object {
-        private const val PROVIDE_COIN_BY_COMPLETE_PICK = 20
     }
 }
