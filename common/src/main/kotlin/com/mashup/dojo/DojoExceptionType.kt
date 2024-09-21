@@ -42,6 +42,7 @@ enum class DojoExceptionType(
     // friend
     FRIEND_NOT_FOUND("Friend not found", "C070_FRIEND_NOT_FOUND", 400),
     ALREADY_FRIEND("Already Friend", "C071_ALREADY_FRIEND", 400),
+    ALREADY_ACCOMPANY("Already Accompany", "C071_ALREADY_ACCOMPANY", 400),
 
     // auth
     INVALID_TOKEN("invalid token", "C100_INVALID_TOKEN", 401),

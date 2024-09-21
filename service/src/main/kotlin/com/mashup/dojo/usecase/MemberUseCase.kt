@@ -84,6 +84,8 @@ interface MemberUseCase {
 
     fun updateFriendRelation(command: UpdateFriendCommand): MemberRelationId
 
+    fun deleteFriendRelation(command: UpdateFriendCommand)
+
     fun receivedMySpacePicks(currentMemberId: MemberId): List<PickService.SpacePickDetail>
 
     fun searchMember(
@@ -194,6 +196,11 @@ class DefaultMemberUseCase(
     @Transactional
     override fun updateFriendRelation(command: MemberUseCase.UpdateFriendCommand): MemberRelationId {
         return memberRelationService.updateRelationToFriend(command.fromId, command.toId)
+    }
+
+    @Transactional
+    override fun deleteFriendRelation(command: MemberUseCase.UpdateFriendCommand) {
+        return memberRelationService.deleteFriendRelation(command.fromId, command.toId)
     }
 
     override fun searchMember(
