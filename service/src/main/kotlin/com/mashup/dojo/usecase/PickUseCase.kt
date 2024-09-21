@@ -133,7 +133,7 @@ class DefaultPickUseCase(
                     questionSetId = questionSet.id,
                     questionSheetId = command.questionSheetId,
                     pickerMemberId = command.pickerId,
-                    pickedMemberId = MemberId(SKIP_ID)
+                    pickedMemberId = MemberId("SKIP")
                 )
             createPickInfo = PickUseCase.CreatePickInfo(pickId, 0)
         } else {
@@ -209,9 +209,5 @@ class DefaultPickUseCase(
                 ?: throw DojoException.of(DojoExceptionType.QUESTION_SET_NOT_READY)
 
         return nextOperatingQuestionSet.publishedAt
-    }
-
-    companion object {
-        const val SKIP_ID = "SKIP"
     }
 }
