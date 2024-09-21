@@ -1,2 +1,5 @@
 ### 현재 유저 코인 정보 조회
 GET {{host}}/coin
+
+### 투표 종료 후 요청하는 API, 현재 운영중인 QuestionSheet 중 pick 개수로 지급된 코인 반환 API
+GET {{host}}/coin/current/question-set/solved-picks

@@ -16,6 +16,8 @@ dojo:
     size: 8
   rank:
     size: 3
+  coin:
+    solvedPick: 20
   profile:
     male: ENC(y7SDgKPyWwAg4dJMql9v7uWrAdJRQoMCHyPLxvma89kwZgpCKhva2Qi9Yfn7XBEyP6Z1hPVdfAJ4cuvcjoglQ1Obp3HtOc6+4+IXG7jttKCIA+sWpf9D3FagSvybbjN7BxgXrWIkloQ=)
     female: ENC(G6ycXZSiw82d4TkZ8q5TOGbV/PnPW5TMvBPx6a0hojXGIm3c3Ho/K5FqNBhuKl/m2pSIPzK5ammRqCCKpFw6+S8YvjrmWumC/ky6ciXrIKAbriS45RwKNuprrpnT+zyVcdf0M8VXBnI=)
