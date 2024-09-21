@@ -41,7 +41,7 @@ interface MemberRelationService {
 
     fun findCandidateOfFriend(memberId: MemberId): List<MemberId>
 
-    fun findCandidateOfAccompany(memberId: MemberId): List<MemberId>
+    fun findCandidateOfAll(memberId: MemberId): List<MemberId>
 
     fun findRelationByIds(
         fromId: MemberId,
@@ -123,8 +123,8 @@ class DefaultMemberRelationService(
         }
     }
 
-    override fun findCandidateOfAccompany(memberId: MemberId): List<MemberId> {
-        return memberRelationRepository.findRandomOfAccompany(
+    override fun findCandidateOfAll(memberId: MemberId): List<MemberId> {
+        return memberRelationRepository.findRandomOfAll(
             memberId = memberId.value,
             limit = defaultCandidateSize
         ).map {
