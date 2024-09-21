@@ -59,7 +59,7 @@ class CoinController(
             .let { DojoApiResponse.success(it) }
     }
 
-    @GetMapping("/solved-pick")
+    @GetMapping("/current/question-set/solved-picks")
     fun getCoinBySolvedPick(): DojoApiResponse<CoinUseCase.CoinBySolvedPick> {
         val memberId = MemberPrincipalContextHolder.current().id
         return coinUseCase.getCoinBySolvedPickList(memberId).let {
