@@ -216,9 +216,10 @@ class MemberController(
     fun deleteFriend(
         @RequestBody request: MemberDeleteFriendRelationRequest,
     ): DojoApiResponse<Unit> {
+        val currentMemberId = MemberPrincipalContextHolder.current().id
         val command =
             MemberUseCase.UpdateFriendCommand(
-                fromId = request.fromMemberId,
+                fromId = currentMemberId,
                 toId = request.toMemberId
             )
         memberUseCase.deleteFriendRelation(command)
