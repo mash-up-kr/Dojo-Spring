@@ -39,9 +39,6 @@ data class MemberCreateFriendRelationRequest(
 @Schema(description = "팔로우 해제 요청")
 data class MemberDeleteFriendRelationRequest(
     @field:NotBlank
-    @Schema(description = "팔로우 해제 요청한 유저 id")
-    val fromMemberId: MemberId,
-    @field:NotBlank
     @Schema(description = "팔로우 해제 대상 유저 id")
     val toMemberId: MemberId,
 )

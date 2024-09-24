@@ -45,7 +45,6 @@ Content-Type: application/json
 Authorization: {{authorization}}
 
 {
-    "fromMemberId": "22ee8f4c-c2db-49c5-ad5d-22db7bb67796",
     "toMemberId": "71400a62-b535-48c3-967b-5a25a64137ae"
 }
 
