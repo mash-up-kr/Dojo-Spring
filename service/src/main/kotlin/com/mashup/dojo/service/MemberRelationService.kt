@@ -34,6 +34,11 @@ interface MemberRelationService {
         toId: MemberId,
     ): MemberRelationId
 
+    fun deleteFriendRelation(
+        fromId: MemberId,
+        toId: MemberId,
+    )
+
     fun isFriend(
         fromId: MemberId,
         toId: MemberId,
@@ -105,6 +110,18 @@ class DefaultMemberRelationService(
 
         val updatedRelation = toDomain.updateToFriend()
         return MemberRelationId(memberRelationRepository.save(updatedRelation.toEntity()).id)
+    }
+
+    @Transactional
+    override fun deleteFriendRelation(
+        fromId: MemberId,
+        toId: MemberId,
+    ) {
+        val relation = memberRelationRepository.findByFromIdAndToId(fromId.value, toId.value)?.toDomain() ?: throw DojoException.of(DojoExceptionType.FRIEND_NOT_FOUND)
+        if (relation.relation == RelationType.ACCOMPANY) {
+            throw DojoException.of(DojoExceptionType.ALREADY_ACCOMPANY)
+        }
+        relation.accompany()
     }
 
     override fun isFriend(

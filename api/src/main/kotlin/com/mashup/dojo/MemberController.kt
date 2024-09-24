@@ -8,6 +8,7 @@ import com.mashup.dojo.domain.MemberRelationId
 import com.mashup.dojo.dto.FriendSpacePickResponse
 import com.mashup.dojo.dto.MemberCreateFriendRelationRequest
 import com.mashup.dojo.dto.MemberCreateRequest
+import com.mashup.dojo.dto.MemberDeleteFriendRelationRequest
 import com.mashup.dojo.dto.MemberLoginRequest
 import com.mashup.dojo.dto.MemberProfileResponse
 import com.mashup.dojo.dto.MemberSearchResponse
@@ -21,6 +22,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -204,6 +206,23 @@ class MemberController(
         @RequestBody request: MemberCreateFriendRelationRequest,
     ): DojoApiResponse<MemberRelationId> {
         return DojoApiResponse.success(memberUseCase.updateFriendRelation(MemberUseCase.UpdateFriendCommand(request.fromMemberId, request.toMemberId)))
+    }
+
+    @DeleteMapping("/member/friend")
+    @Operation(
+        summary = "친구(팔로우)해제 API",
+        description = "from 이 to 에 대한 친구(팔로우)를 해제합니다. 이미 친구 관계가 아니라면 예외를 반환해요."
+    )
+    fun deleteFriend(
+        @RequestBody request: MemberDeleteFriendRelationRequest,
+    ): DojoApiResponse<Unit> {
+        val command =
+            MemberUseCase.UpdateFriendCommand(
+                fromId = request.fromMemberId,
+                toId = request.toMemberId
+            )
+        memberUseCase.deleteFriendRelation(command)
+        return DojoApiResponse.success()
     }
 
     @GetMapping("/member/my-space/pick")

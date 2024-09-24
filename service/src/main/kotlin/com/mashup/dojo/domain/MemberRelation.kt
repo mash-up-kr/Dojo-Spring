@@ -35,6 +35,10 @@ data class MemberRelation(
     fun updateToFriend(): MemberRelation {
         return this.copy(relation = RelationType.FRIEND, lastUpdatedAt = LocalDateTime.now())
     }
+
+    fun accompany(): MemberRelation {
+        return this.copy(relation = RelationType.ACCOMPANY, lastUpdatedAt = LocalDateTime.now())
+    }
 }
 
 enum class RelationType {
