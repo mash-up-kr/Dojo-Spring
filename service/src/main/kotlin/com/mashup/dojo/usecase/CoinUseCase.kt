@@ -74,7 +74,7 @@ class DefaultCoinUseCase(
             pickService.getSolvedPickList(
                 pickerMemberId = memberId,
                 questionSetId = operatingQSet.id
-            ).size
+            ).filter { pick -> pick.pickedId.value != "SKIP" }.size
 
         return CoinUseCase.CoinBySolvedPick(solvedPickCount * provideCoinByCompletePick)
     }

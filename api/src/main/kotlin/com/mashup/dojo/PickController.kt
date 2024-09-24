@@ -7,6 +7,7 @@ import com.mashup.dojo.domain.PickOpenItem
 import com.mashup.dojo.domain.PickSort
 import com.mashup.dojo.domain.QuestionId
 import com.mashup.dojo.dto.CreatePickRequest
+import com.mashup.dojo.dto.CreatePickResponse
 import com.mashup.dojo.dto.PickDetailPaging
 import com.mashup.dojo.dto.PickOpenItemDto
 import com.mashup.dojo.dto.PickOpenRequest
@@ -165,20 +166,18 @@ class PickController(
     )
     fun create(
         @RequestBody request: CreatePickRequest,
-    ): DojoApiResponse<PickId> {
+    ): DojoApiResponse<CreatePickResponse> {
         val currentMemberId = MemberPrincipalContextHolder.current().id
-        val pickId =
-            pickUseCase.createPick(
-                PickUseCase.CreatePickCommand(
-                    questionSheetId = request.questionSheetId,
-                    questionSetId = request.questionSetId,
-                    questionId = request.questionId,
-                    pickerId = currentMemberId,
-                    pickedId = request.pickedId
-                )
+        return pickUseCase.createPick(
+            PickUseCase.CreatePickCommand(
+                questionSheetId = request.questionSheetId,
+                questionSetId = request.questionSetId,
+                questionId = request.questionId,
+                pickerId = currentMemberId,
+                pickedId = request.pickedId,
+                skip = request.skip
             )
-
-        return DojoApiResponse.success(pickId)
+        ).let { DojoApiResponse.success(CreatePickResponse(it.pickId, it.coin)) }
     }
 
     @GetMapping("/next-pick-time")

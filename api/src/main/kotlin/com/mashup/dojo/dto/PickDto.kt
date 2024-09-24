@@ -24,6 +24,16 @@ data class CreatePickRequest(
     val questionId: QuestionId,
     @Schema(description = "후보자 중 선택한 대상 멤버 id")
     val pickedId: MemberId,
+    @Schema(description = "질문 스킵 여부")
+    val skip: Boolean,
+)
+
+@Schema(description = "Pick 생성 응답")
+data class CreatePickResponse(
+    @Schema(description = "픽 id")
+    val pickId: PickId,
+    @Schema(description = "획득한 코인")
+    val coin: Int,
 )
 
 data class ReceivedPickPagingGetResponse(
