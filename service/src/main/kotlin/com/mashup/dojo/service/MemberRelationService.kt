@@ -121,7 +121,7 @@ class DefaultMemberRelationService(
         if (relation.relation == RelationType.ACCOMPANY) {
             throw DojoException.of(DojoExceptionType.ALREADY_ACCOMPANY)
         }
-        relation.accompany()
+        memberRelationRepository.save(relation.accompany().toEntity())
     }
 
     override fun isFriend(
